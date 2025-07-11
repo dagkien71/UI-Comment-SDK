@@ -1,0 +1,35 @@
+# Thư mục cài đặt package
+node_modules/
+
+# File build, output
+dist/
+build/
+coverage/
+
+# File log
+*.log
+npm-debug.log*
+
+# File môi trường, bí mật
+.env
+.env.*
+
+# File hệ điều hành
+.DS_Store
+Thumbs.db
+
+# File editor/IDE
+.vscode/
+.idea/
+*.swp
+
+# File tạm của hệ thống
+*.tmp
+*.temp
+
+# File test output
+*.lcov
+
+# File lock của hệ thống cũ
+yarn.lock
+pnpm-lock.yaml
