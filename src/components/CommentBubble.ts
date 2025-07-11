@@ -352,6 +352,21 @@ export class CommentBubble {
         // Update bubble appearance
         this.updateBubbleAppearance();
       },
+      onDeleteComment: async (commentId: string) => {
+        console.log("🗑️ Deleting comment:", commentId);
+        await this.props.onDelete(commentId);
+
+        // Update bubble appearance after deletion
+        this.updateBubbleAppearance();
+
+        // If this was the main comment being deleted, close modal
+        if (commentId === this.props.comment.id) {
+          if (this.modal) {
+            this.modal.destroy();
+            this.modal = null;
+          }
+        }
+      },
     });
 
     console.log("✅ Modal created, using CommentManager to show");

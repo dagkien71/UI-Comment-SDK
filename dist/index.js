@@ -1818,6 +1818,70 @@ class CommentModal {
         const timeAgo = document.createElement("span");
         timeAgo.className = "uicm-comment-time";
         timeAgo.textContent = this.formatTimeAgo(comment.createdAt);
+        // Add delete button for comments (only show if onDeleteComment callback is provided)
+        if (this.props.onDeleteComment) {
+            const deleteButton = document.createElement("button");
+            deleteButton.className = "uicm-comment-delete-btn";
+            deleteButton.innerHTML = "🗑️";
+            deleteButton.title = "Delete comment";
+            deleteButton.style.cssText = `
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        color: #6b7280;
+        font-size: 14px;
+        margin-left: 8px;
+        transition: all 0.2s ease;
+      `;
+            // Hover effects
+            deleteButton.addEventListener("mouseenter", () => {
+                deleteButton.style.backgroundColor = "#fee2e2";
+                deleteButton.style.color = "#dc2626";
+            });
+            deleteButton.addEventListener("mouseleave", () => {
+                deleteButton.style.backgroundColor = "transparent";
+                deleteButton.style.color = "#6b7280";
+            });
+            // Delete functionality
+            deleteButton.addEventListener("click", async (e) => {
+                e.stopPropagation();
+                if (confirm("Are you sure you want to delete this comment? This action cannot be undone.")) {
+                    try {
+                        deleteButton.disabled = true;
+                        deleteButton.innerHTML = "⏳";
+                        deleteButton.title = "Deleting...";
+                        await this.props.onDeleteComment(comment.id);
+                        // Remove the comment item from DOM
+                        item.style.opacity = "0.5";
+                        item.style.transform = "translateX(-100%)";
+                        item.style.transition = "all 0.3s ease";
+                        setTimeout(() => {
+                            item.remove();
+                            // Update comment count
+                            const commentCount = this.element.querySelector(".uicm-comment-count");
+                            if (commentCount) {
+                                const remainingComments = this.props.comments.filter((c) => c.id !== comment.id).length;
+                                commentCount.textContent = `${remainingComments} comment${remainingComments !== 1 ? "s" : ""}`;
+                                // If no comments left, close modal
+                                if (remainingComments === 0) {
+                                    this.props.onClose();
+                                }
+                            }
+                        }, 300);
+                    }
+                    catch (error) {
+                        console.error("Failed to delete comment:", error);
+                        deleteButton.disabled = false;
+                        deleteButton.innerHTML = "🗑️";
+                        deleteButton.title = "Delete comment";
+                        alert("Failed to delete comment. Please try again.");
+                    }
+                }
+            });
+            commentHeader.appendChild(deleteButton);
+        }
         commentHeader.appendChild(authorName);
         commentHeader.appendChild(roleBadge);
         commentHeader.appendChild(timeAgo);
@@ -2557,6 +2621,19 @@ class CommentBubble {
                 await this.props.onStatusChange(commentId, status);
                 // Update bubble appearance
                 this.updateBubbleAppearance();
+            },
+            onDeleteComment: async (commentId) => {
+                console.log("🗑️ Deleting comment:", commentId);
+                await this.props.onDelete(commentId);
+                // Update bubble appearance after deletion
+                this.updateBubbleAppearance();
+                // If this was the main comment being deleted, close modal
+                if (commentId === this.props.comment.id) {
+                    if (this.modal) {
+                        this.modal.destroy();
+                        this.modal = null;
+                    }
+                }
             },
         });
         console.log("✅ Modal created, using CommentManager to show");

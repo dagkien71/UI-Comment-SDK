@@ -9,6 +9,7 @@ export interface CommentModalProps {
     onClose: () => void;
     onAddReply: (commentId: string, content: string, user?: User, attachments?: CommentAttachment[]) => Promise<void>;
     onStatusChange: (commentId: string, status: CommentStatus) => Promise<void>;
+    onDeleteComment?: (commentId: string) => Promise<void>;
 }
 export declare class CommentModal {
     private element;
