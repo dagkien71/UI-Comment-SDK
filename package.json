@@ -1,0 +1,72 @@
+{
+  "name": "ui-comment-sdk",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A modern SDK for embedding comment functionality directly on web UI elements",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "serve": "serve demo",
+    "clean": "rimraf dist",
+    "prebuild": "npm run clean",
+    "prepublishOnly": "npm run build",
+    "prepack": "npm run build"
+  },
+  "keywords": [
+    "comment",
+    "ui",
+    "sdk",
+    "annotation",
+    "feedback",
+    "collaboration",
+    "review",
+    "sidebar",
+    "modal",
+    "tester",
+    "support test"
+  ],
+  "author": "UI Comment SDK Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/ui-comment-sdk.git"
+  },
+  "homepage": "https://github.com/your-username/ui-comment-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/your-username/ui-comment-sdk/issues"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "rimraf": "^5.0.5",
+    "rollup": "^4.6.1",
+    "rollup-plugin-postcss": "^4.0.2",
+    "serve": "^14.2.1",
+    "tailwindcss": "^3.3.6",
+    "tslib": "^2.6.2",
+    "typescript": "^5.3.2"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  }
+}

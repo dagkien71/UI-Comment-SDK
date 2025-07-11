@@ -1,0 +1,137 @@
+/* Image Modal Styles */
+.uicm-image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  pointer-events: auto;
+}
+
+.uicm-image-modal.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.uicm-image-container {
+  position: relative;
+  max-width: 80vw;
+  max-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.uicm-image-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
+  cursor: zoom-in;
+  user-select: none;
+}
+
+.uicm-image-close {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 32px;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.uicm-image-close:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.uicm-image-download {
+  position: absolute;
+  top: -40px;
+  right: 50px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.uicm-image-download:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.uicm-image-zoom-in:hover,
+.uicm-image-zoom-out:hover,
+.uicm-image-reset:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .uicm-image-container {
+    max-width: 95vw;
+    max-height: 90vh;
+  }
+
+  .uicm-image-close {
+    top: -50px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    font-size: 28px;
+  }
+
+  .uicm-image-download {
+    top: -50px;
+    right: 50px;
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
+  .uicm-image-zoom-in,
+  .uicm-image-zoom-out,
+  .uicm-image-reset {
+    top: -50px;
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .uicm-image-zoom-in {
+    right: 90px;
+  }
+
+  .uicm-image-zoom-out {
+    right: 130px;
+  }
+
+  .uicm-image-reset {
+    right: 170px;
+  }
+}

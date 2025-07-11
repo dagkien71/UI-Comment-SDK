@@ -1,0 +1,44 @@
+import { CommentMode, CommentSDKConfig, EventCallback, SDKEvents, Comment } from "../types";
+export declare class CommentSDK {
+    private config;
+    private commentManager;
+    private debugIcon;
+    private settingsButton;
+    private sidebarButton;
+    private sidebar;
+    private root;
+    private isInitialized;
+    private isNavigatingFromSidebar;
+    private eventListeners;
+    constructor(config: CommentSDKConfig);
+    private validateConfig;
+    init(): Promise<void>;
+    private setupDOM;
+    private setupKeyboardShortcuts;
+    private handleKeyboardShortcut;
+    private toggleMode;
+    setMode(mode: CommentMode): void;
+    getMode(): CommentMode;
+    reload(): Promise<void>;
+    getComments(): Comment[];
+    private openSidebar;
+    private navigateToComment;
+    private highlightCommentOnPage;
+    private findElementByXPath;
+    private checkForHighlightComment;
+    getCommentsForElement(element: Element): Comment[];
+    highlightElement(element: Element): void;
+    setTheme(theme: "light" | "dark"): void;
+    getTheme(): "light" | "dark";
+    on<T extends keyof SDKEvents>(event: T, callback: EventCallback<T>): void;
+    off<T extends keyof SDKEvents>(event: T, callback: EventCallback<T>): void;
+    private emit;
+    destroy(): void;
+    isReady(): boolean;
+    getVersion(): string;
+    getConfig(): Readonly<CommentSDKConfig>;
+    testBubbleClicks(): void;
+    testSidebar(): void;
+}
+export declare function initCommentSDK(config: CommentSDKConfig): CommentSDK;
+//# sourceMappingURL=CommentSDK.d.ts.map
