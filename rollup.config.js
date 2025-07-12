@@ -7,26 +7,26 @@ import postcss from "rollup-plugin-postcss";
 const isProduction = process.env.NODE_ENV === "production";
 
 export default [
-  // Main builds
+  // Main builds (development)
   {
     input: "src/index.ts",
     output: [
       {
         file: "dist/index.js",
         format: "cjs",
-        sourcemap: true,
+        sourcemap: !isProduction,
         exports: "named",
       },
       {
         file: "dist/index.esm.js",
         format: "es",
-        sourcemap: true,
+        sourcemap: !isProduction,
       },
       {
         file: "dist/index.umd.js",
         format: "umd",
         name: "UICommentSDK",
-        sourcemap: true,
+        sourcemap: !isProduction,
         exports: "named",
         globals: {
           react: "React",
@@ -49,8 +49,8 @@ export default [
       }),
       typescript({
         tsconfig: "./tsconfig.json",
-        sourceMap: true,
-        inlineSources: true,
+        sourceMap: !isProduction,
+        inlineSources: !isProduction,
       }),
       ...(isProduction ? [terser()] : []),
     ],
@@ -58,7 +58,7 @@ export default [
       return id === "react" || id === "react-dom";
     },
   },
-  // CDN builds (minified)
+  // CDN builds (minified for production)
   {
     input: "src/index.ts",
     output: [
@@ -101,9 +101,17 @@ export default [
         compress: {
           drop_console: true,
           drop_debugger: true,
+          pure_funcs: ["console.log", "console.info", "console.debug"],
+          passes: 2,
         },
         mangle: {
           toplevel: true,
+          properties: {
+            regex: /^_/,
+          },
+        },
+        format: {
+          comments: false,
         },
       }),
     ],
