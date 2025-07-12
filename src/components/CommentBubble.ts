@@ -113,8 +113,10 @@ export class CommentBubble {
     switch (this.props.comment.status) {
       case CommentStatus.BUG:
         return { bg: "#dc3545", border: "#c82333", text: "white" }; // Red
-      case CommentStatus.DEV_COMPLETED:
+      case CommentStatus.FEATURE_REQUEST:
         return { bg: "#ffc107", border: "#e0a800", text: "black" }; // Yellow
+      case CommentStatus.DEV_COMPLETED:
+        return { bg: "#3b82f6", border: "#2066b3", text: "white" }; // Blue
       case CommentStatus.DONE:
         return { bg: "#28a745", border: "#1e7e34", text: "white" }; // Green
       case CommentStatus.ARCHIVED:
@@ -403,6 +405,15 @@ export class CommentBubble {
         ...this.props.comment.replies,
       ];
       this.modal.updateComments(updatedComments);
+    }
+  }
+
+  public updateUser(user: User): void {
+    this.props.currentUser = user;
+    console.log("🔄 CommentBubble: User updated:", user.name);
+    // Refresh modal if it's open
+    if (this.modal) {
+      this.modal.updateUser(user);
     }
   }
 

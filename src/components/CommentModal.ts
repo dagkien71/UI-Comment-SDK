@@ -133,128 +133,135 @@ export class CommentModal {
     // Remove from DOM temporarily
     document.body.removeChild(modal);
 
-    // Gradient header bar (similar to comment form)
+    // Gradient header bar
     const headerBar = document.createElement("div");
     headerBar.className = "uicm-modal-header-bar";
 
-    // Header
+    // Main header container
     const header = document.createElement("div");
     header.className = "uicm-modal-header";
 
+    // Header content wrapper
     const headerContent = document.createElement("div");
     headerContent.className = "uicm-modal-header-content";
+
+    // Top section: Title, description, and close button
+    const topSection = document.createElement("div");
+    topSection.className = "uicm-modal-top-section";
+
+    // Left side: Title and description
+    const titleSection = document.createElement("div");
+    titleSection.className = "uicm-modal-title-section";
 
     const title = document.createElement("h3");
     title.className = "uicm-modal-title";
     title.textContent = "Comment";
 
-    const commentCount = document.createElement("span");
-    commentCount.className = "uicm-comment-count";
-    commentCount.textContent = `${this.props.comments.length} comment${
-      this.props.comments.length !== 1 ? "s" : ""
-    }`;
+    const description = document.createElement("p");
+    description.className = "uicm-modal-description";
+    description.textContent = "View and manage feedback";
 
-    // Status display
-    const statusDisplay = document.createElement("div");
-    statusDisplay.className = "uicm-status-display";
+    titleSection.appendChild(title);
+    titleSection.appendChild(description);
 
-    const mainComment = this.props.comments[0];
-    const statusBadge = document.createElement("span");
-    statusBadge.className = `uicm-status-badge status-${mainComment.status}`;
-    statusBadge.textContent = mainComment.status.toUpperCase();
-
-    statusDisplay.appendChild(statusBadge);
-
-    headerContent.appendChild(title);
-    headerContent.appendChild(commentCount);
-    headerContent.appendChild(statusDisplay);
-
-    const actionButtons = document.createElement("div");
-    actionButtons.className = "uicm-modal-actions";
-
-    // Status change dropdown
-    const statusControl = document.createElement("div");
-    statusControl.className = "uicm-status-control";
-
-    const statusDropdown = document.createElement("select");
-    statusDropdown.className = "uicm-status-dropdown";
-    statusDropdown.value = mainComment.status;
-
-    // Add the 3 main status options (exclude ARCHIVED from dropdown)
-    const mainStatuses = [
-      CommentStatus.BUG,
-      CommentStatus.DEV_COMPLETED,
-      CommentStatus.DONE,
-    ];
-
-    mainStatuses.forEach((status) => {
-      const option = document.createElement("option");
-      option.value = status;
-      option.textContent = status.toUpperCase();
-      option.selected = status === mainComment.status;
-      statusDropdown.appendChild(option);
-    });
-
-    // If current status is ARCHIVED, add it as selected option
-    if (mainComment.status === CommentStatus.ARCHIVED) {
-      const option = document.createElement("option");
-      option.value = CommentStatus.ARCHIVED;
-      option.textContent = "ARCHIVED";
-      option.selected = true;
-      statusDropdown.appendChild(option);
-    }
-
-    // Status change handler
-    statusDropdown.addEventListener("change", async (e) => {
-      const newStatus = (e.target as HTMLSelectElement).value as CommentStatus;
-      if (newStatus !== mainComment.status) {
-        await this.props.onStatusChange(mainComment.id, newStatus);
-        // Update the status badge
-        statusBadge.textContent = newStatus.toUpperCase();
-        statusBadge.className = `uicm-status-badge status-${newStatus}`;
-
-        // Update archive button visibility
-        archiveButton.style.display =
-          newStatus === CommentStatus.DONE ? "inline-block" : "none";
-      }
-    });
-
-    statusControl.appendChild(statusDropdown);
-
-    // Archive button (show for DONE status or if already archived)
-    const archiveButton = document.createElement("button");
-    archiveButton.className = "uicm-archive-button";
-    archiveButton.innerHTML = "📦 Archive";
-    archiveButton.title = "Archive Comment";
-    archiveButton.style.display =
-      mainComment.status === CommentStatus.DONE ||
-      mainComment.status === CommentStatus.ARCHIVED
-        ? "inline-block"
-        : "none";
-    archiveButton.onclick = async () => {
-      await this.props.onStatusChange(mainComment.id, CommentStatus.ARCHIVED);
-      statusBadge.textContent = CommentStatus.ARCHIVED.toUpperCase();
-      statusBadge.className = `uicm-status-badge status-${CommentStatus.ARCHIVED}`;
-
-      // Update dropdown to show archived status
-      statusDropdown.value = CommentStatus.ARCHIVED;
-
-      // Hide archive button since it's now archived
-      archiveButton.style.display = "none";
-    };
-
+    // Right side: Close button
     const closeButton = document.createElement("button");
     closeButton.className = "uicm-close-button";
     closeButton.innerHTML = "×";
     closeButton.title = "Close";
     closeButton.onclick = () => this.props.onClose();
 
-    actionButtons.appendChild(statusControl);
-    actionButtons.appendChild(archiveButton);
-    actionButtons.appendChild(closeButton);
+    topSection.appendChild(titleSection);
+    topSection.appendChild(closeButton);
 
+    // Bottom section: Status select and delete button
+    const bottomSection = document.createElement("div");
+    bottomSection.className = "uicm-modal-bottom-section";
+
+    const mainComment = this.props.comments[0];
+
+    // Status select with color coding
+    const statusSelect = document.createElement("select");
+    statusSelect.className = "uicm-status-select";
+    statusSelect.value = mainComment.status;
+    statusSelect.setAttribute("data-status", mainComment.status);
+
+    // Add status options with color coding
+    const statuses = [
+      CommentStatus.BUG,
+      CommentStatus.FEATURE_REQUEST,
+      CommentStatus.DEV_COMPLETED,
+      CommentStatus.DONE,
+      CommentStatus.ARCHIVED,
+    ];
+
+    statuses.forEach((status) => {
+      const option = document.createElement("option");
+      option.value = status;
+      option.textContent = status.toUpperCase();
+      option.selected = status === mainComment.status;
+      statusSelect.appendChild(option);
+    });
+
+    // Status change handler
+    statusSelect.addEventListener("change", async (e) => {
+      const newStatus = (e.target as HTMLSelectElement).value as CommentStatus;
+      if (newStatus !== mainComment.status) {
+        await this.props.onStatusChange(mainComment.id, newStatus);
+        // Update the data-status attribute for color coding
+        statusSelect.setAttribute("data-status", newStatus);
+      }
+    });
+
+    // Delete button (only show if onDeleteComment callback is provided)
+    if (this.props.onDeleteComment) {
+      const deleteButton = document.createElement("button");
+      deleteButton.className = "uicm-delete-button";
+      deleteButton.innerHTML = "🗑️";
+      deleteButton.title = "Delete comment";
+
+      // Delete functionality
+      deleteButton.addEventListener("click", async (e) => {
+        e.stopPropagation();
+
+        if (
+          confirm(
+            "Are you sure you want to delete this comment and all its replies? This action cannot be undone."
+          )
+        ) {
+          try {
+            deleteButton.disabled = true;
+            deleteButton.innerHTML = "⏳";
+            deleteButton.title = "Deleting...";
+            deleteButton.style.opacity = "0.7";
+
+            // Delete the main comment (which will delete all replies too)
+            await this.props.onDeleteComment!(mainComment.id);
+
+            // Close the modal after successful deletion
+            this.props.onClose();
+          } catch (error) {
+            console.error("Failed to delete comment:", error);
+            deleteButton.disabled = false;
+            deleteButton.innerHTML = "🗑️";
+            deleteButton.title = "Delete comment";
+            deleteButton.style.opacity = "1";
+            alert("Failed to delete comment. Please try again.");
+          }
+        }
+      });
+
+      bottomSection.appendChild(statusSelect);
+      bottomSection.appendChild(deleteButton);
+    } else {
+      // If no delete function, just add the status select
+      bottomSection.appendChild(statusSelect);
+    }
+
+    // Assemble header
+    headerContent.appendChild(topSection);
+    headerContent.appendChild(bottomSection);
     header.appendChild(headerContent);
-    header.appendChild(actionButtons);
 
     // Comments list
     const commentsList = document.createElement("div");
@@ -314,90 +321,6 @@ export class CommentModal {
     const timeAgo = document.createElement("span");
     timeAgo.className = "uicm-comment-time";
     timeAgo.textContent = this.formatTimeAgo(comment.createdAt);
-
-    // Add delete button for comments (only show if onDeleteComment callback is provided)
-    if (this.props.onDeleteComment) {
-      const deleteButton = document.createElement("button");
-      deleteButton.className = "uicm-comment-delete-btn";
-      deleteButton.innerHTML = "🗑️";
-      deleteButton.title = "Delete comment";
-      deleteButton.style.cssText = `
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 4px;
-        border-radius: 4px;
-        color: #6b7280;
-        font-size: 14px;
-        margin-left: 8px;
-        transition: all 0.2s ease;
-      `;
-
-      // Hover effects
-      deleteButton.addEventListener("mouseenter", () => {
-        deleteButton.style.backgroundColor = "#fee2e2";
-        deleteButton.style.color = "#dc2626";
-      });
-
-      deleteButton.addEventListener("mouseleave", () => {
-        deleteButton.style.backgroundColor = "transparent";
-        deleteButton.style.color = "#6b7280";
-      });
-
-      // Delete functionality
-      deleteButton.addEventListener("click", async (e) => {
-        e.stopPropagation();
-
-        if (
-          confirm(
-            "Are you sure you want to delete this comment? This action cannot be undone."
-          )
-        ) {
-          try {
-            deleteButton.disabled = true;
-            deleteButton.innerHTML = "⏳";
-            deleteButton.title = "Deleting...";
-
-            await this.props.onDeleteComment!(comment.id);
-
-            // Remove the comment item from DOM
-            item.style.opacity = "0.5";
-            item.style.transform = "translateX(-100%)";
-            item.style.transition = "all 0.3s ease";
-
-            setTimeout(() => {
-              item.remove();
-
-              // Update comment count
-              const commentCount = this.element.querySelector(
-                ".uicm-comment-count"
-              );
-              if (commentCount) {
-                const remainingComments = this.props.comments.filter(
-                  (c) => c.id !== comment.id
-                ).length;
-                commentCount.textContent = `${remainingComments} comment${
-                  remainingComments !== 1 ? "s" : ""
-                }`;
-
-                // If no comments left, close modal
-                if (remainingComments === 0) {
-                  this.props.onClose();
-                }
-              }
-            }, 300);
-          } catch (error) {
-            console.error("Failed to delete comment:", error);
-            deleteButton.disabled = false;
-            deleteButton.innerHTML = "🗑️";
-            deleteButton.title = "Delete comment";
-            alert("Failed to delete comment. Please try again.");
-          }
-        }
-      });
-
-      commentHeader.appendChild(deleteButton);
-    }
 
     commentHeader.appendChild(authorName);
     commentHeader.appendChild(roleBadge);
@@ -901,6 +824,13 @@ export class CommentModal {
     console.log("✅ Modal updated with new comments:", comments.length);
   }
 
+  public updateUser(user: User): void {
+    this.props.currentUser = user;
+    console.log("🔄 CommentModal: User updated:", user.name);
+    // Refresh the modal to show updated user info
+    this.refreshCommentsList();
+  }
+
   private refreshCommentsList(): void {
     console.log("🔄 Refreshing comments list");
     const commentsList = this.element.querySelector(".uicm-comments-list");
@@ -968,9 +898,9 @@ export class CommentModal {
   }
 
   public reposition(): void {
-    // Reposition modal to ensure it stays within viewport
+    // Reposition modal to ensure it stays within viewport with 100px padding
     repositionInViewport(this.element, {
-      padding: 20,
+      padding: 100,
       preferredSide: "bottom",
     });
   }

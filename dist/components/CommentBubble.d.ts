@@ -26,6 +26,7 @@ export declare class CommentBubble {
     private handleClick;
     private showModal;
     updateComment(comment: Comment): void;
+    updateUser(user: User): void;
     private updateBubbleAppearance;
     updatePosition(position: {
         x: number;

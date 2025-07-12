@@ -1,4 +1,5 @@
 import { User } from "../types";
+import { HybridCommentStorage } from "../storage/HybridCommentStorage";
 
 export interface ProfileSettingsModalProps {
   currentUser: User;
@@ -238,7 +239,23 @@ export class ProfileSettingsModal {
         role: role as any, // Type assertion for role
       };
 
+      // Check if name has changed
+      const nameChanged = this.props.currentUser.name !== name;
+
+      // Update profile first
       await this.props.onSave(updatedUser);
+
+      // If name changed, update all comments
+      if (nameChanged) {
+        console.log(
+          `🔄 Updating user name from "${this.props.currentUser.name}" to "${name}" in all comments...`
+        );
+        await HybridCommentStorage.updateUserNameInAllComments(
+          this.props.currentUser.id,
+          name
+        );
+      }
+
       console.log("✅ Profile updated successfully");
       this.props.onClose();
     } catch (error) {

@@ -1,4 +1,4 @@
-import { CommentSDKConfig } from "../types";
+import { CommentManagerConfig } from "../types";
 import { HybridCommentStorage } from "../storage/HybridCommentStorage";
 
 /**
@@ -7,7 +7,7 @@ import { HybridCommentStorage } from "../storage/HybridCommentStorage";
  */
 export function createHybridStorageConfig(
   projectId: string = "demo-project"
-): CommentSDKConfig {
+): CommentManagerConfig {
   return {
     projectId,
     currentUser: {

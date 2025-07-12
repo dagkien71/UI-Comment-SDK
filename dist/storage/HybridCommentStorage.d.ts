@@ -13,6 +13,7 @@ export declare class HybridCommentStorage {
     static addComment(comment: Omit<Comment, "id" | "createdAt">): Promise<Comment>;
     static updateComment(updatedComment: Comment): Promise<Comment>;
     static deleteComment(commentId: string): Promise<void>;
+    static updateUserNameInAllComments(userId: string, newName: string): Promise<void>;
     static getCommentsForUrl(url: string): Promise<Comment[]>;
     private static generateId;
     static clearAllComments(): Promise<void>;

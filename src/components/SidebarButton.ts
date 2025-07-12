@@ -67,6 +67,12 @@ export class SidebarButton {
     }
   }
 
+  public updateUser(user: User): void {
+    this.props.currentUser = user;
+    // Sidebar button doesn't display user info, so no UI update needed
+    console.log("🔄 SidebarButton: User updated:", user.name);
+  }
+
   public destroy(): void {
     this.element.remove();
   }

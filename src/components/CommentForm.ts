@@ -129,30 +129,51 @@ export class CommentForm {
     // Remove from DOM temporarily
     document.body.removeChild(form);
 
-    // Header
+    // Header with improved layout
     const header = document.createElement("div");
     header.className = "uicm-form-header";
+
+    // Header content container
+    const headerContent = document.createElement("div");
+    headerContent.className = "uicm-form-header-content";
+
+    // Title section
+    const titleSection = document.createElement("div");
+    titleSection.className = "uicm-form-title-section";
 
     const title = document.createElement("h2");
     title.className = "uicm-form-title";
     title.textContent = "Add Comment";
 
+    const subtitle = document.createElement("p");
+    subtitle.className = "uicm-form-subtitle";
+    subtitle.textContent = "Share your thoughts or feedback";
+
+    titleSection.appendChild(title);
+    titleSection.appendChild(subtitle);
+
+    // Action buttons section
+    const actionSection = document.createElement("div");
+    actionSection.className = "uicm-form-action-section";
+
+    // Close button with improved styling
     const closeButton = document.createElement("button");
     closeButton.className = "uicm-close-button";
-    closeButton.innerHTML = `
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-      </svg>
-    `;
-    closeButton.setAttribute("aria-label", "Close");
+    closeButton.innerHTML = "×";
+    closeButton.setAttribute("aria-label", "Close comment form");
+    closeButton.title = "Close";
     closeButton.onclick = (e) => {
       e.preventDefault();
       e.stopPropagation();
       this.props.onCancel();
     };
 
-    header.appendChild(title);
-    header.appendChild(closeButton);
+    actionSection.appendChild(closeButton);
+
+    // Assemble header
+    headerContent.appendChild(titleSection);
+    headerContent.appendChild(actionSection);
+    header.appendChild(headerContent);
 
     // Content area
     const content = document.createElement("div");
@@ -613,9 +634,9 @@ export class CommentForm {
   }
 
   public reposition(): void {
-    // Reposition form to ensure it stays within viewport
+    // Reposition form to ensure it stays within viewport with 100px padding
     repositionInViewport(this.element, {
-      padding: 20,
+      padding: 100,
       preferredSide: "bottom",
     });
   }

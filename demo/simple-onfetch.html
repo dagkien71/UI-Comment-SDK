@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple onFetchJsonFile Demo</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .test-area {
+        background: #f8f9fa;
+        border: 2px dashed #dee2e6;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      .button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .button:hover {
+        background: #0056b3;
+      }
+      .info {
+        background: #e7f3ff;
+        border: 1px solid #b3d9ff;
+        padding: 15px;
+        border-radius: 6px;
+        margin: 15px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🚀 Simple onFetchJsonFile Demo</h1>
+
+      <div class="info">
+        <h3>✨ v1.1.0 - Flexible Backend Integration</h3>
+        <p>
+          This demo uses localStorage as backend. You can easily switch to
+          JSONBin.io, Firebase, or any other backend!
+        </p>
+      </div>
+
+      <div class="test-area">
+        <h3>🎯 Test Area</h3>
+        <p>Click 🔧 icon → Click anywhere to add comments</p>
+
+        <div
+          style="
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+          "
+        >
+          <p>This is a test element</p>
+          <button class="button" onclick="alert('Button clicked!')">
+            Test Button
+          </button>
+        </div>
+      </div>
+
+      <div class="info">
+        <h3>📊 Current Comments: <span id="comment-count">0</span></h3>
+        <button class="button" onclick="clearComments()">
+          Clear All Comments
+        </button>
+        <button class="button" onclick="showComments()">
+          Show Comments in Console
+        </button>
+      </div>
+    </div>
+
+    <script src="../dist/ui-comment-sdk.min.js"></script>
+    <script>
+      // Simple localStorage backend
+      const STORAGE_KEY = "ui-comment-sdk-demo";
+
+      const sdk = UICommentSDK.initCommentSDK({
+        projectId: "simple-demo",
+        theme: "light",
+
+        // Fetch comments from localStorage
+        onFetchJsonFile: async () => {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (stored) {
+            const data = JSON.parse(stored);
+            return { comments: data.comments || [] };
+          }
+          return { comments: [] };
+        },
+
+        // Save comments to localStorage
+        onUpdate: async (comments) => {
+          const data = {
+            comments,
+            lastUpdated: new Date().toISOString(),
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+          updateCommentCount();
+          console.log("✅ Comments saved to localStorage");
+        },
+      });
+
+      // Initialize SDK
+      sdk
+        .init()
+        .then(() => {
+          console.log("✅ SDK initialized!");
+          updateCommentCount();
+        })
+        .catch((error) => {
+          console.error("❌ Failed to initialize SDK:", error);
+        });
+
+      // Helper functions
+      function updateCommentCount() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const data = JSON.parse(stored);
+          document.getElementById("comment-count").textContent =
+            data.comments?.length || 0;
+        }
+      }
+
+      function clearComments() {
+        localStorage.removeItem(STORAGE_KEY);
+        sdk.reload().then(() => {
+          updateCommentCount();
+          console.log("✅ Comments cleared!");
+        });
+      }
+
+      function showComments() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const data = JSON.parse(stored);
+          console.log("📂 Current comments:", data.comments);
+        } else {
+          console.log("📭 No comments found");
+        }
+      }
+    </script>
+  </body>
+</html>

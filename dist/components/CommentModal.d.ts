@@ -23,6 +23,7 @@ export declare class CommentModal {
     private createCommentItem;
     private createReplyForm;
     updateComments(comments: Comment[]): void;
+    updateUser(user: User): void;
     private refreshCommentsList;
     private formatTimeAgo;
     private attachEventListeners;

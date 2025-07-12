@@ -6,7 +6,8 @@ export interface User {
 }
 export declare enum CommentStatus {
     BUG = "bug",// Màu đỏ - comment mới tạo
-    DEV_COMPLETED = "dev_completed",// Màu vàng - dev đã fix
+    FEATURE_REQUEST = "feature_request",// Màu vàng - yêu cầu tính năng mới
+    DEV_COMPLETED = "dev_completed",// Màu xanh dương - dev đã fix
     DONE = "done",// Màu xanh - tester đã review
     ARCHIVED = "archived"
 }
@@ -47,6 +48,23 @@ export interface CommentSDKConfig {
     theme?: "light" | "dark";
     autoInject?: boolean;
     debugMode?: boolean;
+    onLoadComments: () => Promise<Comment[]>;
+    onSaveComment: (comment: Omit<Comment, "id" | "createdAt">) => Promise<Comment>;
+    onUpdateComment?: (comment: Comment) => Promise<Comment>;
+    onDeleteComment?: (commentId: string) => Promise<void>;
+}
+export interface CommentSDKConfig {
+    projectId: string;
+    theme?: "light" | "dark";
+    onFetchJsonFile: () => Promise<{
+        comments: Comment[];
+    }>;
+    onUpdate: (comments: Comment[]) => Promise<void>;
+}
+export interface CommentManagerConfig {
+    projectId: string;
+    currentUser: User;
+    theme?: "light" | "dark";
     onLoadComments: () => Promise<Comment[]>;
     onSaveComment: (comment: Omit<Comment, "id" | "createdAt">) => Promise<Comment>;
     onUpdateComment?: (comment: Comment) => Promise<Comment>;

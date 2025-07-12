@@ -196,6 +196,41 @@ export class HybridCommentStorage {
     await this.saveComments(filteredComments);
   }
 
+  // Update user name in all comments
+  public static async updateUserNameInAllComments(
+    userId: string,
+    newName: string
+  ): Promise<void> {
+    const comments = await this.loadComments();
+    let hasChanges = false;
+
+    // Update main comments
+    for (const comment of comments) {
+      if (comment.createdBy.id === userId) {
+        comment.createdBy.name = newName;
+        hasChanges = true;
+      }
+
+      // Update replies
+      for (const reply of comment.replies) {
+        if (reply.createdBy.id === userId) {
+          reply.createdBy.name = newName;
+          hasChanges = true;
+        }
+      }
+    }
+
+    // Save only if there were changes
+    if (hasChanges) {
+      await this.saveComments(comments);
+      console.log(
+        `✅ Updated user name from ${userId} to "${newName}" in all comments`
+      );
+    } else {
+      console.log(`ℹ️ No comments found for user ${userId}`);
+    }
+  }
+
   // Get comments for URL
   public static async getCommentsForUrl(url: string): Promise<Comment[]> {
     const allComments = await this.loadComments();

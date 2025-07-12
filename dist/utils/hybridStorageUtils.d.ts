@@ -1,9 +1,9 @@
-import { CommentSDKConfig } from "../types";
+import { CommentManagerConfig } from "../types";
 /**
  * Creates a hybrid storage config for demo/development purposes
  * Saves comments to localStorage + exports to JSON file
  */
-export declare function createHybridStorageConfig(projectId?: string): CommentSDKConfig;
+export declare function createHybridStorageConfig(projectId?: string): CommentManagerConfig;
 /**
  * Hybrid storage utilities for demo/development
  */

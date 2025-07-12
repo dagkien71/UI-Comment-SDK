@@ -2,6 +2,65 @@
 
 A modern, glassmorphism-styled comment system that allows developers to easily add collaborative feedback functionality to any web application. Similar to Figma's comment mode, but for regular DOM elements.
 
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+npm install ui-comment-sdk
+```
+
+### Simple Setup
+
+```javascript
+import { initCommentSDK } from "ui-comment-sdk";
+
+const sdk = initCommentSDK({
+  projectId: "my-website",
+  theme: "light", // optional: "light" or "dark"
+  onFetchJsonFile: async () => {
+    // Fetch comments from your backend
+    const response = await fetch("/api/comments.json");
+    const data = await response.json();
+    return { comments: data.comments || [] };
+  },
+  onUpdate: async (comments) => {
+    // Save to your backend
+    await fetch("/api/comments.json", {
+      method: "POST",
+      body: JSON.stringify({ comments }),
+    });
+  },
+});
+
+await sdk.init();
+```
+
+### CDN Usage
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/ui-comment-sdk@1.1.0/dist/ui-comment-sdk.min.js"></script>
+<script>
+  const sdk = UICommentSDK.initCommentSDK({
+    projectId: "my-website",
+    theme: "light",
+    onFetchJsonFile: async () => {
+      const response = await fetch("/api/comments.json");
+      const data = await response.json();
+      return { comments: data.comments || [] };
+    },
+    onUpdate: async (comments) => {
+      await fetch("/api/comments.json", {
+        method: "POST",
+        body: JSON.stringify({ comments }),
+      });
+    },
+  });
+
+  sdk.init();
+</script>
+```
+
 ## ✨ Features
 
 - 🎯 **Click-to-Comment**: Click on any DOM element to add contextual comments
@@ -14,141 +73,78 @@ A modern, glassmorphism-styled comment system that allows developers to easily a
 - ⚡ **Performance Optimized**: Efficient XPath-based element tracking and debounced positioning
 - ⌨️ **Keyboard Shortcuts**: Toggle comment mode with `Ctrl+Alt+C` (or `Cmd+Alt+C` on Mac)
 
-## 🚀 Quick Start
-
-### Installation
-
-```bash
-npm install ui-comment-sdk
-```
-
-### Basic Usage
-
-```javascript
-import { initCommentSDK } from "ui-comment-sdk";
-
-const sdk = initCommentSDK({
-  projectId: "my-website",
-  currentUser: {
-    id: "user-123",
-    name: "John Doe",
-    avatar: "https://example.com/avatar.jpg", // optional
-  },
-  onLoadComments: async () => {
-    // Load comments from your backend
-    const response = await fetch("/api/comments");
-    return await response.json();
-  },
-  onSaveComment: async (comment) => {
-    // Save comment to your backend
-    const response = await fetch("/api/comments", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(comment),
-    });
-    return await response.json();
-  },
-  theme: "glass-light", // or 'glass-dark'
-});
-```
-
 ## 📚 API Reference
 
-### Configuration Options
+### Configuration
 
 ```typescript
 interface CommentSDKConfig {
-  projectId: string; // Unique identifier for your project
-  currentUser: User; // Current user information
-  onLoadComments: () => Promise<Comment[]>; // Function to load existing comments
-  onSaveComment: (
-    comment: Omit<Comment, "id" | "createdAt">
-  ) => Promise<Comment>; // Function to save new comments
-  onUpdateComment?: (comment: Comment) => Promise<Comment>; // Optional: Update existing comments
-  onDeleteComment?: (commentId: string) => Promise<void>; // Optional: Delete comments
-  theme?: "glass-light" | "glass-dark"; // UI theme (default: 'glass-light')
-  autoInject?: boolean; // Auto-initialize on DOM ready (default: true)
-  debugMode?: boolean; // Enable debug logging (default: false)
+  projectId: string; // Required: Unique project identifier
+  theme?: "light" | "dark"; // Optional: UI theme (default: 'light')
+  onFetchJsonFile: () => Promise<{ comments: Comment[] }>; // Required: Fetch comments
+  onUpdate: (comments: Comment[]) => Promise<void>; // Required: Save comments
 }
 ```
 
-### Data Structures
+### Data Types
 
 ```typescript
+interface Comment {
+  id: string;
+  content: string;
+  xpath: string;
+  url: string;
+  position: { x: number; y: number };
+  relativePosition: { x: number; y: number };
+  createdAt: string;
+  createdBy: User;
+  role: string;
+  replies: Comment[];
+  status: CommentStatus;
+  resolvedAt?: string;
+  archivedAt?: string;
+  attachments?: CommentAttachment[];
+}
+
 interface User {
   id: string;
   name: string;
   avatar?: string;
+  role?:
+    | "developer"
+    | "designer"
+    | "product-manager"
+    | "qa"
+    | "stakeholder"
+    | "other";
 }
 
-interface Comment {
-  id: string;
-  xpath: string; // XPath selector for the target element
-  content: string;
-  createdAt: string; // ISO date string
-  createdBy: User;
-  resolved: boolean;
-  replies?: Comment[]; // Nested replies
-  position?: { x: number; y: number }; // Optional cached position
+enum CommentStatus {
+  BUG = "bug",
+  FEATURE_REQUEST = "feature_request",
+  DEV_COMPLETED = "dev_completed",
+  DONE = "done",
+  ARCHIVED = "archived",
 }
 ```
 
 ### SDK Methods
 
 ```javascript
-// Initialize the SDK (if autoInject is false)
+// Initialize SDK
 await sdk.init();
 
-// Toggle comment mode programmatically
+// Toggle comment mode
 sdk.setMode("comment"); // or 'normal'
 
-// Get current mode
-const mode = sdk.getMode(); // 'comment' | 'normal'
-
-// Switch themes
-sdk.setTheme("glass-dark");
-
-// Reload comments from data source
-await sdk.reload();
-
-// Get all current comments
+// Get current comments
 const comments = sdk.getComments();
 
-// Get comments for a specific element
-const elementComments = sdk.getCommentsForElement(
-  document.querySelector(".my-element")
-);
+// Reload comments
+await sdk.reload();
 
-// Highlight an element (useful for drawing attention)
-sdk.highlightElement(document.querySelector(".important-element"));
-
-// Clean up and remove SDK
+// Clean up
 sdk.destroy();
-```
-
-### Event System
-
-```javascript
-// Listen for mode changes
-sdk.on("mode-changed", ({ mode }) => {
-  console.log("Comment mode is now:", mode);
-});
-
-// Listen for comment events
-sdk.on("comment-created", ({ comment }) => {
-  console.log("New comment created:", comment);
-});
-
-sdk.on("comment-updated", ({ comment }) => {
-  console.log("Comment updated:", comment);
-});
-
-sdk.on("comment-deleted", ({ commentId }) => {
-  console.log("Comment deleted:", commentId);
-});
-
-// Remove event listeners
-sdk.off("mode-changed", handler);
 ```
 
 ## 🎨 Customization
@@ -178,128 +174,87 @@ document.documentElement.style.setProperty(
 );
 ```
 
-## 💡 Advanced Usage
+## 🔌 Backend Examples
 
-### Custom Comment Positioning
+### JSONBin.io (Free)
 
 ```javascript
-// Override default positioning logic
 const sdk = initCommentSDK({
-  // ... other config
-  onSaveComment: async (comment) => {
-    // Add custom position logic
-    const element = document.evaluate(comment.xpath, document).singleNodeValue;
-    if (element) {
-      const rect = element.getBoundingClientRect();
-      comment.position = {
-        x: rect.left + rect.width / 2,
-        y: rect.top + rect.height / 2,
-      };
-    }
-
-    return await saveToBackend(comment);
+  projectId: "my-project",
+  onFetchJsonFile: async () => {
+    const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+      headers: { "X-Master-Key": MASTER_KEY },
+    });
+    const data = await response.json();
+    return { comments: data.record?.comments || [] };
+  },
+  onUpdate: async (comments) => {
+    await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+      method: "PUT",
+      headers: { "X-Master-Key": MASTER_KEY },
+      body: JSON.stringify({ comments }),
+    });
   },
 });
 ```
 
-### Integration with Authentication
+### Firebase
 
 ```javascript
-// Update current user when authentication state changes
-function updateUser(newUser) {
-  sdk.destroy();
-  const newSDK = initCommentSDK({
-    ...originalConfig,
-    currentUser: newUser,
-  });
-}
+const sdk = initCommentSDK({
+  projectId: "my-project",
+  onFetchJsonFile: async () => {
+    const response = await fetch(
+      "https://your-project.firebaseio.com/comments.json"
+    );
+    const data = await response.json();
+    return { comments: data.comments || [] };
+  },
+  onUpdate: async (comments) => {
+    await fetch("https://your-project.firebaseio.com/comments.json", {
+      method: "PUT",
+      body: JSON.stringify({ comments }),
+    });
+  },
+});
 ```
 
-### Batch Operations
+### Local API
 
 ```javascript
-// Bulk resolve comments
-async function resolveAllComments() {
-  const comments = sdk.getComments();
-  const unresolvedComments = comments.filter((c) => !c.resolved);
-
-  for (const comment of unresolvedComments) {
-    comment.resolved = true;
-    if (sdk.config.onUpdateComment) {
-      await sdk.config.onUpdateComment(comment);
-    }
-  }
-
-  await sdk.reload();
-}
+const sdk = initCommentSDK({
+  projectId: "my-project",
+  onFetchJsonFile: async () => {
+    const response = await fetch("/api/comments.json");
+    const data = await response.json();
+    return { comments: data.comments || [] };
+  },
+  onUpdate: async (comments) => {
+    await fetch("/api/comments.json", {
+      method: "POST",
+      body: JSON.stringify({ comments }),
+    });
+  },
+});
 ```
 
 ## 🚀 Demo
 
-Visit the demo page to see the SDK in action:
+Try the demo to see the SDK in action:
 
 1. Clone this repository
 2. Open `demo/index.html` in your browser
-3. Click the debug icon (⚙️) in the bottom-left corner
-4. Click on any element to add a comment
-5. Try different themes and interactions
+3. Click the debug icon (🔧) to enable comment mode
+4. Click on any element to add comments
 
 ## 🔧 Development
 
-### Building from Source
-
 ```bash
-# Install dependencies
 npm install
-
-# Build the SDK
 npm run build
-
-# Start development server with demo
 npm run dev
-
-# Serve demo page
-npm run serve
 ```
-
-### Project Structure
-
-```
-ui-comment-sdk/
-├── src/
-│   ├── types/           # TypeScript type definitions
-│   ├── utils/           # Utility functions (XPath, DOM helpers)
-│   ├── components/      # UI components (DebugIcon, CommentBubble, etc.)
-│   ├── core/            # Core SDK logic (CommentSDK, CommentManager)
-│   ├── styles/          # CSS styles with glassmorphism theme
-│   └── index.ts         # Main entry point
-├── demo/                # Demo page
-├── dist/                # Built files
-└── docs/                # Documentation
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-- 📧 Email: support@ui-comment-sdk.com
-- 💬 Discord: [Join our community](https://discord.gg/ui-comment-sdk)
-- 🐛 Issues: [GitHub Issues](https://github.com/your-org/ui-comment-sdk/issues)
-- 📖 Documentation: [Full API Documentation](https://docs.ui-comment-sdk.com)
-
-## 🙏 Acknowledgments
-
-- Inspired by Figma's commenting system
-- Built with modern web technologies
-- Glassmorphism design trend
-- Community feedback and contributions
+MIT License

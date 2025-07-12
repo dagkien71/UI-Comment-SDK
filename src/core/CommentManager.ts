@@ -1,7 +1,7 @@
 import {
   Comment,
   CommentMode,
-  CommentSDKConfig,
+  CommentManagerConfig,
   CommentStatus,
   User,
   CommentAttachment,
@@ -36,7 +36,7 @@ import {
 } from "../utils/xpath";
 
 export class CommentManager {
-  private config: CommentSDKConfig;
+  private config: CommentManagerConfig;
   private comments: Comment[] = [];
   private commentBubbles: Map<string, CommentBubble> = new Map();
   private activeForm: CommentForm | null = null;
@@ -66,7 +66,7 @@ export class CommentManager {
     this.updateBubblePositions();
   }, 100);
 
-  constructor(config: CommentSDKConfig, root: HTMLElement) {
+  constructor(config: CommentManagerConfig, root: HTMLElement) {
     this.config = config;
     this.root = root;
 
@@ -1061,6 +1061,20 @@ export class CommentManager {
   public updateCurrentUser(user: User): void {
     this.config.currentUser = user;
     console.log("🔄 CommentManager: Current user updated:", user);
+
+    // Refresh all comment bubbles to show updated user names
+    this.refreshAllCommentBubbles();
+  }
+
+  private refreshAllCommentBubbles(): void {
+    // Update all existing bubbles to reflect user name changes
+    this.commentBubbles.forEach((bubble, commentId) => {
+      const comment = this.comments.find((c) => c.id === commentId);
+      if (comment) {
+        bubble.updateComment(comment);
+        bubble.updateUser(this.config.currentUser);
+      }
+    });
   }
 
   public highlightElement(element: Element): void {

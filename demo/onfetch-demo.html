@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>onFetchJsonFile Demo - UI Comment SDK</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .info {
+        background: #e7f3ff;
+        border: 1px solid #b3d9ff;
+        padding: 15px;
+        border-radius: 6px;
+        margin: 15px 0;
+      }
+      .code {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        padding: 15px;
+        border-radius: 6px;
+        font-family: monospace;
+        margin: 10px 0;
+        overflow-x: auto;
+      }
+      .test-area {
+        background: #f8f9fa;
+        border: 2px dashed #dee2e6;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      .button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .button:hover {
+        background: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🚀 onFetchJsonFile Demo</h1>
+
+      <div class="info">
+        <h3>✨ Tính năng mới trong v1.0.2:</h3>
+        <ul>
+          <li>
+            <strong>onFetchJsonFile</strong> - Function callback để user tự gọi
+            API
+          </li>
+          <li>
+            <strong>Flexible</strong> - Có thể dùng JSONBin.io, Firebase,
+            MongoDB, etc.
+          </li>
+          <li>
+            <strong>Type-safe</strong> - Bắt buộc return format:
+            <code>{ comments: [] }</code>
+          </li>
+          <li><strong>Clean</strong> - Core SDK không biết gì về API cụ thể</li>
+        </ul>
+      </div>
+
+      <div class="test-area">
+        <h3>🎯 Test Area</h3>
+        <p>
+          Click vào debug icon (🔧) ở góc trên phải để bật comment mode, sau đó
+          click vào bất kỳ đâu trên trang này để tạo comment!
+        </p>
+
+        <div
+          style="
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+          "
+        >
+          <p>Đây là một element để test comment</p>
+          <button class="button" onclick="alert('Button clicked!')">
+            Test Button
+          </button>
+        </div>
+      </div>
+
+      <div class="info">
+        <h3>📋 Cách sử dụng:</h3>
+        <div class="code">
+          const sdk = UICommentSDK.initCommentSDK({ projectId: "demo", theme:
+          "light", // Function để fetch data - user tự quyết định API
+          onFetchJsonFile: async () => { const response = await
+          fetch('https://api.jsonbin.io/v3/b/YOUR_BIN_ID', { headers: {
+          "X-Master-Key": MASTER_KEY } }); const data = await response.json();
+          // Bắt buộc return format này return { comments: data.record?.comments
+          || [] }; }, // Function để save data onUpdate: async (comments) => {
+          await fetch('https://api.jsonbin.io/v3/b/YOUR_BIN_ID', { method:
+          "PUT", headers: { "X-Master-Key": MASTER_KEY }, body: JSON.stringify({
+          comments }) }); } }); sdk.init();
+        </div>
+      </div>
+
+      <div class="info">
+        <h3>🔧 Ví dụ với các API khác:</h3>
+        <div class="code">
+          // Firebase onFetchJsonFile: async () => { const response = await
+          fetch('https://your-firebase-api.com/comments'); const data = await
+          response.json(); return { comments: data.comments || [] }; } //
+          MongoDB onFetchJsonFile: async () => { const response = await
+          fetch('https://your-mongodb-api.com/comments'); const data = await
+          response.json(); return { comments: data.comments || [] }; } // Local
+          JSON file onFetchJsonFile: async () => { const response = await
+          fetch('/api/comments.json'); const data = await response.json();
+          return { comments: data.comments || [] }; }
+        </div>
+      </div>
+    </div>
+
+    <script src="../dist/ui-comment-sdk.min.js"></script>
+    <script>
+      // Demo với JSONBin.io
+      const BIN_ID = "68724ce06063391d31ac1b52";
+      const MASTER_KEY = "$2a$10$YOUR_MASTER_KEY"; // Thay bằng Master Key thật
+
+      const sdk = UICommentSDK.initCommentSDK({
+        projectId: "demo",
+        theme: "light",
+
+        // Function để fetch data - user tự quyết định API
+        onFetchJsonFile: async () => {
+          try {
+            // Có thể gọi JSONBin.io, Firebase, MongoDB, etc.
+            const response = await fetch(
+              `https://api.jsonbin.io/v3/b/${BIN_ID}`,
+              {
+                headers: { "X-Master-Key": MASTER_KEY },
+              }
+            );
+            const data = await response.json();
+
+            // Bắt buộc return format này
+            return {
+              comments: data.record?.comments || [],
+            };
+          } catch (error) {
+            console.error("Failed to fetch comments:", error);
+            return { comments: [] };
+          }
+        },
+
+        // Function để save data
+        onUpdate: async (comments) => {
+          try {
+            await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                "X-Master-Key": MASTER_KEY,
+              },
+              body: JSON.stringify({ comments }),
+            });
+            console.log("✅ Comments saved successfully!");
+          } catch (error) {
+            console.error("❌ Failed to save comments:", error);
+          }
+        },
+      });
+
+      sdk
+        .init()
+        .then(() => {
+          console.log("✅ SDK initialized with onFetchJsonFile!");
+        })
+        .catch((error) => {
+          console.error("❌ Failed to initialize SDK:", error);
+        });
+    </script>
+  </body>
+</html>

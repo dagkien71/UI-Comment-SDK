@@ -12,14 +12,20 @@ export declare class CommentSidebar {
     private props;
     private isVisible;
     private currentTab;
+    private currentStatusFilter;
+    private isFilterOpen;
     private commentsList;
     private statsContent;
+    private filterContainer;
+    private filterToggleBtn;
     constructor(props: CommentSidebarProps);
     private formatTimeAgo;
     private getStatusColor;
     private getPageName;
     private getFilteredComments;
     private switchTab;
+    private switchStatusFilter;
+    private toggleFilter;
     private updateCommentsDisplay;
     private updateStats;
     private createCommentItem;
@@ -29,6 +35,7 @@ export declare class CommentSidebar {
     hide(): void;
     updateComments(comments: Comment[]): void;
     private updateTabStates;
+    private updateFilterStates;
     getElement(): HTMLElement;
     destroy(): void;
 }

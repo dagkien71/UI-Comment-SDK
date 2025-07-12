@@ -1,4 +1,4 @@
-import { Comment, CommentMode, CommentSDKConfig, User } from "../types";
+import { Comment, CommentMode, CommentManagerConfig, User } from "../types";
 export declare class CommentManager {
     private config;
     private comments;
@@ -18,7 +18,7 @@ export declare class CommentManager {
     private isMobile;
     private touchGestureRecognizer;
     private debouncedUpdatePositions;
-    constructor(config: CommentSDKConfig, root: HTMLElement);
+    constructor(config: CommentManagerConfig, root: HTMLElement);
     private attachEventListeners;
     private handleElementClick;
     private handleElementMouseEnter;
@@ -48,6 +48,7 @@ export declare class CommentManager {
     getCommentsForElement(element: Element): Comment[];
     getCommentBubble(commentId: string): any | null;
     updateCurrentUser(user: User): void;
+    private refreshAllCommentBubbles;
     highlightElement(element: Element): void;
     testBubbleClicks(): void;
     destroy(): void;

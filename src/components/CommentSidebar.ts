@@ -17,8 +17,12 @@ export class CommentSidebar {
   private props: CommentSidebarProps;
   private isVisible: boolean = false;
   private currentTab: SidebarTab = "active";
+  private currentStatusFilter: CommentStatus | "all" = "all";
+  private isFilterOpen: boolean = false;
   private commentsList: HTMLElement | null = null;
   private statsContent: HTMLElement | null = null;
+  private filterContainer: HTMLElement | null = null;
+  private filterToggleBtn: HTMLElement | null = null;
 
   constructor(props: CommentSidebarProps) {
     console.log(
@@ -50,8 +54,10 @@ export class CommentSidebar {
     switch (status) {
       case CommentStatus.BUG:
         return { bg: "#dc3545", text: "white" };
-      case CommentStatus.DEV_COMPLETED:
+      case CommentStatus.FEATURE_REQUEST:
         return { bg: "#ffc107", text: "black" };
+      case CommentStatus.DEV_COMPLETED:
+        return { bg: "#3b82f6", text: "white" };
       case CommentStatus.DONE:
         return { bg: "#28a745", text: "white" };
       case CommentStatus.ARCHIVED:
@@ -85,11 +91,26 @@ export class CommentSidebar {
   }
 
   private getFilteredComments(): Comment[] {
+    let filteredComments: Comment[];
+
     if (this.currentTab === "active") {
-      return this.props.comments.filter((c) => c.status !== "archived");
+      filteredComments = this.props.comments.filter(
+        (c) => c.status !== "archived"
+      );
     } else {
-      return this.props.comments.filter((c) => c.status === "archived");
+      filteredComments = this.props.comments.filter(
+        (c) => c.status === "archived"
+      );
     }
+
+    // Apply status filter if not "all"
+    if (this.currentStatusFilter !== "all") {
+      filteredComments = filteredComments.filter(
+        (c) => c.status === this.currentStatusFilter
+      );
+    }
+
+    return filteredComments;
   }
 
   private switchTab(tab: SidebarTab): void {
@@ -97,6 +118,36 @@ export class CommentSidebar {
     this.updateCommentsDisplay();
     this.updateStats();
     this.updateTabStates();
+  }
+
+  private switchStatusFilter(status: CommentStatus | "all"): void {
+    this.currentStatusFilter = status;
+    this.updateCommentsDisplay();
+    this.updateStats();
+    this.updateFilterStates();
+  }
+
+  private toggleFilter(): void {
+    this.isFilterOpen = !this.isFilterOpen;
+
+    if (this.filterContainer) {
+      if (this.isFilterOpen) {
+        this.filterContainer.classList.remove("uicm-sidebar-filters-closed");
+        this.filterContainer.classList.add("uicm-sidebar-filters-open");
+      } else {
+        this.filterContainer.classList.remove("uicm-sidebar-filters-open");
+        this.filterContainer.classList.add("uicm-sidebar-filters-closed");
+      }
+    }
+
+    if (this.filterToggleBtn) {
+      const arrow = this.filterToggleBtn.querySelector(
+        ".uicm-filter-toggle-arrow"
+      );
+      if (arrow) {
+        arrow.textContent = this.isFilterOpen ? "▲" : "▼";
+      }
+    }
   }
 
   private updateCommentsDisplay(): void {
@@ -118,7 +169,7 @@ export class CommentSidebar {
           : "Archived comments will appear here";
 
       emptyState.innerHTML = `
-        <div class="uicm-sidebar-empty-icon">💬</div>
+        <div class="uicm-sidebar-empty-icon">��</div>
         <div class="uicm-sidebar-empty-title">${emptyText}</div>
         <div class="uicm-sidebar-empty-subtitle">${emptySubtext}</div>
       `;
@@ -314,6 +365,134 @@ export class CommentSidebar {
     tabsContainer.appendChild(activeTab);
     tabsContainer.appendChild(archiveTab);
 
+    // Filter Toggle Button
+    this.filterToggleBtn = document.createElement("button");
+    this.filterToggleBtn.className = "uicm-sidebar-filter-toggle";
+    this.filterToggleBtn.innerHTML = `
+      <span class="uicm-filter-toggle-icon">🔍</span>
+      <span class="uicm-filter-toggle-text">Filter</span>
+      <span class="uicm-filter-toggle-arrow">▼</span>
+    `;
+    this.filterToggleBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.toggleFilter();
+    });
+
+    // Status Filters
+    this.filterContainer = document.createElement("div");
+    this.filterContainer.className =
+      "uicm-sidebar-filters uicm-sidebar-filters-closed";
+
+    const filterHeader = document.createElement("div");
+    filterHeader.className = "uicm-sidebar-filter-header";
+
+    const filterIcon = document.createElement("span");
+    filterIcon.className = "uicm-sidebar-filter-icon";
+    filterIcon.innerHTML = "🔍";
+
+    const filterTitle = document.createElement("div");
+    filterTitle.className = "uicm-sidebar-filter-title";
+    filterTitle.textContent = "Filter by Status";
+
+    filterHeader.appendChild(filterIcon);
+    filterHeader.appendChild(filterTitle);
+
+    const filterButtons = document.createElement("div");
+    filterButtons.className = "uicm-sidebar-filter-buttons";
+
+    // All filter button
+    const allFilterBtn = document.createElement("button");
+    allFilterBtn.className = "uicm-status-filter-btn active";
+    allFilterBtn.setAttribute("data-status", "all");
+    allFilterBtn.innerHTML = `
+      <span class="uicm-filter-btn-icon">📋</span>
+      <span class="uicm-filter-btn-text">All</span>
+    `;
+    allFilterBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.switchStatusFilter("all");
+    });
+
+    // Status filter buttons
+    const statusFilters = [
+      {
+        status: CommentStatus.BUG,
+        label: "Bug",
+        icon: "🐛",
+        color: "#dc3545",
+        colorDark: "#c82333",
+        colorDarker: "#a71e2a",
+        colorRgb: "220, 53, 69",
+      },
+      {
+        status: CommentStatus.FEATURE_REQUEST,
+        label: "Feature",
+        icon: "💡",
+        color: "#ffc107",
+        colorDark: "#e0a800",
+        colorDarker: "#d39e00",
+        colorRgb: "255, 193, 7",
+      },
+      {
+        status: CommentStatus.DEV_COMPLETED,
+        label: "Dev Done",
+        icon: "✅",
+        color: "#3b82f6",
+        colorDark: "#2563eb",
+        colorDarker: "#1d4ed8",
+        colorRgb: "59, 130, 246",
+      },
+      {
+        status: CommentStatus.DONE,
+        label: "Done",
+        icon: "🎉",
+        color: "#28a745",
+        colorDark: "#218838",
+        colorDarker: "#1e7e34",
+        colorRgb: "40, 167, 69",
+      },
+    ];
+
+    statusFilters.forEach(
+      ({ status, label, icon, color, colorDark, colorDarker, colorRgb }) => {
+        const filterBtn = document.createElement("button");
+        filterBtn.className = "uicm-status-filter-btn";
+        filterBtn.setAttribute("data-status", status);
+        filterBtn.setAttribute("data-color", color);
+        filterBtn.innerHTML = `
+        <span class="uicm-filter-btn-icon">${icon}</span>
+        <span class="uicm-filter-btn-text">${label}</span>
+      `;
+
+        // Set CSS custom properties for color coding
+        (filterBtn as HTMLElement).style.setProperty("--status-color", color);
+        (filterBtn as HTMLElement).style.setProperty(
+          "--status-color-dark",
+          colorDark
+        );
+        (filterBtn as HTMLElement).style.setProperty(
+          "--status-color-darker",
+          colorDarker
+        );
+        (filterBtn as HTMLElement).style.setProperty(
+          "--status-color-rgb",
+          colorRgb
+        );
+
+        filterBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.switchStatusFilter(status);
+        });
+        filterButtons.appendChild(filterBtn);
+      }
+    );
+
+    this.filterContainer.appendChild(filterHeader);
+    this.filterContainer.appendChild(filterButtons);
+
     // Stats
     const stats = document.createElement("div");
     stats.className = "uicm-sidebar-stats";
@@ -347,6 +526,8 @@ export class CommentSidebar {
 
     sidebar.appendChild(header);
     sidebar.appendChild(tabsContainer);
+    sidebar.appendChild(this.filterToggleBtn);
+    sidebar.appendChild(this.filterContainer);
     sidebar.appendChild(stats);
     sidebar.appendChild(this.commentsList);
 
@@ -399,25 +580,39 @@ export class CommentSidebar {
     this.updateCommentsDisplay();
     this.updateStats();
     this.updateTabStates();
+    this.updateFilterStates();
   }
 
   private updateTabStates(): void {
-    const activeTab = this.element.querySelector(
-      ".uicm-sidebar-tab:first-child"
-    ) as HTMLElement;
-    const archiveTab = this.element.querySelector(
-      ".uicm-sidebar-tab:last-child"
-    ) as HTMLElement;
+    const activeTab = this.element.querySelector(".uicm-sidebar-tab.active");
+    const archiveTab = this.element.querySelector(".uicm-sidebar-tab.archive");
 
-    if (activeTab && archiveTab) {
-      if (this.currentTab === "active") {
-        activeTab.classList.add("uicm-sidebar-tab-active");
-        archiveTab.classList.remove("uicm-sidebar-tab-active");
-      } else {
-        activeTab.classList.remove("uicm-sidebar-tab-active");
-        archiveTab.classList.add("uicm-sidebar-tab-active");
-      }
+    if (activeTab) {
+      activeTab.classList.toggle("active", this.currentTab === "active");
     }
+    if (archiveTab) {
+      archiveTab.classList.toggle("active", this.currentTab === "archive");
+    }
+  }
+
+  private updateFilterStates(): void {
+    if (!this.filterContainer) return;
+
+    const filterButtons = this.filterContainer.querySelectorAll(
+      ".uicm-status-filter-btn"
+    );
+    filterButtons.forEach((btn) => {
+      const status = btn.getAttribute("data-status");
+
+      if (
+        status === this.currentStatusFilter ||
+        (status === "all" && this.currentStatusFilter === "all")
+      ) {
+        btn.classList.add("active");
+      } else {
+        btn.classList.remove("active");
+      }
+    });
   }
 
   public getElement(): HTMLElement {

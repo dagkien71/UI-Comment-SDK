@@ -39,16 +39,14 @@
     0 0;
 }
 
-/* Modal Header Improvements */
+/* Modal Header - Redesigned */
 .uicm-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 24px;
-  background: #ffffff;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border-bottom: 1px solid #e5e7eb;
   border-radius: 16px 16px 0 0;
   position: relative;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .uicm-modal-header::before {
@@ -65,78 +63,281 @@
 .uicm-modal-header-content {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  padding: 0;
+}
+
+/* Top Section: Title, description, and close button */
+.uicm-modal-top-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px 28px 16px;
+  gap: 20px;
+}
+
+.uicm-modal-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
 }
 
 .uicm-modal-title {
   margin: 0;
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
   color: #1f2937;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
 }
 
-.uicm-comment-count {
-  font-size: 13px;
-  color: #64748b;
+.uicm-modal-description {
+  margin: 0;
+  font-size: 14px;
+  color: #6b7280;
   font-weight: 500;
+  line-height: 1.4;
 }
 
-.uicm-status-display {
-  margin-top: 4px;
-}
-
-.uicm-modal-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.uicm-resolve-button,
+/* Close Button - Positioned at top */
 .uicm-close-button {
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: var(--uicm-text-secondary, #64748b);
-  font-size: 16px;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 12px;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.uicm-resolve-button:hover {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.3);
-  color: var(--uicm-success, #10b981);
-  transform: scale(1.05);
-}
-
-.uicm-close-button {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: none;
-  background: rgba(239, 68, 68, 0.1);
+  background: linear-gradient(
+    145deg,
+    rgba(239, 68, 68, 0.1),
+    rgba(220, 38, 38, 0.08)
+  );
+  border: 1px solid rgba(239, 68, 68, 0.2);
   color: #dc2626;
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
 }
 
-.uicm-close-button:hover {
-  background: rgba(239, 68, 68, 0.2);
-  transform: scale(1.05);
+/* Bottom Section: Status select and delete button */
+.uicm-modal-bottom-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 28px 24px;
+  gap: 12px;
+}
+
+/* Status Select with Color Coding */
+.uicm-status-select {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(248, 250, 252, 0.8)
+  );
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  width: 85%;
+  max-width: none;
+}
+
+.uicm-status-select:hover {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 1),
+    rgba(248, 250, 252, 0.9)
+  );
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.uicm-status-select:focus {
+  outline: none;
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Color coding for status select text based on current value */
+.uicm-status-select[data-status="bug"] {
+  color: #dc3545;
+  font-weight: 700;
+}
+
+.uicm-status-select[data-status="feature_request"] {
+  color: #ffc107;
+  font-weight: 700;
+}
+
+.uicm-status-select[data-status="dev_completed"] {
+  color: #3b82f6;
+  font-weight: 700;
+}
+
+.uicm-status-select[data-status="done"] {
+  color: #28a745;
+  font-weight: 700;
+}
+
+.uicm-status-select[data-status="archived"] {
+  color: #6c757d;
+  font-weight: 700;
+}
+
+/* Color coding for status options with text colors */
+.uicm-status-select option[value="bug"] {
+  background-color: #dc3545;
+  color: white;
+}
+
+.uicm-status-select option[value="feature_request"] {
+  background-color: #ffc107;
+  color: #000000;
+}
+
+.uicm-status-select option[value="dev_completed"] {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.uicm-status-select option[value="done"] {
+  background-color: #28a745;
+  color: white;
+}
+
+.uicm-status-select option[value="archived"] {
+  background-color: #6c757d;
+  color: white;
+}
+
+/* Delete Button */
+.uicm-delete-button {
+  background: linear-gradient(
+    145deg,
+    rgba(245, 158, 11, 0.1),
+    rgba(217, 119, 6, 0.08)
+  );
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  color: #d97706;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 15%;
+  min-width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.uicm-delete-button:hover {
+  background: linear-gradient(
+    145deg,
+    rgba(245, 158, 11, 0.15),
+    rgba(217, 119, 6, 0.12)
+  );
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #b45309;
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25);
+}
+
+.uicm-delete-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Status Control */
+.uicm-status-control {
+  display: flex;
+  align-items: center;
+}
+
+.uicm-status-dropdown {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(248, 250, 252, 0.8)
+  );
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #374151;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  min-width: 120px;
+}
+
+.uicm-status-dropdown:hover {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 1),
+    rgba(248, 250, 252, 0.9)
+  );
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.uicm-status-dropdown:focus {
+  outline: none;
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Archive Button */
+.uicm-archive-button {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(248, 250, 252, 0.8)
+  );
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  white-space: nowrap;
+}
+
+.uicm-archive-button:hover {
+  background: linear-gradient(
+    145deg,
+    rgba(107, 114, 128, 0.1),
+    rgba(75, 85, 99, 0.08)
+  );
+  border-color: rgba(107, 114, 128, 0.3);
+  color: #4b5563;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.15);
 }
 
 /* Comments List */
@@ -429,9 +630,14 @@
   color: white;
 }
 
-.uicm-status-badge.status-dev_completed {
+.uicm-status-badge.status-feature_request {
   background-color: #ffc107;
   color: black;
+}
+
+.uicm-status-badge.status-dev_completed {
+  background-color: #3b82f6;
+  color: white;
 }
 
 .uicm-status-badge.status-done {
@@ -529,7 +735,42 @@ button.uicm-file-preview-remove {
     margin: 10px;
   }
 
-  .uicm-modal-header,
+  .uicm-modal-top-section {
+    padding: 20px 20px 12px;
+    gap: 16px;
+  }
+
+  .uicm-modal-title {
+    font-size: 20px;
+  }
+
+  .uicm-modal-description {
+    font-size: 13px;
+  }
+
+  .uicm-modal-bottom-section {
+    padding: 0 20px 20px;
+    gap: 8px;
+  }
+
+  .uicm-status-select {
+    width: 85%;
+  }
+
+  .uicm-delete-button {
+    width: 15%;
+    min-width: 36px;
+    height: 36px;
+    padding: 8px;
+  }
+
+  .uicm-close-button {
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+    font-size: 16px;
+  }
+
   .uicm-comments-list,
   .uicm-reply-form {
     padding: 16px 20px;

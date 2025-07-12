@@ -40,23 +40,51 @@
     0 0;
 }
 
-/* Header Section */
+/* Header Section with improved layout */
 .uicm-form-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 24px;
   background: #ffffff;
   border-bottom: 1px solid #e5e7eb;
   border-radius: 16px 16px 0 0;
+  padding: 0;
+}
+
+.uicm-form-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px 24px 20px;
+  gap: 16px;
+}
+
+.uicm-form-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
 }
 
 .uicm-form-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: #1f2937;
   margin: 0;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.uicm-form-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.uicm-form-action-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .uicm-user-info {
@@ -127,30 +155,26 @@
 }
 
 .uicm-close-button {
-  background: transparent;
-  border: none;
-  color: #6b7280;
-  font-size: 18px;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.8),
+    rgba(247, 243, 233, 0.6)
+  );
+  border: 1px solid rgba(224, 122, 95, 0.2);
+  color: #6b5b47;
+  font-size: 20px;
+  font-weight: 600;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
-  width: 32px;
-  height: 32px;
+  padding: 10px;
+  border-radius: 20px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.uicm-close-button:hover {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
-  color: var(--uicm-danger, #ef4444);
-  transform: scale(1.05) rotate(90deg);
-}
-
-.uicm-close-button:active {
-  transform: scale(0.95) rotate(90deg);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(224, 122, 95, 0.1);
+  line-height: 1;
 }
 
 /* Content Section */
@@ -421,7 +445,21 @@
     margin: 10px;
   }
 
-  .uicm-form-header,
+  .uicm-form-header-content {
+    padding: 20px 20px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .uicm-form-title-section {
+    width: 100%;
+  }
+
+  .uicm-form-action-section {
+    align-self: flex-end;
+  }
+
   .uicm-form-content {
     padding: 20px;
   }

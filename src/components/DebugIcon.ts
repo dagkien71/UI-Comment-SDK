@@ -30,6 +30,7 @@ export class DebugIcon {
     icon.style.transition = "all 0.3s ease";
     icon.style.zIndex = "999999";
     icon.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.2)";
+    icon.style.pointerEvents = "auto";
 
     // Add hover effect
     icon.addEventListener("mouseenter", () => {
@@ -92,9 +93,6 @@ export class DebugIcon {
   private createTooltip(): HTMLElement {
     const tooltip = document.createElement("div");
     tooltip.className = "uicm-tooltip";
-    tooltip.textContent = this.props.isActive
-      ? "Exit Comment Mode"
-      : "Enter Comment Mode";
     tooltip.setAttribute("data-uicm-element", "true");
 
     const iconRect = this.element.getBoundingClientRect();
@@ -106,9 +104,13 @@ export class DebugIcon {
 
   public updateState(isActive: boolean): void {
     this.props.isActive = isActive;
-    this.element.className = `uicm-debug-icon uicm-glass uicm-glass-hover ${
-      isActive ? "uicm-active" : ""
-    }`;
+    this.element.className = "uicm-debug-icon";
+
+    // Update background color based on active state
+    this.element.style.backgroundColor = this.props.isActive
+      ? "rgba(255, 0, 0, 0.8)"
+      : "rgba(0, 0, 0, 0.5)";
+
     this.element.innerHTML = this.getIconHTML();
   }
 

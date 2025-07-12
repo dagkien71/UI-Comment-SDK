@@ -12,6 +12,7 @@ export declare class SidebarButton {
     private attachEventListeners;
     getElement(): HTMLElement;
     setVisible(visible: boolean): void;
+    updateUser(user: User): void;
     destroy(): void;
 }
 //# sourceMappingURL=SidebarButton.d.ts.map
