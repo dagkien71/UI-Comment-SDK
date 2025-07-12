@@ -4937,13 +4937,13 @@ class CommentSDK {
     }
     validateConfig() {
         if (!this.config.projectId) {
-            throw new Error("EasyCommentSDK: projectId is required");
+            throw new Error("CommentSDK: projectId is required");
         }
         if (!this.config.onFetchJsonFile) {
-            throw new Error("EasyCommentSDK: onFetchJsonFile function is required");
+            throw new Error("CommentSDK: onFetchJsonFile function is required");
         }
         if (!this.config.onUpdate) {
-            throw new Error("EasyCommentSDK: onUpdate callback is required");
+            throw new Error("CommentSDK: onUpdate callback is required");
         }
     }
     async init() {
@@ -4992,10 +4992,10 @@ class CommentSDK {
             // Load comments
             await this.commentManager.loadComments();
             this.isInitialized = true;
-            console.log("EasyCommentSDK: Initialized successfully");
+            console.log("CommentSDK: Initialized successfully");
         }
         catch (error) {
-            console.error("EasyCommentSDK: Failed to initialize", error);
+            console.error("CommentSDK: Failed to initialize", error);
             throw error;
         }
     }
@@ -5005,13 +5005,12 @@ class CommentSDK {
     }
     async loadCommentsFromUserFunction() {
         try {
-            // Gọi function của user để fetch data
             const data = await this.config.onFetchJsonFile();
             this.comments = data.comments || [];
-            console.log(`📂 Loaded ${this.comments.length} comments from user's fetch function`);
+            console.log(`📂 Loaded ${this.comments.length} comments from user function`);
         }
         catch (error) {
-            console.log(`📂 Could not load comments from user's fetch function, starting fresh`);
+            console.log(`📂 Could not load comments from user function, starting fresh`);
             this.comments = [];
         }
     }
@@ -5070,7 +5069,7 @@ class CommentSDK {
     }
     setMode(mode) {
         if (!this.isInitialized) {
-            throw new Error("SimpleCommentSDK: Not initialized. Call init() first.");
+            throw new Error("CommentSDK: Not initialized. Call init() first.");
         }
         this.commentManager.setMode(mode);
         this.debugIcon.updateState(mode === "comment");

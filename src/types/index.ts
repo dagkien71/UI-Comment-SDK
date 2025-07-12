@@ -49,20 +49,6 @@ export type CommentMode = "normal" | "comment";
 
 export interface CommentSDKConfig {
   projectId: string;
-  currentUser: User;
-  theme?: "light" | "dark";
-  autoInject?: boolean;
-  debugMode?: boolean;
-  onLoadComments: () => Promise<Comment[]>;
-  onSaveComment: (
-    comment: Omit<Comment, "id" | "createdAt">
-  ) => Promise<Comment>;
-  onUpdateComment?: (comment: Comment) => Promise<Comment>;
-  onDeleteComment?: (commentId: string) => Promise<void>;
-}
-
-export interface CommentSDKConfig {
-  projectId: string;
   theme?: "light" | "dark";
   onFetchJsonFile: () => Promise<{ comments: Comment[] }>; // Function to fetch JSON data
   onUpdate: (comments: Comment[]) => Promise<void>; // Action to update JSON file
