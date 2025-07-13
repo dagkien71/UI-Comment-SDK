@@ -6,4 +6,3 @@ export interface RoleColor {
 export declare const ROLE_COLORS: Record<string, RoleColor>;
 export declare function getRoleColor(role: string): RoleColor;
 export declare function getRoleDisplayName(role: string): string;
-//# sourceMappingURL=roleColors.d.ts.map

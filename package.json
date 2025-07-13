@@ -7,28 +7,21 @@
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist/index.js",
-    "dist/index.esm.js",
-    "dist/index.umd.js",
     "dist/ui-comment-sdk.min.js",
     "dist/ui-comment-sdk.esm.min.js",
     "dist/index.d.ts",
-    "dist/types",
-    "dist/core",
-    "dist/components",
-    "dist/storage",
-    "dist/utils",
     "README.md"
   ],
   "scripts": {
     "build": "rollup -c",
     "build:prod": "NODE_ENV=production rollup -c",
+    "clean:prod": "rm -f dist/index.js dist/index.esm.js dist/index.umd.js",
     "dev": "rollup -c -w",
     "serve": "serve demo",
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
-    "prepublishOnly": "npm run build:prod",
-    "prepack": "npm run build:prod"
+    "prepublishOnly": "npm run build:prod && npm run clean:prod",
+    "prepack": "npm run build:prod && npm run clean:prod"
   },
   "keywords": [
     "comment",

@@ -4,9 +4,7 @@
   border-radius: 16px;
   border: 1px solid #e5e7eb;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  min-width: 400px;
-  max-width: 500px;
-  max-height: 740px;
+  width: 380px;
   position: relative;
   overflow: hidden;
   font-family: "Inter", sans-serif;
@@ -260,19 +258,22 @@
 
 /* Comments List */
 .uicm-comments-list {
-  padding: 24px 28px;
-  max-height: 400px;
+  padding: 5px;
+  max-height: 300px;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 #f1f5f9;
 }
 
 .uicm-comment-item {
-  margin-bottom: 20px;
+  margin-bottom: 6px;
   padding: 16px;
   background: rgba(255, 255, 255, 0.8);
   border-radius: 12px;
   border: 1px solid rgba(229, 231, 235, 0.5);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
 }
 
 .uicm-comment-item:last-child {
@@ -291,12 +292,13 @@
   color: white;
   font-weight: 600;
   font-size: 14px;
-  margin-right: 12px;
+  flex-shrink: 0;
 }
 
 /* Comment Content */
 .uicm-comment-content {
   flex: 1;
+  min-width: 0;
 }
 
 .uicm-comment-header {
@@ -344,57 +346,37 @@
 
 /* Reply Form */
 .uicm-reply-form {
-  margin-top: 16px;
-  padding-top: 16px;
+  margin-top: 4px;
+  padding: 16px;
   border-top: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
+/* Hide reply header (avatar and name) */
 .uicm-reply-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-  gap: 8px;
+  display: none;
 }
 
-.uicm-reply-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #10b981, #06b6d4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-  font-size: 12px;
-}
-
-.uicm-reply-user-name-input {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 13px;
-  color: #374151;
-  transition: all 0.2s ease;
-}
-
-.uicm-reply-user-name-input:hover {
-  border-color: #9ca3af;
-}
-
-.uicm-reply-user-name-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+/* File previews at top */
+.uicm-reply-form .uicm-file-preview-container {
+  order: 1;
+  margin-bottom: 8px;
+  overflow-x: auto;
 }
 
 .uicm-reply-input-container {
   position: relative;
+  order: 2;
+  flex: 1;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
 }
 
 .uicm-reply-input {
-  width: 100%;
+  flex: 1;
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid #d1d5db;
   border-radius: 10px;
@@ -404,6 +386,7 @@
   resize: vertical;
   min-height: 60px;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .uicm-reply-input:focus {
@@ -419,6 +402,7 @@
 /* Character Counter */
 .uicm-reply-char-counter {
   position: absolute;
+  display: none;
   bottom: 8px;
   right: 12px;
   font-size: 11px;
@@ -426,6 +410,7 @@
   background: rgba(255, 255, 255, 0.9);
   padding: 2px 6px;
   border-radius: 4px;
+  z-index: 1;
 }
 
 .uicm-reply-char-counter.uicm-warning {
@@ -436,12 +421,15 @@
   color: #dc2626;
 }
 
-/* Reply Actions */
+/* Reply Actions - at the very bottom */
 .uicm-reply-actions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: 12px;
+  order: 3;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
 }
 
 .uicm-reply-send {
@@ -530,11 +518,78 @@
   transform: translateY(-1px);
 }
 
+/* Reply File Upload Button (small) */
+.uicm-reply-file-upload-button {
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.1),
+    rgba(139, 92, 246, 0.1)
+  );
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.uicm-reply-file-upload-button:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.15),
+    rgba(139, 92, 246, 0.15)
+  );
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+/* File upload button next to textarea */
+.uicm-reply-form .uicm-file-upload-button {
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .uicm-file-preview-container {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
   margin-top: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.uicm-file-preview-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.uicm-file-preview-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 2px;
+}
+
+.uicm-file-preview-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.uicm-file-preview-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .uicm-file-preview-item {
@@ -542,29 +597,80 @@
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  padding: 8px;
-  max-width: 120px;
+  padding: 6px;
+  max-width: 80px;
+  min-width: 80px;
+}
+
+/* Reply File Preview Container (small) */
+.uicm-reply-file-preview-container {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  margin-bottom: 8px;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.uicm-reply-file-preview-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.uicm-reply-file-preview-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 2px;
+}
+
+.uicm-reply-file-preview-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.uicm-reply-file-preview-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.uicm-reply-file-preview-item {
+  position: relative;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 4px;
+  max-width: 50px;
+  min-width: 50px;
 }
 
 .uicm-file-preview-remove {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  background: #dc2626;
+  top: -16px;
+  right: -16px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
   color: white;
-  border: none;
-  border-radius: 50%;
+  border: 2px solid #ffffff;
+  border-radius: 100%;
   width: 20px;
   height: 20px;
-  font-size: 12px;
+  font-size: 15px;
+  font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+button.uicm-file-preview-remove {
+  padding: 0 !important;
 }
 
 .uicm-file-preview-remove:hover {
-  background: #b91c1c;
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .uicm-file-preview-info {
@@ -580,15 +686,15 @@
 
 .uicm-file-preview-image {
   width: 100%;
-  height: 80px;
+  height: 60px;
   object-fit: cover;
   border-radius: 4px;
   margin-bottom: 4px;
 }
 
 .uicm-file-preview-icon {
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   margin: 0 auto 4px;
   display: flex;
   align-items: center;
@@ -596,6 +702,29 @@
   background: #f3f4f6;
   border-radius: 4px;
   color: #6b7280;
+  font-size: 12px;
+}
+
+/* Reply File Preview (small) */
+.uicm-reply-file-preview-image {
+  width: 100%;
+  height: 30px;
+  object-fit: cover;
+  border-radius: 3px;
+  margin-bottom: 2px;
+}
+
+.uicm-reply-file-preview-icon {
+  width: 16px;
+  height: 16px;
+  margin: 0 auto 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  border-radius: 3px;
+  color: #6b7280;
+  font-size: 8px;
 }
 
 /* Comment Attachments */

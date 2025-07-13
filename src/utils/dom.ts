@@ -1,4 +1,29 @@
 /**
+ * Calculate center position for modals and forms
+ */
+export function getCenterPosition(
+  element: HTMLElement,
+  options: { padding?: number } = {}
+): { x: number; y: number } {
+  const { padding = 20 } = options;
+
+  // Get viewport dimensions
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  // Get element dimensions
+  const rect = element.getBoundingClientRect();
+  const elementWidth = rect.width || 400; // fallback width
+  const elementHeight = rect.height || 300; // fallback height;
+
+  // Calculate center position
+  const x = Math.max(padding, (viewportWidth - elementWidth) / 2);
+  const y = Math.max(padding, (viewportHeight - elementHeight) / 2);
+
+  return { x, y };
+}
+
+/**
  * Get the position of an element relative to the viewport
  */
 export function getElementPosition(element: Element): { x: number; y: number } {

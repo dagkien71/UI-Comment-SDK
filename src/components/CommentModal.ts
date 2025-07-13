@@ -1,7 +1,11 @@
 import { Comment, User, CommentStatus, CommentAttachment } from "../types";
 import { base64UploadManager } from "../utils/base64Upload";
 import { ImageModal } from "./ImageModal";
-import { constrainToViewport, repositionInViewport } from "../utils/dom";
+import {
+  constrainToViewport,
+  repositionInViewport,
+  getCenterPosition,
+} from "../utils/dom";
 import { getRoleColor, getRoleDisplayName } from "../utils/roleColors";
 
 export interface CommentModalProps {
@@ -52,8 +56,7 @@ export class CommentModal {
     container: HTMLElement,
     onRemove: () => void
   ): void {
-    // Limit to 5 images
-    if (container.childElementCount >= 5) return;
+    // No limit on number of images
 
     const previewItem = document.createElement("div");
     previewItem.className = "uicm-file-preview-item";
@@ -116,19 +119,12 @@ export class CommentModal {
     // Temporarily add to DOM to get accurate dimensions
     document.body.appendChild(modal);
 
-    // Constrain position to viewport
-    const constrainedPosition = constrainToViewport(
-      modal,
-      this.props.position,
-      {
-        padding: 20,
-        preferredSide: "bottom",
-      }
-    );
+    // Use center position instead of click position
+    const centerPosition = getCenterPosition(modal, { padding: 20 });
 
-    // Set constrained position
-    modal.style.left = `${constrainedPosition.x}px`;
-    modal.style.top = `${constrainedPosition.y}px`;
+    // Set center position
+    modal.style.left = `${centerPosition.x}px`;
+    modal.style.top = `${centerPosition.y}px`;
 
     // Remove from DOM temporarily
     document.body.removeChild(modal);
@@ -425,12 +421,6 @@ export class CommentModal {
 
     // Avatar for current user
     const avatar = document.createElement("div");
-    avatar.className = "uicm-reply-avatar";
-    if (this.props.currentUser.avatar) {
-      avatar.innerHTML = `<img src="${this.props.currentUser.avatar}" alt="${this.props.currentUser.name}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-    } else {
-      avatar.textContent = this.props.currentUser.name.charAt(0).toUpperCase();
-    }
 
     // Editable user name
     const nameInput = document.createElement("input");
@@ -476,7 +466,7 @@ export class CommentModal {
     const fileUploadButton = document.createElement("button");
     fileUploadButton.className = "uicm-file-upload-button";
     fileUploadButton.type = "button";
-    fileUploadButton.innerHTML = "📎 Attach Files";
+    fileUploadButton.innerHTML = "📎";
     fileUploadButton.onclick = () => fileInput.click();
 
     const filePreviewContainer = document.createElement("div");
@@ -540,10 +530,17 @@ export class CommentModal {
 
     actions.appendChild(sendButton);
 
+    // Restructure: file upload button next to textarea, file previews at top, actions at bottom
+    form.appendChild(replyHeader);
+    form.appendChild(filePreviewContainer); // File previews at top
+
+    // Input container with textarea and file upload button side by side
     inputContainer.appendChild(input);
-    inputContainer.appendChild(fileUploadSection);
+    inputContainer.appendChild(fileUploadButton);
     inputContainer.appendChild(charCounter);
-    inputContainer.appendChild(actions);
+
+    form.appendChild(inputContainer);
+    form.appendChild(actions); // Reply button at bottom
 
     // Input event handlers
     input.addEventListener("input", () => {
@@ -898,11 +895,14 @@ export class CommentModal {
   }
 
   public reposition(): void {
-    // Reposition modal to ensure it stays within viewport with 100px padding
-    repositionInViewport(this.element, {
-      padding: 100,
-      preferredSide: "bottom",
-    });
+    // Use center position instead of click position
+    const centerPosition = getCenterPosition(this.element, { padding: 20 });
+
+    // Apply center position
+    this.element.style.position = "fixed";
+    this.element.style.left = `${centerPosition.x}px`;
+    this.element.style.top = `${centerPosition.y}px`;
+    this.element.style.transform = "none";
   }
 
   public destroy(): void {

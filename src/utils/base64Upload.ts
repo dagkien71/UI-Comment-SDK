@@ -1,12 +1,28 @@
 import { CommentAttachment } from "../types";
+import { ImageCompressor } from "./imageCompression";
+import {
+  AdvancedImageCompressor,
+  AdvancedCompressionOptions,
+} from "./advancedImageCompression";
 
 export class Base64UploadManager {
   private maxFileSize: number;
   private allowedTypes: string[];
+  private enableCompression: boolean;
+  private compressionMode: "basic" | "advanced" | "minimal";
+  private advancedOptions?: AdvancedCompressionOptions;
 
-  constructor(maxFileSize: number = 5 * 1024 * 1024) {
+  constructor(
+    maxFileSize: number = 5 * 1024 * 1024,
+    enableCompression: boolean = true,
+    compressionMode: "basic" | "advanced" | "minimal" = "basic",
+    advancedOptions?: AdvancedCompressionOptions
+  ) {
     // 5MB default
     this.maxFileSize = maxFileSize;
+    this.enableCompression = enableCompression;
+    this.compressionMode = compressionMode;
+    this.advancedOptions = advancedOptions;
     this.allowedTypes = [
       "image/jpeg",
       "image/png",
@@ -42,14 +58,70 @@ export class Base64UploadManager {
     }
 
     try {
-      const base64 = await this.fileToBase64(file);
+      let base64: string;
+      let finalSize: number;
+
+      if (this.enableCompression && this.isImage(file)) {
+        // Advanced compression based on mode
+        if (
+          this.compressionMode === "advanced" ||
+          this.compressionMode === "minimal"
+        ) {
+          const scenario =
+            this.compressionMode === "minimal" ? "minimal" : "balanced";
+          const options =
+            this.advancedOptions ||
+            AdvancedImageCompressor.getOptimalSettings(file.size, scenario);
+
+          base64 = await AdvancedImageCompressor.compressImageAdvanced(
+            file,
+            options
+          );
+
+          // Estimate compressed size
+          const base64Size = this.getBase64Size(base64);
+          finalSize = base64Size;
+
+          console.log(
+            `📸 Advanced image compression (${scenario}): ${this.formatFileSize(
+              file.size
+            )} → ${this.formatFileSize(finalSize)}`
+          );
+        } else {
+          // Basic compression
+          const compressionOptions = ImageCompressor.getOptimalSettings(
+            file.size
+          );
+          base64 = await ImageCompressor.compressImage(
+            file,
+            compressionOptions
+          );
+
+          // Estimate compressed size
+          finalSize = ImageCompressor.estimateCompressedSize(
+            file.size,
+            compressionOptions
+          );
+
+          console.log(
+            `📸 Basic image compression: ${this.formatFileSize(
+              file.size
+            )} → ~${this.formatFileSize(finalSize)}`
+          );
+        }
+      } else {
+        // Use original file for non-images or when compression is disabled
+        base64 = await this.fileToBase64(file);
+        finalSize = file.size;
+      }
 
       return {
         id: this.generateId(),
         filename: file.name,
         url: base64,
         type: file.type.startsWith("image/") ? "image" : "file",
-        size: file.size,
+        size: finalSize,
+        originalSize: file.size, // Keep original size for reference
         uploadedAt: new Date().toISOString(),
       };
     } catch (error) {
@@ -97,6 +169,18 @@ export class Base64UploadManager {
   }
 
   /**
+   * Calculate base64 size in bytes
+   */
+  private getBase64Size(base64: string): number {
+    // Remove data URL prefix
+    const base64Data = base64.split(",")[1];
+    if (!base64Data) return 0;
+
+    // Calculate size: base64 is 4/3 of original size
+    return Math.ceil((base64Data.length * 3) / 4);
+  }
+
+  /**
    * Generate unique ID
    */
   private generateId(): string {
@@ -104,5 +188,22 @@ export class Base64UploadManager {
   }
 }
 
-// Create default instance
-export const base64UploadManager = new Base64UploadManager();
+// Create different compression instances
+export const base64UploadManager = new Base64UploadManager(); // Basic compression
+export const advancedUploadManager = new Base64UploadManager(
+  5 * 1024 * 1024,
+  true,
+  "advanced"
+); // Advanced compression
+export const minimalUploadManager = new Base64UploadManager(
+  5 * 1024 * 1024,
+  true,
+  "minimal"
+); // Minimal size compression
+
+// Create custom instances with specific options
+export const createCustomUploadManager = (
+  options: AdvancedCompressionOptions
+) => {
+  return new Base64UploadManager(5 * 1024 * 1024, true, "advanced", options);
+};

@@ -27,27 +27,9 @@ export class CommentBubble {
   private imageModal: ImageModal | null = null;
 
   constructor(props: CommentBubbleProps) {
-    console.log("🔧 Creating CommentBubble:", props.comment.id);
     this.props = props;
     this.element = this.createElement();
-    console.log("📦 Element created:", this.element);
     this.attachEventListeners();
-    console.log("🎯 Event listeners attached");
-
-    // Add global click listener to test if bubble receives clicks
-    document.addEventListener("click", (e) => {
-      if (
-        e.target === this.element ||
-        this.element.contains(e.target as Node)
-      ) {
-        console.log(
-          "🎯 Global click detected on bubble:",
-          this.props.comment.id
-        );
-        console.log("🎯 Click target:", e.target);
-        console.log("🎯 Bubble element:", this.element);
-      }
-    });
   }
 
   private checkBubbleVisibility(): void {
@@ -57,22 +39,6 @@ export class CommentBubble {
 
     // Check what element is at the bubble's center point
     const elementAtPoint = document.elementFromPoint(centerX, centerY);
-
-    console.log("👁️ Bubble visibility check:", {
-      commentId: this.props.comment.id,
-      rect: rect,
-      centerPoint: { x: centerX, y: centerY },
-      elementAtPoint: elementAtPoint,
-      isOwnElement: elementAtPoint === this.element,
-      isVisible: rect.width > 0 && rect.height > 0,
-      computedStyle: {
-        display: getComputedStyle(this.element).display,
-        visibility: getComputedStyle(this.element).visibility,
-        opacity: getComputedStyle(this.element).opacity,
-        pointerEvents: getComputedStyle(this.element).pointerEvents,
-        zIndex: getComputedStyle(this.element).zIndex,
-      },
-    });
   }
 
   private testBubbleClickability(): void {
@@ -83,29 +49,7 @@ export class CommentBubble {
     // Check what element is at the bubble's center point
     const elementAtPoint = document.elementFromPoint(centerX, centerY);
 
-    console.log("🧪 BUBBLE CLICKABILITY TEST:", {
-      commentId: this.props.comment.id,
-      bubbleElement: this.element,
-      elementRect: rect,
-      elementAtCenter: elementAtPoint,
-      isClickable: elementAtPoint === this.element,
-      parentElement: this.element.parentElement,
-      parentDisplay: this.element.parentElement?.style.display,
-      parentComputedDisplay: this.element.parentElement
-        ? getComputedStyle(this.element.parentElement).display
-        : null,
-      bubbleStyles: {
-        display: getComputedStyle(this.element).display,
-        visibility: getComputedStyle(this.element).visibility,
-        opacity: getComputedStyle(this.element).opacity,
-        pointerEvents: getComputedStyle(this.element).pointerEvents,
-        zIndex: getComputedStyle(this.element).zIndex,
-        position: getComputedStyle(this.element).position,
-      },
-    });
-
     // Try to trigger a click programmatically to test
-    console.log("🔄 Attempting programmatic click...");
     this.element.click();
   }
 
@@ -204,30 +148,17 @@ export class CommentBubble {
 
     bubble.appendChild(roleIndicator);
 
-    console.log("💬 Chat bubble element created:", {
-      className: bubble.className,
-      position: { x: this.props.position.x, y: this.props.position.y },
-      status: this.props.comment.status,
-      colors: colors,
-      commentCount: commentCount,
-    });
-
     return bubble;
   }
 
   private attachEventListeners(): void {
-    console.log("🔗 Attaching event listeners to bubble");
-
     this.element.addEventListener("click", this.handleClick);
-    console.log("✅ Click listener attached");
 
     this.element.addEventListener("mouseenter", () => {
-      console.log("🐭 Mouse enter bubble");
       this.element.style.transform = "scale(1.1)";
     });
 
     this.element.addEventListener("mouseleave", () => {
-      console.log("🐭 Mouse leave bubble");
       this.element.style.transform = "scale(1)";
     });
 
@@ -238,7 +169,6 @@ export class CommentBubble {
         customEvent.detail.commentId === this.props.comment.id &&
         this.modal
       ) {
-        console.log("🔄 Reply added event received, refreshing modal");
         const updatedComments = [
           this.props.comment,
           ...this.props.comment.replies,
@@ -249,24 +179,6 @@ export class CommentBubble {
   }
 
   private handleClick = (e: Event): void => {
-    console.log("🔵 CommentBubble clicked!", this.props.comment.id);
-    console.log("🔵 Click event details:", {
-      target: e.target,
-      currentTarget: e.currentTarget,
-      type: e.type,
-      bubbles: e.bubbles,
-      cancelable: e.cancelable,
-      eventPhase: e.eventPhase,
-      isTrusted: e.isTrusted,
-    });
-
-    console.log("🔵 Bubble element state:", {
-      element: this.element,
-      parent: this.element.parentElement,
-      parentDisplay: this.element.parentElement?.style.display,
-      rect: this.element.getBoundingClientRect(),
-    });
-
     e.stopPropagation();
     e.preventDefault();
 
@@ -277,23 +189,18 @@ export class CommentBubble {
       y: mouseEvent.clientY || this.props.position.y,
     };
 
-    console.log("🔄 About to show modal at click position:", clickPosition);
     this.showModal(clickPosition);
   };
 
   private showModal(position: { x: number; y: number }): void {
-    console.log("🔄 Creating modal for comment:", this.props.comment.id);
-
     // Destroy existing modal if any
     if (this.modal) {
-      console.log("🗑️ Destroying existing modal");
       this.modal.destroy();
       this.modal = null;
     }
 
     // Get all comments for this element (main comment + replies)
     const allComments = [this.props.comment, ...this.props.comment.replies];
-    console.log("📝 Modal comments:", allComments.length);
 
     // Calculate initial modal position
     const initialPosition = {
@@ -307,7 +214,6 @@ export class CommentBubble {
       currentUser: this.props.currentUser,
       position: initialPosition,
       onClose: () => {
-        console.log("❌ Modal closed");
         if (this.modal) {
           this.modal.destroy();
           this.modal = null;
@@ -319,14 +225,6 @@ export class CommentBubble {
         user?: User,
         attachments?: CommentAttachment[]
       ) => {
-        console.log(
-          "💬 Adding reply:",
-          commentId,
-          content,
-          user?.name,
-          "attachments:",
-          attachments?.length || 0
-        );
         await this.props.onReply(commentId, content, user, attachments);
 
         // Update modal with refreshed comment data (including new reply)
@@ -349,13 +247,11 @@ export class CommentBubble {
         this.element.title = `Status: ${this.props.comment.status.toUpperCase()} | Comments: ${commentCount}`;
       },
       onStatusChange: async (commentId: string, status: CommentStatus) => {
-        console.log("🔄 Changing status:", commentId, status);
         await this.props.onStatusChange(commentId, status);
         // Update bubble appearance
         this.updateBubbleAppearance();
       },
       onDeleteComment: async (commentId: string) => {
-        console.log("🗑️ Deleting comment:", commentId);
         await this.props.onDelete(commentId);
 
         // Update bubble appearance after deletion
@@ -371,8 +267,6 @@ export class CommentBubble {
       },
     });
 
-    console.log("✅ Modal created, using CommentManager to show");
-
     // Use CommentManager for centralized modal management
     this.props.onShowModal(this.modal);
 
@@ -382,24 +276,15 @@ export class CommentBubble {
       interactionLayer.appendChild(this.modal.getElement());
       // Reposition modal to ensure it stays within viewport
       this.modal.reposition();
-      console.log("🎯 Modal appended to interaction layer");
     }
   }
 
   public updateComment(comment: Comment): void {
-    console.log("🔄 CommentBubble.updateComment called:", {
-      commentId: comment.id,
-      oldRepliesCount: this.props.comment.replies?.length || 0,
-      newRepliesCount: comment.replies?.length || 0,
-      modalExists: !!this.modal,
-    });
-
     this.props.comment = comment;
     this.updateBubbleAppearance();
 
     // Update modal if it exists and is open
     if (this.modal) {
-      console.log("🔄 Updating modal with new comment data");
       const updatedComments = [
         this.props.comment,
         ...this.props.comment.replies,
@@ -410,7 +295,6 @@ export class CommentBubble {
 
   public updateUser(user: User): void {
     this.props.currentUser = user;
-    console.log("🔄 CommentBubble: User updated:", user.name);
     // Refresh modal if it's open
     if (this.modal) {
       this.modal.updateUser(user);
@@ -446,13 +330,6 @@ export class CommentBubble {
     }
 
     this.element.title = `Status: ${this.props.comment.status.toUpperCase()} | Role: ${this.props.comment.role.toUpperCase()} | Comments: ${commentCount}`;
-
-    console.log("💬 Chat bubble appearance updated:", {
-      status: this.props.comment.status,
-      role: this.props.comment.role,
-      colors: colors,
-      commentCount: commentCount,
-    });
   }
 
   public updatePosition(position: { x: number; y: number }): void {

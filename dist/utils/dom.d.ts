@@ -1,4 +1,13 @@
 /**
+ * Calculate center position for modals and forms
+ */
+export declare function getCenterPosition(element: HTMLElement, options?: {
+    padding?: number;
+}): {
+    x: number;
+    y: number;
+};
+/**
  * Get the position of an element relative to the viewport
  */
 export declare function getElementPosition(element: Element): {
@@ -116,4 +125,3 @@ export declare function scrollIntoView(element: Element): void;
  * Get XPath of an element
  */
 export declare function getXPath(element: Element): string;
-//# sourceMappingURL=dom.d.ts.map

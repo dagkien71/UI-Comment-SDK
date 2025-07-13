@@ -39,4 +39,3 @@ export declare class CommentSidebar {
     getElement(): HTMLElement;
     destroy(): void;
 }
-//# sourceMappingURL=CommentSidebar.d.ts.map

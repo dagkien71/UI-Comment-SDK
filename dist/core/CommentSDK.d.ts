@@ -6,6 +6,7 @@ export declare class CommentSDK {
     private settingsButton;
     private sidebarButton;
     private sidebar;
+    private commentModal;
     private root;
     private isInitialized;
     private comments;
@@ -13,19 +14,22 @@ export declare class CommentSDK {
     constructor(config: CommentSDKConfig);
     private validateConfig;
     init(): Promise<void>;
+    syncCommentsFromManager(): void;
+    private loadCommentsFromAPI;
     private setupDOM;
-    private loadCommentsFromUserFunction;
-    private saveCommentsToJsonFile;
     private initializeUI;
     private toggleMode;
-    setMode(mode: "normal" | "comment"): void;
+    private toggleModeSilent;
+    setMode(mode: "normal" | "comment"): Promise<void>;
     private openSidebar;
     private navigateToComment;
+    private openCommentModal;
+    private getElementPosition;
     private findElementByXPath;
     private generateId;
     destroy(): void;
     getComments(): Comment[];
     getCurrentUser(): User;
+    private handleSidebarNavigation;
 }
 export declare function initCommentSDK(config: CommentSDKConfig): CommentSDK;
-//# sourceMappingURL=CommentSDK.d.ts.map

@@ -20,4 +20,3 @@ export declare class HybridCommentStorage {
     static syncToFile(): Promise<void>;
     static importFromFile(): Promise<void>;
 }
-//# sourceMappingURL=HybridCommentStorage.d.ts.map

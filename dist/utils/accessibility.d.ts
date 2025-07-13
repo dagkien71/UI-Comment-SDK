@@ -151,4 +151,3 @@ export declare function isAccessible(element: HTMLElement): boolean;
  * Generates unique IDs for accessibility relationships
  */
 export declare function generateAccessibilityId(prefix?: string): string;
-//# sourceMappingURL=accessibility.d.ts.map

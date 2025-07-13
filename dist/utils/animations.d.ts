@@ -137,4 +137,3 @@ export declare function sequence(animations: Array<() => Promise<void>>, delay?:
  * Parallel animation helper
  */
 export declare function parallel(animations: Array<() => Promise<void>>): Promise<void[]>;
-//# sourceMappingURL=animations.d.ts.map

@@ -18,4 +18,3 @@ export declare class CommentStorage {
         lastUpdated: string | null;
     };
 }
-//# sourceMappingURL=CommentStorage.d.ts.map

@@ -1,8 +1,12 @@
 import { CommentAttachment } from "../types";
+import { AdvancedCompressionOptions } from "./advancedImageCompression";
 export declare class Base64UploadManager {
     private maxFileSize;
     private allowedTypes;
-    constructor(maxFileSize?: number);
+    private enableCompression;
+    private compressionMode;
+    private advancedOptions?;
+    constructor(maxFileSize?: number, enableCompression?: boolean, compressionMode?: "basic" | "advanced" | "minimal", advancedOptions?: AdvancedCompressionOptions);
     /**
      * Convert file to base64 and create attachment
      */
@@ -24,9 +28,15 @@ export declare class Base64UploadManager {
      */
     private formatFileSize;
     /**
+     * Calculate base64 size in bytes
+     */
+    private getBase64Size;
+    /**
      * Generate unique ID
      */
     private generateId;
 }
 export declare const base64UploadManager: Base64UploadManager;
-//# sourceMappingURL=base64Upload.d.ts.map
+export declare const advancedUploadManager: Base64UploadManager;
+export declare const minimalUploadManager: Base64UploadManager;
+export declare const createCustomUploadManager: (options: AdvancedCompressionOptions) => Base64UploadManager;

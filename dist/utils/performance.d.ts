@@ -41,4 +41,3 @@ export declare class LRUCache<K, V> {
     set(key: K, value: V): void;
     clear(): void;
 }
-//# sourceMappingURL=performance.d.ts.map

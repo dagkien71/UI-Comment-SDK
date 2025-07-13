@@ -12,4 +12,3 @@ export declare class DebugIcon {
     getElement(): HTMLElement;
     destroy(): void;
 }
-//# sourceMappingURL=DebugIcon.d.ts.map

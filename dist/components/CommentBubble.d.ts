@@ -36,4 +36,3 @@ export declare class CommentBubble {
     destroy(): void;
     testClickability(): void;
 }
-//# sourceMappingURL=CommentBubble.d.ts.map

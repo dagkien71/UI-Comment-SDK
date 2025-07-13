@@ -4,8 +4,7 @@
   border-radius: 16px;
   border: 1px solid #e5e7eb;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  min-width: 380px;
-  max-width: 480px;
+  width: 380px;
   position: relative;
   overflow: hidden;
   font-family: "Inter", sans-serif;
@@ -91,7 +90,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
+  order: 2;
+  margin-bottom: 8px;
 }
 
 .uicm-user-avatar {
@@ -179,12 +179,15 @@
 
 /* Content Section */
 .uicm-form-content {
-  padding: 20px 24px;
+  padding: 16px 20px;
   background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .uicm-comment-textarea {
-  width: 100%;
+  flex: 1;
   min-height: 80px;
   max-height: 200px;
   padding: 12px 16px;
@@ -198,6 +201,7 @@
   background: #ffffff;
   font-family: inherit;
   outline: none;
+  box-sizing: border-box;
 }
 
 .uicm-comment-textarea:focus {
@@ -211,26 +215,63 @@
   opacity: 0.7;
 }
 
-/* Character Counter */
+/* Character Counter - Hidden like in reply form */
 .uicm-char-counter {
-  text-align: right;
-  font-size: 13px;
-  color: var(--uicm-text-secondary, #64748b);
-  margin: 12px 0 20px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  letter-spacing: 0.02em;
+  display: none;
 }
 
-.uicm-char-counter.uicm-warning {
-  color: var(--uicm-warning, #f59e0b);
-  animation: uicm-glow-warning 2s infinite;
+/* File previews at top - with higher specificity */
+.uicm-comment-form .uicm-file-preview-container {
+  order: 1;
+  margin-bottom: 8px;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 8px;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
 }
 
-.uicm-char-counter.uicm-error {
-  color: var(--uicm-danger, #ef4444);
-  font-weight: 700;
-  animation: uicm-glow-error 1s infinite;
+.uicm-comment-form .uicm-file-preview-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.uicm-comment-form .uicm-file-preview-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 2px;
+}
+
+.uicm-comment-form .uicm-file-preview-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.uicm-comment-form .uicm-file-preview-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Form input container (textarea + file upload button) */
+.uicm-form-input-container {
+  position: relative;
+  order: 2;
+  flex: 1;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+/* File upload button in form input container (small like reply form) */
+.uicm-form-input-container .uicm-file-upload-button {
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 /* Actions Section */
@@ -239,6 +280,10 @@
   justify-content: space-between;
   align-items: center;
   gap: 20px;
+  order: 3;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
 }
 
 .uicm-secondary-actions {

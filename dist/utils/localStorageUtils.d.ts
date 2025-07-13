@@ -19,4 +19,3 @@ export declare class LocalStorageManager implements LocalStorageUtils {
     displayAllData(): void;
 }
 export declare const localStorageUtils: LocalStorageManager;
-//# sourceMappingURL=localStorageUtils.d.ts.map

@@ -125,4 +125,3 @@ export declare function addMobileCSS(): void;
  * Removes mobile-specific CSS
  */
 export declare function removeMobileCSS(): void;
-//# sourceMappingURL=mobile.d.ts.map

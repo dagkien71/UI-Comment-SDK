@@ -3,6 +3,7 @@ import {
   generateId,
   constrainToViewport,
   repositionInViewport,
+  getCenterPosition,
 } from "../utils/dom";
 import { base64UploadManager } from "../utils/base64Upload";
 import { ImageModal } from "./ImageModal";
@@ -44,8 +45,7 @@ export class CommentForm {
     container: HTMLElement,
     onRemove: () => void
   ): void {
-    // Limit to 5 images
-    if (container.childElementCount >= 5) return;
+    // No limit on number of images
 
     const previewItem = document.createElement("div");
     previewItem.className = "uicm-file-preview-item";
@@ -116,15 +116,12 @@ export class CommentForm {
     // Temporarily add to DOM to get accurate dimensions
     document.body.appendChild(form);
 
-    // Constrain position to viewport
-    const constrainedPosition = constrainToViewport(form, this.props.position, {
-      padding: 20,
-      preferredSide: "bottom",
-    });
+    // Use center position instead of click position
+    const centerPosition = getCenterPosition(form, { padding: 20 });
 
-    // Set constrained position
-    form.style.left = `${constrainedPosition.x}px`;
-    form.style.top = `${constrainedPosition.y}px`;
+    // Set center position
+    form.style.left = `${centerPosition.x}px`;
+    form.style.top = `${centerPosition.y}px`;
 
     // Remove from DOM temporarily
     document.body.removeChild(form);
@@ -231,7 +228,7 @@ export class CommentForm {
     const fileUploadButton = document.createElement("button");
     fileUploadButton.className = "uicm-file-upload-button";
     fileUploadButton.type = "button";
-    fileUploadButton.innerHTML = "📎 Attach Files";
+    fileUploadButton.innerHTML = "📎";
     fileUploadButton.onclick = () => fileInput.click();
 
     const filePreviewContainer = document.createElement("div");
@@ -310,12 +307,20 @@ export class CommentForm {
     actions.appendChild(secondaryActions);
     actions.appendChild(primaryActions);
 
-    // Assemble form
-    content.appendChild(userInfo);
-    content.appendChild(this.textarea);
-    content.appendChild(this.charCounter); // move char counter right below textarea
-    content.appendChild(fileUploadSection);
-    content.appendChild(actions);
+    // Create input container for textarea and file upload button (like reply form)
+    const inputContainer = document.createElement("div");
+    inputContainer.className = "uicm-form-input-container";
+
+    // Add textarea and file upload button to input container
+    inputContainer.appendChild(this.textarea);
+    inputContainer.appendChild(fileUploadButton);
+    inputContainer.appendChild(this.charCounter);
+
+    // Restructure: file previews at top, input container in middle, actions at bottom
+    content.appendChild(filePreviewContainer); // File previews at top
+    content.appendChild(userInfo); // User info
+    content.appendChild(inputContainer); // Input container (textarea + file upload button)
+    content.appendChild(actions); // Actions at bottom
 
     form.appendChild(header);
     form.appendChild(content);
@@ -634,11 +639,14 @@ export class CommentForm {
   }
 
   public reposition(): void {
-    // Reposition form to ensure it stays within viewport with 100px padding
-    repositionInViewport(this.element, {
-      padding: 100,
-      preferredSide: "bottom",
-    });
+    // Use center position instead of click position
+    const centerPosition = getCenterPosition(this.element, { padding: 20 });
+
+    // Apply center position
+    this.element.style.position = "fixed";
+    this.element.style.left = `${centerPosition.x}px`;
+    this.element.style.top = `${centerPosition.y}px`;
+    this.element.style.transform = "none";
   }
 
   public destroy(): void {

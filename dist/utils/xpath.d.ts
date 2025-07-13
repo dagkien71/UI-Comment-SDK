@@ -14,4 +14,3 @@ export declare function getElementSelector(element: Element): string;
  * Validate if an element still exists and is visible
  */
 export declare function isElementValid(element: Element): boolean;
-//# sourceMappingURL=xpath.d.ts.map

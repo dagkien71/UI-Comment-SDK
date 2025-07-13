@@ -15,4 +15,3 @@ export declare class SidebarButton {
     updateUser(user: User): void;
     destroy(): void;
 }
-//# sourceMappingURL=SidebarButton.d.ts.map

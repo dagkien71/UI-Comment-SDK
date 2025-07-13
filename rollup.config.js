@@ -58,7 +58,7 @@ export default [
       return id === "react" || id === "react-dom";
     },
   },
-  // CDN builds (minified for production)
+  // CDN builds (ultra-minified for production)
   {
     input: "src/index.ts",
     output: [
@@ -91,6 +91,22 @@ export default [
         modules: false,
         use: ["sass"],
         minimize: true,
+        cssnano: {
+          preset: [
+            "default",
+            {
+              discardComments: { removeAll: true },
+              normalizeWhitespace: true,
+              colormin: true,
+              minifyFontValues: true,
+              minifySelectors: true,
+              mergeLonghand: true,
+              mergeRules: true,
+              reduceIdents: false,
+              zindex: false,
+            },
+          ],
+        },
       }),
       typescript({
         tsconfig: "./tsconfig.json",
@@ -101,18 +117,54 @@ export default [
         compress: {
           drop_console: true,
           drop_debugger: true,
-          pure_funcs: ["console.log", "console.info", "console.debug"],
-          passes: 2,
+          pure_funcs: [
+            "console.log",
+            "console.info",
+            "console.debug",
+            "console.warn",
+          ],
+          passes: 3,
+          unsafe: true,
+          unsafe_comps: true,
+          unsafe_Function: true,
+          unsafe_math: true,
+          unsafe_proto: true,
+          unsafe_regexp: true,
+          unsafe_undefined: true,
+          dead_code: true,
+          evaluate: true,
+          hoist_funs: true,
+          hoist_props: true,
+          hoist_vars: true,
+          if_return: true,
+          inline: true,
+          join_vars: true,
+          loops: true,
+          reduce_vars: true,
+          sequences: true,
+          side_effects: true,
+          switches: true,
+          toplevel: true,
+          typeofs: true,
+          unused: true,
         },
         mangle: {
           toplevel: true,
           properties: {
             regex: /^_/,
           },
+          safari10: true,
         },
         format: {
           comments: false,
+          ascii_only: true,
+          beautify: false,
         },
+        ecma: 2020,
+        keep_classnames: false,
+        keep_fnames: false,
+        ie8: false,
+        safari10: true,
       }),
     ],
     external: (id) => {

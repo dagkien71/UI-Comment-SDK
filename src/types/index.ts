@@ -25,6 +25,7 @@ export interface CommentAttachment {
   url: string;
   type: "image" | "file";
   size: number;
+  originalSize?: number; // Original file size before compression
   uploadedAt: string;
 }
 
@@ -64,6 +65,8 @@ export interface CommentManagerConfig {
   ) => Promise<Comment>;
   onUpdateComment?: (comment: Comment) => Promise<Comment>;
   onDeleteComment?: (commentId: string) => Promise<void>;
+  onFetchJsonFile?: () => Promise<{ comments: Comment[] }>; // Function to fetch JSON data
+  onToggleModeSilent?: () => Promise<void>; // Callback for keyboard shortcut toggle without showing icons
 }
 
 export interface CommentBubbleProps {

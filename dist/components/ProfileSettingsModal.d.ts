@@ -14,4 +14,3 @@ export declare class ProfileSettingsModal {
     getElement(): HTMLElement;
     destroy(): void;
 }
-//# sourceMappingURL=ProfileSettingsModal.d.ts.map

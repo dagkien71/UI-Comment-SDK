@@ -21,4 +21,3 @@ export declare class ImageModal {
     hide(): void;
     destroy(): void;
 }
-//# sourceMappingURL=ImageModal.d.ts.map

@@ -14,4 +14,3 @@ export declare class LocalUserProfileStorage implements UserProfileStorage {
     updateUserProfile(updates: Partial<User>): User | null;
 }
 export declare const userProfileStorage: LocalUserProfileStorage;
-//# sourceMappingURL=userProfileStorage.d.ts.map

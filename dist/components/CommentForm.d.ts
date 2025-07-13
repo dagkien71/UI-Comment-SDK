@@ -33,4 +33,3 @@ export declare class CommentForm {
     reposition(): void;
     destroy(): void;
 }
-//# sourceMappingURL=CommentForm.d.ts.map

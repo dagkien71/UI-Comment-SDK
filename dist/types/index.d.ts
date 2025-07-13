@@ -17,6 +17,7 @@ export interface CommentAttachment {
     url: string;
     type: "image" | "file";
     size: number;
+    originalSize?: number;
     uploadedAt: string;
 }
 export interface Comment {
@@ -58,6 +59,10 @@ export interface CommentManagerConfig {
     onSaveComment: (comment: Omit<Comment, "id" | "createdAt">) => Promise<Comment>;
     onUpdateComment?: (comment: Comment) => Promise<Comment>;
     onDeleteComment?: (commentId: string) => Promise<void>;
+    onFetchJsonFile?: () => Promise<{
+        comments: Comment[];
+    }>;
+    onToggleModeSilent?: () => Promise<void>;
 }
 export interface CommentBubbleProps {
     comment: Comment;
@@ -118,4 +123,3 @@ export interface SDKEvents {
     };
 }
 export type EventCallback<T extends keyof SDKEvents> = (event: SDKEvents[T]) => void;
-//# sourceMappingURL=index.d.ts.map

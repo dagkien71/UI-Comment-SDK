@@ -16,4 +16,3 @@ export declare class SettingsButton {
     setVisible(visible: boolean): void;
     destroy(): void;
 }
-//# sourceMappingURL=SettingsButton.d.ts.map

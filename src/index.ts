@@ -34,6 +34,22 @@ export {
   LocalStorageManager,
 } from "./utils/localStorageUtils";
 
+// GitHub Gist Storage
+export { GitHubGistStorage } from "./utils/githubGistStorage";
+
+// Storage optimization
+export { StorageOptimizer } from "./utils/storageOptimizer";
+export { ImageCompressor } from "./utils/imageCompression";
+export { AdvancedImageCompressor } from "./utils/advancedImageCompression";
+
+// Upload managers with different compression levels
+export {
+  base64UploadManager,
+  advancedUploadManager,
+  minimalUploadManager,
+  createCustomUploadManager,
+} from "./utils/base64Upload";
+
 // Version information
 export const VERSION = "1.0.0";
 

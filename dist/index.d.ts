@@ -17,9 +17,13 @@ export { HybridCommentStorage } from "./storage/HybridCommentStorage";
 export { createHybridStorageConfig, hybridStorageUtils, } from "./utils/hybridStorageUtils";
 export { userProfileStorage, LocalUserProfileStorage, } from "./utils/userProfileStorage";
 export { localStorageUtils, LocalStorageManager, } from "./utils/localStorageUtils";
+export { GitHubGistStorage } from "./utils/githubGistStorage";
+export { StorageOptimizer } from "./utils/storageOptimizer";
+export { ImageCompressor } from "./utils/imageCompression";
+export { AdvancedImageCompressor } from "./utils/advancedImageCompression";
+export { base64UploadManager, advancedUploadManager, minimalUploadManager, createCustomUploadManager, } from "./utils/base64Upload";
 export declare const VERSION = "1.0.0";
 declare const _default: {
     initCommentSDK: typeof initCommentSDK;
 };
 export default _default;
-//# sourceMappingURL=index.d.ts.map

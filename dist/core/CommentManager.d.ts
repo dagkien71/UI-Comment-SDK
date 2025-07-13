@@ -41,8 +41,10 @@ export declare class CommentManager {
     private forceUpdateBubblePositions;
     private getCurrentUrl;
     loadComments(): Promise<void>;
+    private saveCommentsToLocalStorage;
+    private loadCommentsFromLocalStorage;
     private updateLayerVisibility;
-    setMode(mode: CommentMode): void;
+    setMode(mode: CommentMode): Promise<void>;
     getMode(): CommentMode;
     getComments(): Comment[];
     getCommentsForElement(element: Element): Comment[];
@@ -51,6 +53,6 @@ export declare class CommentManager {
     private refreshAllCommentBubbles;
     highlightElement(element: Element): void;
     testBubbleClicks(): void;
+    private clearAllBubbles;
     destroy(): void;
 }
-//# sourceMappingURL=CommentManager.d.ts.map

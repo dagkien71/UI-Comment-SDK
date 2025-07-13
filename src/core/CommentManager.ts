@@ -88,11 +88,26 @@ export class CommentManager {
   }
 
   private attachEventListeners(): void {
-    // ESC key handler to exit comment mode and close components
+    // Keyboard shortcuts handler
     this.escKeyHandler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        console.log("🔑 ESC pressed");
+      // Ctrl+E to toggle comment mode
+      if ((e.ctrlKey || e.metaKey) && e.key === "e") {
+        e.preventDefault();
+        e.stopPropagation();
 
+        // Use the silent toggle callback if available
+        if (this.config.onToggleModeSilent) {
+          this.config.onToggleModeSilent();
+        } else {
+          // Fallback to regular toggle
+          const newMode = this.mode === "normal" ? "comment" : "normal";
+          this.setMode(newMode);
+        }
+        return;
+      }
+
+      // ESC key handler to exit comment mode and close components
+      if (e.key === "Escape") {
         // If modal or form is active, close them first
         if (this.activeModal || this.activeForm) {
           this.closeActiveComponents();
@@ -238,22 +253,12 @@ export class CommentManager {
   }
 
   private handleElementClick = (e: Event): void => {
-    console.log("🔍 handleElementClick called", {
-      mode: this.mode,
-      target: e.target,
-      currentTarget: e.currentTarget,
-      targetElement: (e.target as HTMLElement)?.tagName,
-      targetClass: (e.target as HTMLElement)?.className,
-    });
-
     if (this.mode !== "comment") {
-      console.log("❌ Not in comment mode, ignoring click");
       return;
     }
 
     // Check if we're navigating from sidebar (prevent form opening)
     if ((window as any).uicmIsNavigatingFromSidebar) {
-      console.log("🔒 Navigating from sidebar, preventing form opening");
       return;
     }
 
@@ -265,18 +270,14 @@ export class CommentManager {
       clickTarget.classList.contains("uicm-comment-bubble") ||
       clickTarget.closest(".uicm-comment-bubble")
     ) {
-      console.log("🔵 Click on bubble, letting bubble handle it");
       return;
     }
 
     // Check if click is inside form layer or any SDK element
     const formLayer = document.querySelector(".uicm-comment-form");
     if (formLayer && formLayer.contains(clickTarget)) {
-      console.log("❌ Click inside form layer, ignoring");
       return;
     }
-
-    console.log("🎯 Processing element click for new comment...");
 
     // Temporarily hide all SDK elements
     const sdkElements = document.querySelectorAll("[data-uicm-element]");
@@ -299,17 +300,8 @@ export class CommentManager {
       htmlEl.style.display = originalDisplay[index];
     });
 
-    console.log("🎯 Click target:", {
-      element: target,
-      tagName: target?.tagName,
-      id: target?.id,
-      className: target?.className,
-      xpath: target ? getElementXPath(target) : null,
-    });
-
     // Ignore if no target found or if it's an SDK element
     if (!target || target.closest("[data-uicm-element]")) {
-      console.log("❌ Invalid target or SDK element, ignoring");
       return;
     }
 
@@ -465,7 +457,6 @@ export class CommentManager {
       // Only close if the click target is the overlay itself (not modal/form inside)
       if (e.target === overlay) {
         e.stopPropagation();
-        console.log("🔒 Overlay direct click, closing active components");
         this.closeActiveComponents();
       }
     });
@@ -486,9 +477,6 @@ export class CommentManager {
 
       // If not inside modal or form, close components
       if (!isInsideModal && !isInsideForm) {
-        console.log(
-          "🔒 Global click outside modal/form, closing active components"
-        );
         this.closeActiveComponents();
         document.removeEventListener("click", globalClickHandler);
       }
@@ -506,7 +494,6 @@ export class CommentManager {
     }
 
     this.activeOverlay = overlay;
-    console.log("✅ Overlay created with global click handler");
     return overlay;
   }
 
@@ -516,13 +503,10 @@ export class CommentManager {
         this.activeOverlay.parentNode.removeChild(this.activeOverlay);
       }
       this.activeOverlay = null;
-      console.log("✅ Overlay removed");
     }
   }
 
   public showModal(modal: any): void {
-    console.log("🔄 CommentManager: Showing modal");
-
     // Close any existing components
     this.closeActiveComponents();
 
@@ -531,8 +515,6 @@ export class CommentManager {
 
     // Set active modal
     this.activeModal = modal;
-
-    console.log("✅ Modal shown with overlay");
   }
 
   private showCommentForm(
@@ -610,7 +592,6 @@ export class CommentManager {
       }
 
       this.activeForm = form;
-      console.log("✅ Comment form shown with overlay");
     });
   }
 
@@ -629,7 +610,6 @@ export class CommentManager {
     }
 
     interactionLayer.appendChild(bubble.getElement());
-    console.log("✅ Bubble added to interaction layer");
   }
 
   private async createComment(
@@ -655,6 +635,7 @@ export class CommentManager {
 
     try {
       const newComment = await this.config.onSaveComment(commentData);
+
       this.comments.push(newComment);
       this.createCommentBubble(newComment);
     } catch (error) {
@@ -790,13 +771,6 @@ export class CommentManager {
       comment.archivedAt = new Date().toISOString();
     }
 
-    console.log("📝 Comment status changed:", {
-      commentId,
-      previousStatus,
-      newStatus: status,
-      timestamp: new Date().toISOString(),
-    });
-
     // Update comment via API if configured
     if (this.config.onUpdateComment) {
       await this.config.onUpdateComment(comment);
@@ -850,13 +824,6 @@ export class CommentManager {
       return;
     }
 
-    console.log(
-      "🔄 Updating bubble positions, total bubbles:",
-      this.commentBubbles.size,
-      "mode:",
-      this.mode
-    );
-
     this.commentBubbles.forEach((bubble, commentId) => {
       const comment = this.comments.find((c) => c.id === commentId);
       if (!comment) {
@@ -867,14 +834,12 @@ export class CommentManager {
       // Hide archived bubbles
       if (comment.status === CommentStatus.ARCHIVED) {
         bubble.getElement().style.display = "none";
-        console.log("📦 Hiding archived bubble:", commentId);
         return;
       }
 
       const element = getElementByXPath(comment.xpath);
       if (!element || !isElementValid(element)) {
         // Element not found, hide bubble
-        console.log("❌ Element not found, hiding bubble:", comment.xpath);
         bubble.getElement().style.display = "none";
         return;
       }
@@ -890,20 +855,6 @@ export class CommentManager {
       const absoluteX = rect.left + rect.width * comment.relativePosition.x;
       const absoluteY = rect.top + rect.height * comment.relativePosition.y;
 
-      console.log("📍 Updating bubble position:", {
-        commentId,
-        xpath: comment.xpath,
-        elementRect: {
-          left: rect.left,
-          top: rect.top,
-          width: rect.width,
-          height: rect.height,
-        },
-        relativePosition: comment.relativePosition,
-        newPosition: { x: absoluteX, y: absoluteY },
-        status: comment.status,
-      });
-
       // Update bubble position
       bubble.updatePosition({ x: absoluteX, y: absoluteY });
 
@@ -917,11 +868,6 @@ export class CommentManager {
     if (this.commentBubbles.size === 0) {
       return;
     }
-
-    console.log(
-      "🔄 Force updating bubble positions:",
-      this.commentBubbles.size
-    );
 
     this.commentBubbles.forEach((bubble, commentId) => {
       const comment = this.comments.find((c) => c.id === commentId);
@@ -961,7 +907,9 @@ export class CommentManager {
 
   public async loadComments(): Promise<void> {
     try {
-      const allComments = await this.config.onLoadComments();
+      // Try to load from API first
+      const data = await this.config.onFetchJsonFile?.();
+      const allComments = data?.comments || [];
       const currentUrl = this.getCurrentUrl();
 
       // Filter comments to only show those from the current URL
@@ -969,10 +917,38 @@ export class CommentManager {
         (comment) => comment.url === currentUrl
       );
 
+      console.log("📂 Loaded comments from API:", {
+        totalFromAPI: allComments.length,
+        filteredForCurrentURL: this.comments.length,
+        currentURL: currentUrl,
+        comments: this.comments.map((c) => ({
+          id: c.id,
+          content: c.content.substring(0, 30) + "...",
+        })),
+      });
+
+      // Save to localStorage as backup (only once when loading)
+      this.saveCommentsToLocalStorage(this.comments);
+
+      // Clear existing bubbles before creating new ones
+      this.clearAllBubbles();
+
       // Create bubbles for all comments
       this.comments.forEach((comment) => {
         this.createCommentBubble(comment);
       });
+
+      // Sync comments back to SDK if it has onLoadComments configured
+      if (this.config.onLoadComments) {
+        try {
+          console.log("🔄 Calling onLoadComments to sync with SDK...");
+          // This will update the SDK's comments array
+          await this.config.onLoadComments();
+          console.log("✅ onLoadComments completed");
+        } catch (error) {
+          console.warn("Failed to sync comments to SDK:", error);
+        }
+      }
 
       // Force update positions after loading comments
       if (this.comments.length > 0) {
@@ -981,8 +957,68 @@ export class CommentManager {
         }, 100);
       }
     } catch (error) {
-      console.error("Failed to load comments:", error);
+      console.error(
+        "Failed to load comments from API, trying localStorage:",
+        error
+      );
+
+      // Fallback to localStorage when API fails
+      try {
+        const localComments = this.loadCommentsFromLocalStorage();
+        const currentUrl = this.getCurrentUrl();
+
+        // Filter comments to only show those from the current URL
+        this.comments = localComments.filter(
+          (comment) => comment.url === currentUrl
+        );
+
+        // Clear existing bubbles before creating new ones
+        this.clearAllBubbles();
+
+        // Create bubbles for all comments
+        this.comments.forEach((comment) => {
+          this.createCommentBubble(comment);
+        });
+
+        // Force update positions after loading comments
+        if (this.comments.length > 0) {
+          setTimeout(() => {
+            this.forceUpdateBubblePositions();
+          }, 100);
+        }
+      } catch (localStorageError) {
+        console.error(
+          "Failed to load comments from localStorage:",
+          localStorageError
+        );
+      }
     }
+  }
+
+  private saveCommentsToLocalStorage(comments: Comment[]): void {
+    try {
+      const data = {
+        comments,
+        lastUpdated: new Date().toISOString(),
+        source: "comment-manager-backup",
+      };
+      localStorage.setItem("uicm-comments-backup", JSON.stringify(data));
+    } catch (error) {
+      console.error("Failed to save comments to localStorage:", error);
+    }
+  }
+
+  private loadCommentsFromLocalStorage(): Comment[] {
+    try {
+      const stored = localStorage.getItem("uicm-comments-backup");
+      if (stored) {
+        const data = JSON.parse(stored);
+        return data.comments || [];
+      }
+    } catch (error) {
+      console.error("Failed to load from localStorage:", error);
+    }
+    return [];
   }
 
   private updateLayerVisibility(): void {
@@ -1023,21 +1059,43 @@ export class CommentManager {
     }
   }
 
-  public setMode(mode: CommentMode): void {
+  public async setMode(mode: CommentMode): Promise<void> {
     this.mode = mode;
     this.updateLayerVisibility();
 
-    // Force update bubble positions when switching to comment mode
-    if (mode === "comment" && this.commentBubbles.size > 0) {
-      console.log("🔄 Switching to comment mode, updating bubble positions");
+    // Only create bubbles when switching to comment mode
+    if (mode === "comment") {
+      // Get comments from SDK instead of loading from API
+      if (this.config.onLoadComments) {
+        try {
+          console.log("🔄 Getting comments from SDK...");
+          const sdkComments = await this.config.onLoadComments();
 
-      // Update positions immediately (synchronous)
-      this.forceUpdateBubblePositions();
+          // Update CommentManager's comments array
+          this.comments = [...sdkComments];
+          console.log("✅ Got comments from SDK:", this.comments.length);
 
-      // Also update after a short delay to ensure proper positioning
-      setTimeout(() => {
-        this.forceUpdateBubblePositions();
-      }, 100);
+          // Clear existing bubbles before creating new ones
+          this.clearAllBubbles();
+
+          // Create bubbles for all comments
+          this.comments.forEach((comment) => {
+            this.createCommentBubble(comment);
+          });
+
+          // Force update bubble positions
+          if (this.commentBubbles.size > 0) {
+            this.forceUpdateBubblePositions();
+
+            // Also update after a short delay to ensure proper positioning
+            setTimeout(() => {
+              this.forceUpdateBubblePositions();
+            }, 100);
+          }
+        } catch (error) {
+          console.error("Failed to get comments from SDK:", error);
+        }
+      }
     }
   }
 
@@ -1060,7 +1118,6 @@ export class CommentManager {
 
   public updateCurrentUser(user: User): void {
     this.config.currentUser = user;
-    console.log("🔄 CommentManager: Current user updated:", user);
 
     // Refresh all comment bubbles to show updated user names
     this.refreshAllCommentBubbles();
@@ -1106,24 +1163,20 @@ export class CommentManager {
   }
 
   public testBubbleClicks(): void {
-    console.log("🧪 TESTING ALL BUBBLE CLICKS");
-    console.log("Mode:", this.mode);
-    console.log("Bubble count:", this.commentBubbles.size);
-
     const interactionLayer = document.getElementById("uicm-interaction-layer");
-    console.log("Interaction layer:", {
-      found: !!interactionLayer,
-      display: interactionLayer?.style.display,
-      computedDisplay: interactionLayer
-        ? getComputedStyle(interactionLayer).display
-        : null,
-      children: interactionLayer?.children.length,
-    });
 
     this.commentBubbles.forEach((bubble, commentId) => {
-      console.log(`🔍 Testing bubble ${commentId}:`);
       bubble.testClickability();
     });
+  }
+
+  private clearAllBubbles(): void {
+    // Clean up all bubbles
+    this.commentBubbles.forEach((bubble) => bubble.destroy());
+    this.commentBubbles.clear();
+
+    // Clear position cache
+    this.positionCache.clear();
   }
 
   public destroy(): void {
@@ -1161,9 +1214,6 @@ export class CommentManager {
     }
 
     // Clean up all bubbles
-    this.commentBubbles.forEach((bubble) => bubble.destroy());
-    this.commentBubbles.clear();
-
-    console.log("CommentManager destroyed");
+    this.clearAllBubbles();
   }
 }

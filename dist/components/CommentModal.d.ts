@@ -32,4 +32,3 @@ export declare class CommentModal {
     reposition(): void;
     destroy(): void;
 }
-//# sourceMappingURL=CommentModal.d.ts.map
