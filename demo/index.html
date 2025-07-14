@@ -584,19 +584,7 @@
       }
     </style>
     <script src="https://unpkg.com/ui-comment-sdk@latest/dist/ui-comment-sdk.min.js"></script>
-    <script type="module">
-      // Import config from separate file
-      import { JSONBIN_CONFIG } from './config.js';
-      // Make config available globally
-      window.JSONBIN_CONFIG = JSONBIN_CONFIG;
-    </script>
-    <script>
-      // Fallback if config.js doesn't exist
-      if (!window.JSONBIN_CONFIG) {
-        console.log("⚠️ config.js not found, using localStorage fallback");
-        window.JSONBIN_CONFIG = null;
-      }
-    </script>
+  
   </head>
 
   <body>
@@ -875,10 +863,10 @@
     <!-- SDK script -->
 
     <script>
-      // JSONBin.io Configuration (Free alternative to GitHub Gist)
-      const BIN_ID = window.JSONBIN_CONFIG?.BIN_ID || "demo-comments-bin"; // You can change this to any unique ID
-      const MASTER_KEY = window.JSONBIN_CONFIG?.MASTER_KEY || "$2a$10$your-master-key-here"; // Get from https://jsonbin.io/
-
+      // JSONBin.io Configuration for Online Demo
+      const BIN_ID = "68724f7c520a0b7959385cb9";
+      const MASTER_KEY = "$2a$10$spXPIbtHsz.rbZrMYwrEMeTym8i4DzcmiBsiyyB.esXTvFPp0l3kq";
+  
       // JSONBin.io API functions
       async function fetchFromBin() {
         try {
@@ -889,7 +877,7 @@
             },
           });
           console.log("📡 JSONBin response status:", response.status);
-
+  
           if (!response.ok) {
             if (response.status === 404) {
               console.log("📭 Bin not found, returning empty data");
@@ -899,7 +887,7 @@
               `JSONBin API error: ${response.status} ${response.statusText}`
             );
           }
-
+  
           const data = await response.json();
           const comments = data.record?.comments || [];
           console.log("✅ Successfully fetched from JSONBin:", {
@@ -914,7 +902,7 @@
           return { comments: [] };
         }
       }
-
+  
       async function saveToBin(data) {
         try {
           console.log("💾 Saving to JSONBin.io...");
@@ -927,7 +915,7 @@
                 )
               : false,
           });
-
+  
           const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
             method: "PUT",
             headers: {
@@ -936,16 +924,16 @@
             },
             body: JSON.stringify(data),
           });
-
+  
           console.log("📡 Save response status:", response.status);
-
+  
           if (!response.ok) {
             const errorText = await response.text();
             throw new Error(
               `JSONBin API error: ${response.status} ${response.statusText} - ${errorText}`
             );
           }
-
+  
           const result = await response.json();
           console.log("✅ Successfully saved to JSONBin");
           return result;
@@ -954,23 +942,16 @@
           throw error;
         }
       }
-
-      // For demo purposes, use localStorage if JSONBin is not configured
+  
+      // Initialize SDK with JSONBin.io
       const sdk = UICommentSDK.initCommentSDK({
-        projectId: "demo",
+        projectId: "online-demo",
         theme: "light",
-
+  
         onFetchJsonFile: async () => {
-          // Try JSONBin first, fallback to localStorage
-          if (MASTER_KEY !== "$2a$10$your-master-key-here") {
-            return await fetchFromBin();
-          } else {
-            console.log("🔧 Using localStorage for demo (JSONBin not configured)");
-            const stored = localStorage.getItem("uicm-demo-project");
-            return { comments: stored ? JSON.parse(stored) : [] };
-          }
+          return await fetchFromBin();
         },
-
+  
         onUpdate: async (comments) => {
           console.log("🔄 SDK onUpdate called with comments:", {
             count: comments.length,
@@ -983,29 +964,11 @@
             ),
             totalDataSize: JSON.stringify(comments).length,
           });
-
-          // Log details about attachments
-          comments.forEach((comment, index) => {
-            if (comment.attachments && comment.attachments.length > 0) {
-              console.log(`📎 Comment ${index + 1} attachments:`, {
-                commentId: comment.id,
-                attachmentCount: comment.attachments.length,
-                attachmentTypes: comment.attachments.map((a) => a.type),
-                attachmentSizes: comment.attachments.map((a) => a.size),
-              });
-            }
-          });
-
-          // Try JSONBin first, fallback to localStorage
-          if (MASTER_KEY !== "$2a$10$your-master-key-here") {
-            await saveToBin({ comments });
-          } else {
-            console.log("🔧 Saving to localStorage (JSONBin not configured)");
-            localStorage.setItem("uicm-demo-project", JSON.stringify(comments));
-          }
+  
+          await saveToBin({ comments });
         },
       });
-
+  
       sdk.init();
     </script>
     <script>
@@ -1157,4 +1120,5 @@
       }, 1000);
     </script>
   </body>
+ 
 </html>
