@@ -587,9 +587,15 @@
     <script type="module">
       // Import config from separate file
       import { JSONBIN_CONFIG } from './config.js';
-      
       // Make config available globally
       window.JSONBIN_CONFIG = JSONBIN_CONFIG;
+    </script>
+    <script>
+      // Fallback if config.js doesn't exist
+      if (!window.JSONBIN_CONFIG) {
+        console.log("⚠️ config.js not found, using localStorage fallback");
+        window.JSONBIN_CONFIG = null;
+      }
     </script>
   </head>
 
@@ -859,13 +865,12 @@
       </div>
     </div>
 
-    <div class="status">
-      🎉 SDK Demo is ready! Try clicking the toggle button or use the keyboard
-      shortcut (Ctrl+E).
-      <br />
-      <strong>💡 Pro Tip:</strong> Check out
-      <code>demo/simple-demo.html</code> for the super simple setup!
-    </div>
+          <div class="status">
+        🎉 SDK Demo is ready! Try clicking the toggle button or use the keyboard
+        shortcut (Ctrl+E).
+        <br />
+        <strong>💡 Pro Tip:</strong> To use JSONBin.io storage, copy <code>demo/config.example.js</code> to <code>demo/config.js</code> and update with your credentials!
+      </div>
 
     <!-- SDK script -->
 
