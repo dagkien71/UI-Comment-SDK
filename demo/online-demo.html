@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UI Comment SDK - Online Demo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas,
+          "Courier New", monospace;
+        line-height: 1.6;
+        color: #e2e8f0;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background: linear-gradient(
+          135deg,
+          #0f172a 0%,
+          #1e293b 50%,
+          #0f172a 100%
+        );
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+            circle at 20% 50%,
+            rgba(0, 255, 255, 0.1) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            rgba(139, 92, 246, 0.1) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 40% 80%,
+            rgba(34, 197, 94, 0.1) 0%,
+            transparent 50%
+          );
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .container {
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(16px);
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+          0 0 0 1px rgba(0, 255, 255, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      }
+
+      h1 {
+        color: #00ffff;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.5),
+          0 0 20px rgba(0, 255, 255, 0.3), 0 0 40px rgba(0, 255, 255, 0.1);
+        letter-spacing: -0.02em;
+      }
+
+      h2 {
+        color: #00ffff;
+        margin-bottom: 30px;
+        font-size: 2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .info {
+        background: rgba(15, 23, 42, 0.6);
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2),
+          inset 0 1px 0 rgba(34, 197, 94, 0.1);
+      }
+
+      .info h3 {
+        color: #22c55e;
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .info p {
+        color: #cbd5e1;
+        margin-bottom: 10px;
+      }
+
+      .keyboard-shortcut {
+        background: rgba(15, 23, 42, 0.8);
+        padding: 15px;
+        border-radius: 6px;
+        margin: 20px 0;
+        border: 1px solid rgba(139, 92, 246, 0.4);
+        color: #8b5cf6;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2),
+          inset 0 1px 0 rgba(139, 92, 246, 0.1);
+      }
+
+      .keyboard-shortcut kbd {
+        background: rgba(30, 41, 59, 0.8);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-family: inherit;
+        font-size: 12px;
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        color: #00ffff;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .status {
+        background: rgba(15, 23, 42, 0.8);
+        padding: 15px;
+        border-radius: 6px;
+        margin-top: 20px;
+        border: 1px solid rgba(34, 197, 94, 0.4);
+        color: #22c55e;
+        text-align: center;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2),
+          inset 0 1px 0 rgba(34, 197, 94, 0.1);
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .feature-card {
+        background: rgba(15, 23, 42, 0.7);
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2),
+          inset 0 1px 0 rgba(139, 92, 246, 0.1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .feature-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #8b5cf6, transparent);
+      }
+
+      .feature-card h3 {
+        color: #8b5cf6;
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .feature-card p {
+        color: #cbd5e1;
+        margin-bottom: 15px;
+      }
+
+      .feature-card .demo-element {
+        background: rgba(30, 41, 59, 0.8);
+        padding: 15px;
+        border-radius: 6px;
+        margin-top: 15px;
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        box-shadow: inset 0 1px 0 rgba(0, 255, 255, 0.1);
+      }
+
+      .demo-element h4 {
+        color: #00ffff;
+        margin: 0 0 10px 0;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.9rem;
+      }
+
+      .demo-element p {
+        color: #cbd5e1;
+        margin: 0;
+      }
+
+      .sample-ui {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .sample-button {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: #0f172a;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        font-family: inherit;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+      }
+
+      .sample-button:hover {
+        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3),
+          0 0 20px rgba(34, 197, 94, 0.2);
+      }
+
+      .sample-input {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        border-radius: 4px;
+        padding: 10px;
+        color: #00ffff;
+        font-size: 14px;
+        font-family: inherit;
+        backdrop-filter: blur(5px);
+        width: 200px;
+        transition: all 0.3s ease;
+      }
+
+      .sample-input:focus {
+        outline: none;
+        border-color: #00ffff;
+        box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.1);
+      }
+
+      .sample-input::placeholder {
+        color: rgba(0, 255, 255, 0.5);
+      }
+
+      .sample-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #cbd5e1;
+        font-size: 14px;
+        cursor: pointer;
+        font-family: inherit;
+      }
+
+      .sample-checkbox input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        accent-color: #22c55e;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        body {
+          padding: 10px;
+        }
+
+        h1 {
+          font-size: 2rem;
+          letter-spacing: 2px;
+        }
+
+        h2 {
+          font-size: 1.5rem;
+        }
+
+        .features {
+          grid-template-columns: 1fr;
+        }
+
+        .sample-ui {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .sample-input {
+          width: 100%;
+        }
+      }
+    </style>
+    <script src="https://unpkg.com/ui-comment-sdk@latest/dist/ui-comment-sdk.min.js"></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>🎨 UI Comment SDK - Online Demo</h1>
+
+      <div class="info">
+        <h3>📋 Demo Instructions</h3>
+        <p>
+          <strong>What is UI Comment SDK?</strong> <br />
+          This SDK enables teams to add visual comments and feedback directly on
+          any web page or app UI. It's designed for developers, designers, and
+          QA teams who need to collaborate, review, and discuss UI elements in
+          real time or asynchronously.
+        </p>
+      </div>
+
+      <div class="info keyboard-shortcut">
+        <h3>🚀 How to Use</h3>
+        <p>
+          <strong>1.</strong> Press <kbd>Ctrl</kbd> + <kbd>E</kbd> or
+          <kbd>click</kbd> the comment icon to toggle comment mode.
+        </p>
+        <p>
+          <strong>2.</strong> Click on any element below to add a comment → SDK
+          shows the comment form
+        </p>
+        <p>
+          <strong>3.</strong> Click on existing comment bubbles to view and
+          reply to comments
+        </p>
+        <p>
+          <strong>4.</strong> Use the sidebar to browse all comments and
+          navigate between them
+        </p>
+        <p>
+          <strong>✨ What the SDK handles:</strong> All UI components (forms,
+          bubbles, modals, sidebar) - you only need to provide API callbacks for
+          data persistence!
+        </p>
+      </div>
+    </div>
+
+    <div class="container">
+      <h2>✨ Features</h2>
+      <div class="features">
+        <div class="feature-card">
+          <h3>🎯 Click-to-Comment</h3>
+          <p>Click on any DOM element to add contextual comments with visual feedback.</p>
+          <div class="demo-element">
+            <h4>Try it here:</h4>
+            <p>Click on this text to add a comment!</p>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <h3>💬 Rich Interactions</h3>
+          <p>Reply to comments, resolve discussions, and manage feedback with ease.</p>
+          <div class="demo-element">
+            <h4>Sample UI Elements:</h4>
+            <div class="sample-ui">
+              <button class="sample-button">Sample Button</button>
+              <input class="sample-input" placeholder="Sample Input" />
+              <label class="sample-checkbox">
+                <input type="checkbox" />
+                Sample Checkbox
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <h3>✨ Glassmorphism UI</h3>
+          <p>Modern glass-effect design with blur backgrounds and smooth animations.</p>
+          <div class="demo-element">
+            <h4>Beautiful Design:</h4>
+            <p>Notice the glassmorphism effects throughout the interface!</p>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <h3>🎨 Dual Themes</h3>
+          <p>Built-in light and dark theme support for any environment.</p>
+          <div class="demo-element">
+            <h4>Theme Support:</h4>
+            <p>Switch between light and dark themes seamlessly.</p>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <h3>📱 Responsive Design</h3>
+          <p>Works seamlessly across desktop, tablet, and mobile devices.</p>
+          <div class="demo-element">
+            <h4>Mobile Friendly:</h3>
+            <p>Try resizing your browser window to see the responsive design!</p>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <h3>⚡ Performance Optimized</h3>
+          <p>Efficient XPath-based element tracking and debounced positioning.</p>
+          <div class="demo-element">
+            <h4>Fast & Smooth:</h4>
+            <p>Optimized for performance with minimal impact on your app.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="status">
+      🎉 SDK Demo is ready! Try clicking the toggle button or use the keyboard
+      shortcut (Ctrl+E).
+      <br />
+      <strong>💡 This demo uses JSONBin.io for data storage - your comments will be saved online!</strong>
+    </div>
+
+    <script>
+      // JSONBin.io Configuration for Online Demo
+      const BIN_ID = "68724f7c520a0b7959385cb9";
+      const MASTER_KEY = "$2a$10$spXPIbtHsz.rbZrMYwrEMeTym8i4DzcmiBsiyyB.esXTvFPp0l3kq";
+
+      // JSONBin.io API functions
+      async function fetchFromBin() {
+        try {
+          console.log("🔄 Fetching from JSONBin.io...");
+          const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+            headers: {
+              "X-Master-Key": MASTER_KEY,
+            },
+          });
+          console.log("📡 JSONBin response status:", response.status);
+
+          if (!response.ok) {
+            if (response.status === 404) {
+              console.log("📭 Bin not found, returning empty data");
+              return { comments: [] };
+            }
+            throw new Error(
+              `JSONBin API error: ${response.status} ${response.statusText}`
+            );
+          }
+
+          const data = await response.json();
+          const comments = data.record?.comments || [];
+          console.log("✅ Successfully fetched from JSONBin:", {
+            hasComments: !!comments,
+            commentCount: comments.length,
+            dataSize: JSON.stringify(data).length,
+          });
+          return { comments };
+        } catch (error) {
+          console.error("❌ Error fetching from JSONBin:", error);
+          // Return empty data on error
+          return { comments: [] };
+        }
+      }
+
+      async function saveToBin(data) {
+        try {
+          console.log("💾 Saving to JSONBin.io...");
+          console.log("📊 Data to save:", {
+            commentCount: data.comments ? data.comments.length : 0,
+            dataSize: JSON.stringify(data).length,
+            hasAttachments: data.comments
+              ? data.comments.some(
+                  (c) => c.attachments && c.attachments.length > 0
+                )
+              : false,
+          });
+
+          const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+            method: "PUT",
+            headers: {
+              "X-Master-Key": MASTER_KEY,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          });
+
+          console.log("📡 Save response status:", response.status);
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(
+              `JSONBin API error: ${response.status} ${response.statusText} - ${errorText}`
+            );
+          }
+
+          const result = await response.json();
+          console.log("✅ Successfully saved to JSONBin");
+          return result;
+        } catch (error) {
+          console.error("❌ Error saving to JSONBin:", error);
+          throw error;
+        }
+      }
+
+      // Initialize SDK with JSONBin.io
+      const sdk = UICommentSDK.initCommentSDK({
+        projectId: "online-demo",
+        theme: "dark",
+
+        onFetchJsonFile: async () => {
+          return await fetchFromBin();
+        },
+
+        onUpdate: async (comments) => {
+          console.log("🔄 SDK onUpdate called with comments:", {
+            count: comments.length,
+            hasAttachments: comments.some(
+              (c) => c.attachments && c.attachments.length > 0
+            ),
+            attachmentsCount: comments.reduce(
+              (total, c) => total + (c.attachments ? c.attachments.length : 0),
+              0
+            ),
+            totalDataSize: JSON.stringify(comments).length,
+          });
+
+          await saveToBin({ comments });
+        },
+      });
+
+      sdk.init();
+    </script>
+  </body>
+</html> 
