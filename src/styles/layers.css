@@ -1,0 +1,60 @@
+/* SDK Layers */
+#uicm-root {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 999998;
+}
+
+/* Base layer for background element highlights */
+#uicm-highlight-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Unified interaction layer for bubbles and forms */
+#uicm-interaction-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Overlay for blocking events when modal/form is active */
+.uicm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.1);
+  z-index: 999997;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* Modal and form should appear above overlay */
+.uicm-comment-modal,
+.uicm-comment-form {
+  z-index: 999999 !important; /* Higher than overlay */
+  pointer-events: auto !important;
+  position: relative; /* Ensure z-index takes effect */
+}
+
+/* Bubbles should be clickable in interaction layer */
+.uicm-comment-bubble {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 100 !important;
+}

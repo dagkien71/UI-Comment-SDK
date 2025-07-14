@@ -1,0 +1,572 @@
+/* Modern Comment Form with New UI */
+.uicm-comment-form {
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  width: 380px;
+  position: relative;
+  overflow: hidden;
+  font-family: "Inter", sans-serif;
+  animation: uicm-form-slide-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
+}
+
+.uicm-comment-form:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.15), 0 20px 40px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Gradient Header Bar */
+.uicm-comment-form::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    135deg,
+    var(--uicm-accent, #3b82f6) 0%,
+    #8b5cf6 25%,
+    #06b6d4 50%,
+    #10b981 75%,
+    #f59e0b 100%
+  );
+  border-radius: var(--uicm-border-radius, 20px) var(--uicm-border-radius, 20px)
+    0 0;
+}
+
+/* Header Section with improved layout */
+.uicm-form-header {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  border-radius: 16px 16px 0 0;
+  padding: 0;
+}
+
+.uicm-form-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px 24px 20px;
+  gap: 16px;
+}
+
+.uicm-form-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.uicm-form-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.uicm-form-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.uicm-form-action-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.uicm-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  order: 2;
+  margin-bottom: 8px;
+}
+
+.uicm-user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  transition: transform 0.2s;
+}
+
+.uicm-user-avatar:hover {
+  transform: scale(1.1);
+}
+
+.uicm-user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.uicm-user-name-input {
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.2;
+  outline: none;
+  transition: all 0.2s ease;
+  max-width: 180px;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.uicm-user-name-input:hover {
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.uicm-user-name-input:focus {
+  background: rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.uicm-user-name-input::placeholder {
+  color: var(--uicm-text-secondary, #64748b);
+  opacity: 0.7;
+}
+
+.uicm-user-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--uicm-text-primary, #0f172a);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.uicm-close-button {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.8),
+    rgba(247, 243, 233, 0.6)
+  );
+  border: 1px solid rgba(224, 122, 95, 0.2);
+  color: #6b5b47;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 20px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(224, 122, 95, 0.1);
+  line-height: 1;
+}
+
+/* Content Section */
+.uicm-form-content {
+  padding: 16px 20px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.uicm-comment-textarea {
+  flex: 1;
+  min-height: 80px;
+  max-height: 200px;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #374151;
+  resize: none;
+  transition: all 0.2s ease;
+  background: #ffffff;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.uicm-comment-textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.uicm-comment-textarea::placeholder {
+  color: #9ca3af;
+  font-style: normal;
+  opacity: 0.7;
+}
+
+/* Character Counter - Hidden like in reply form */
+.uicm-char-counter {
+  display: none;
+}
+
+/* File previews at top - with higher specificity */
+.uicm-comment-form .uicm-file-preview-container {
+  order: 1;
+  margin-bottom: 8px;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 8px;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.uicm-comment-form .uicm-file-preview-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.uicm-comment-form .uicm-file-preview-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 2px;
+}
+
+.uicm-comment-form .uicm-file-preview-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.uicm-comment-form .uicm-file-preview-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Form input container (textarea + file upload button) */
+.uicm-form-input-container {
+  position: relative;
+  order: 2;
+  flex: 1;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+/* File upload button in form input container (small like reply form) */
+.uicm-form-input-container .uicm-file-upload-button {
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Actions Section */
+.uicm-form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  order: 3;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.uicm-secondary-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.uicm-emoji-button,
+.uicm-mention-button {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--uicm-text-secondary, #64748b);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.uicm-emoji-button:hover,
+.uicm-mention-button:hover {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: var(--uicm-accent, #3b82f6);
+  color: var(--uicm-accent, #3b82f6);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
+}
+
+/* Primary actions - single button layout */
+.uicm-primary-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.uicm-submit-button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.uicm-submit-button:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.uicm-submit-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.uicm-submit-button kbd {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: normal;
+}
+
+/* Loading Spinner */
+.uicm-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: uicm-spin 1s linear infinite;
+}
+
+/* Error Message */
+.uicm-error-message {
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.1),
+    rgba(220, 38, 38, 0.05)
+  );
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--uicm-danger, #ef4444);
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  margin-top: 12px;
+  font-weight: 500;
+  animation: uicm-shake 0.5s ease-in-out;
+  backdrop-filter: blur(8px);
+}
+
+/* Animations */
+@keyframes uicm-form-slide-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes uicm-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes uicm-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes uicm-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+/* Paste Loading Styles */
+.uicm-paste-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 12px;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: #1e293b;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.uicm-loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e2e8f0;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  animation: uicm-spin 1s linear infinite;
+}
+
+@keyframes uicm-glow-warning {
+  0%,
+  100% {
+    text-shadow: 0 0 4px rgba(245, 158, 11, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
+  }
+}
+
+@keyframes uicm-glow-error {
+  0%,
+  100% {
+    text-shadow: 0 0 4px rgba(239, 68, 68, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .uicm-comment-form {
+    min-width: 320px;
+    max-width: 95vw;
+    margin: 10px;
+  }
+
+  .uicm-form-header-content {
+    padding: 20px 20px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .uicm-form-title-section {
+    width: 100%;
+  }
+
+  .uicm-form-action-section {
+    align-self: flex-end;
+  }
+
+  .uicm-form-content {
+    padding: 20px;
+  }
+
+  .uicm-form-actions {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .uicm-primary-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .uicm-cancel-button,
+  .uicm-submit-button {
+    flex: 1;
+    text-align: center;
+  }
+
+  .uicm-secondary-actions {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .uicm-user-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .uicm-user-avatar::after {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+/* Form elements should have proper event handling */
+.uicm-comment-form input,
+.uicm-comment-form textarea,
+.uicm-comment-form button,
+.uicm-comment-form select {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 1 !important;
+}
+
+/* Form should prevent event bubbling */
+.uicm-comment-form {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 999999 !important;
+}
+
+/* Header bar styling */
+.uicm-form-header-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #06b6d4, #10b981);
+  border-radius: 8px 8px 0 0;
+  z-index: 1;
+}

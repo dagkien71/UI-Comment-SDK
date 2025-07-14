@@ -1,0 +1,35 @@
+import { Comment, CommentSDKConfig, User } from "../types";
+export declare class CommentSDK {
+    private config;
+    private commentManager;
+    private debugIcon;
+    private settingsButton;
+    private sidebarButton;
+    private sidebar;
+    private commentModal;
+    private root;
+    private isInitialized;
+    private comments;
+    private currentUser;
+    constructor(config: CommentSDKConfig);
+    private validateConfig;
+    init(): Promise<void>;
+    syncCommentsFromManager(): void;
+    private loadCommentsFromAPI;
+    private setupDOM;
+    private initializeUI;
+    private toggleMode;
+    private toggleModeSilent;
+    setMode(mode: "normal" | "comment"): Promise<void>;
+    private openSidebar;
+    private navigateToComment;
+    private openCommentModal;
+    private getElementPosition;
+    private findElementByXPath;
+    private generateId;
+    destroy(): void;
+    getComments(): Comment[];
+    getCurrentUser(): User;
+    private handleSidebarNavigation;
+}
+export declare function initCommentSDK(config: CommentSDKConfig): CommentSDK;
