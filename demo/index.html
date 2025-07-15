@@ -653,25 +653,26 @@ This SDK enables teams to add visual comments and feedback directly on any web p
     <div class="container">
       <h2>📦 CDN Setup</h2>
       <div class="code-block">
-        <pre><span class="comment">// Use the CDN script above and provide required backend API callbacks as shown below.</span>
-<span class="keyword">&lt;script</span> <span class="property">src</span>=<span class="string">"https://unpkg.com/ui-comment-sdk@latest/dist/ui-comment-sdk.min.js"</span><span class="keyword">&gt;&lt;/script&gt;</span>
-<span class="keyword">&lt;script&gt;</span>
-<span class="keyword">const</span> <span class="variable">sdk</span> = <span class="function">UICommentSDK.initCommentSDK</span>({
-  <span class="property">projectId</span>: <span class="string">"my-project"</span>,
-  <span class="property">theme</span>: <span class="string">"light"</span>, <span class="comment">// optional</span>
-  <span class="property">onFetchJsonFile</span>: <span class="keyword">async</span> () => {
-    <span class="keyword">return</span> <span class="keyword">await</span> <span class="function">fetch</span>(<span class="string">"/api/comments.json"</span>).<span class="property">then</span>(<span class="variable">r</span> => <span class="variable">r</span>.<span class="property">json</span>());
+        <pre>
+<script src="https://unpkg.com/ui-comment-sdk@latest/dist/ui-comment-sdk.min.js"></script>
+<script>
+const sdkDemo = UICommentSDK.initCommentSDK({
+  projectId: "my-project",
+  theme: "light", // optional
+  onFetchJsonFile: async () => {
+    return await fetch("/api/comments.json").then(r => r.json());
   },
-  <span class="property">onUpdate</span>: <span class="keyword">async</span> (<span class="variable">comments</span>) => {
-    <span class="keyword">await</span> <span class="function">fetch</span>(<span class="string">"/api/comments.json"</span>, {
-      <span class="property">method</span>: <span class="string">"PUT"</span>,
-      <span class="property">headers</span>: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
-      <span class="property">body</span>: <span class="function">JSON.stringify</span>(<span class="variable">comments</span>)
+  onUpdate: async (comments) => {
+    await fetch("/api/comments.json", {
+      method: "PUT",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(comments)
     });
   }
 });
-<span class="keyword">await</span> <span class="variable">sdk</span>.<span class="property">init</span>();
-<span class="keyword">&lt;/script&gt;</span></pre>
+await sdkDemo.init();
+</script>
+</pre>
       </div>
     </div>
 
