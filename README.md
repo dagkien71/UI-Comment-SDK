@@ -13,7 +13,7 @@ Easily add visual comments and feedback to any web page or app UI. **A backend i
 Set up API endpoints to load and save comments (e.g., REST API, JSON file, or cloud storage).
 
 - **GET** `/api/comments.json` → returns `{ comments: [...] }`
-- **POST** `/api/comments.json` → accepts updated comments array
+- **PUT** `/api/comments.json` → replaces comments array
 
 ### 2. CDN Usage
 
@@ -28,7 +28,7 @@ Set up API endpoints to load and save comments (e.g., REST API, JSON file, or cl
     },
     onUpdate: async (comments) => {
       await fetch("/api/comments.json", {
-        method: "POST",
+        method: "PUT",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(comments)
       });
@@ -57,7 +57,7 @@ function CommentSDKWrapper() {
       },
       onUpdate: async (comments) => {
         await fetch("/api/comments.json", {
-          method: "POST",
+          method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(comments),
         });

@@ -673,7 +673,7 @@
   },
   <span class="property">onUpdate</span>: <span class="keyword">async</span> (<span class="variable">comments</span>) => {
     <span class="keyword">await</span> <span class="function">fetch</span>(<span class="string">"/api/comments.json"</span>, {
-      <span class="property">method</span>: <span class="string">"POST"</span>,
+      <span class="property">method</span>: <span class="string">"PUT"</span>,
       <span class="property">headers</span>: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
       <span class="property">body</span>: <span class="function">JSON.stringify</span>(<span class="variable">comments</span>)
     });
@@ -704,7 +704,7 @@
       },
       <span class="property">onUpdate</span>: <span class="keyword">async</span> (<span class="variable">comments</span>) => {
         <span class="keyword">await</span> <span class="function">fetch</span>(<span class="string">"/api/comments.json"</span>, {
-          <span class="property">method</span>: <span class="string">"POST"</span>,
+          <span class="property">method</span>: <span class="string">"PUT"</span>,
           <span class="property">headers</span>: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
           <span class="property">body</span>: <span class="function">JSON.stringify</span>(<span class="variable">comments</span>)
         });
@@ -803,7 +803,7 @@
 });
 
 <span class="comment">// Update JSON file</span>
-<span class="variable">app</span>.<span class="property">post</span>(<span class="string">'/api/comments.json'</span>, (<span class="variable">req</span>, <span class="variable">res</span>) => {
+<span class="variable">app</span>.<span class="property">put</span>(<span class="string">'/api/comments.json'</span>, (<span class="variable">req</span>, <span class="variable">res</span>) => {
   <span class="keyword">try</span> {
     <span class="keyword">const</span> <span class="variable">data</span> = {
       <span class="property">projectId</span>: <span class="string">"my-project"</span>,
