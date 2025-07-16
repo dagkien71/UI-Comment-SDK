@@ -1,6 +1,6 @@
 {
   "name": "ui-comment-sdk",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "type": "module",
   "description": "A modern SDK for embedding comment functionality directly on web UI elements",
   "main": "dist/index.js",
@@ -55,7 +55,7 @@
     "@rollup/plugin-typescript": "^11.1.5",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.32",
-    "rimraf": "^5.0.5",
+    "rimraf": "^5.0.10",
     "rollup": "^4.6.1",
     "rollup-plugin-postcss": "^4.0.2",
     "serve": "^14.2.1",

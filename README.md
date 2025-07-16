@@ -19,7 +19,7 @@ Set up API endpoints to load and save comments (e.g., REST API, JSON file, or cl
 
 ```html
 <!-- Include SDK from CDN -->
-<script src="https://cdn.jsdelivr.net/npm/ui-comment-sdk@latest/dist/ui-comment-sdk.min.js"></script>
+<script src="https://unpkg.com/ui-comment-sdk@latest/dist/ui-comment-sdk.min.js"></script>
 <script>
   const sdk = UICommentSDK.initCommentSDK({
     projectId: "my-project",
