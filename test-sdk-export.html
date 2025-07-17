@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test SDK CSV Export</title>
+  </head>
+  <body>
+    <h1>SDK CSV Export Test</h1>
+    <button id="test-export">Test Comments Table Export</button>
+    <div id="log"></div>
+
+    <script type="module">
+      // Test data tương tự như trong SDK
+      const testComments = [
+        {
+          id: "1",
+          content: 'This is a test comment with "quotes" and\nnewlines',
+          createdBy: { name: "John Doe", role: "admin" },
+          status: "bug",
+          createdAt: new Date().toISOString(),
+          url: "http://example.com/page1",
+          replies: [],
+          attachments: [
+            {
+              filename: "screenshot.png",
+              type: "image",
+              url: "data:image/png;base64,iVBOR...",
+            },
+          ],
+          xpath: "/html/body/div[1]",
+        },
+        {
+          id: "2",
+          content: "Second comment = with special chars @#$%",
+          createdBy: { name: "Jane Smith", role: "user" },
+          status: "done",
+          createdAt: new Date(Date.now() - 86400000).toISOString(),
+          url: "http://example.com/page2",
+          replies: [{ id: "r1" }, { id: "r2" }],
+          attachments: [],
+          xpath: "/html/body/div[2]",
+        },
+      ];
+
+      // Copy exact function from CommentsTable.ts
+      function exportCommentsToCSV(
+        comments,
+        filename = "comments_export.csv",
+        onError
+      ) {
+        console.log("🔄 exportCommentsToCSV called with:", {
+          commentsCount: comments?.length || 0,
+          filename,
+          hasOnError: !!onError,
+        });
+
+        // Kiểm tra đầu vào
+        if (!Array.isArray(comments) || comments.length === 0) {
+          const errorMsg = "No valid data to export!";
+          console.error("❌", errorMsg);
+          onError?.(errorMsg);
+          alert(errorMsg);
+          return;
+        }
+
+        // Hàm xử lý giá trị để tránh lỗi CSV và CSV injection
+        const escapeCsvValue = (value) => {
+          if (value == null) return "";
+          const str = String(value)
+            .replace(/"/g, '""')
+            .replace(/^([=+\-@])/g, "'$1"); // Ngăn CSV injection
+          return `"${str.replace(/\n/g, " ")}"`; // Thay \n để tránh phá vỡ dòng
+        };
+
+        try {
+          // Chỉ lấy các trường cần thiết
+          const data = comments.map((c) => ({
+            ID: c.id ?? "",
+            Content: c.content ?? "",
+            Author: c.createdBy?.name ?? "",
+            Role: c.createdBy?.role ?? "",
+            Status: c.status ?? "",
+            "Created Date": c.createdAt
+              ? new Date(c.createdAt).toISOString()
+              : "",
+            URL: c.url ?? "",
+            "Replies Count": c.replies?.length ?? 0,
+            Attachments: c.attachments?.map((a) => a.filename).join("; ") ?? "",
+            XPath: c.xpath ?? "",
+          }));
+
+          // Tạo header
+          const headers = Object.keys(data[0]);
+          const csvRows = [headers.join(",")];
+
+          // Tạo dòng dữ liệu
+          for (const row of data) {
+            const values = headers.map((h) => escapeCsvValue(row[h]));
+            csvRows.push(values.join(","));
+          }
+
+          // Tạo file CSV
+          const csvString = csvRows.join("\n");
+          const blob = new Blob([csvString], {
+            type: "text/csv;charset=utf-8;",
+          });
+          const url = URL.createObjectURL(blob);
+
+          // Kiểm tra tên file
+          const safeFilename = filename.endsWith(".csv")
+            ? filename
+            : `${filename}.csv`;
+
+          // Tải file
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = safeFilename;
+
+          console.log("📁 Download element created:", {
+            href: a.href,
+            download: a.download,
+            blobType: blob.type,
+            blobSize: blob.size,
+            csvPreview: csvString.substring(0, 100) + "...",
+          });
+
+          // Kiểm tra user gesture (để tránh bị browser chặn)
+          console.log("🖱️ User activation check:", {
+            hasUserGesture:
+              navigator.userActivation?.hasBeenActive || "unknown",
+            isActive: navigator.userActivation?.isActive || "unknown",
+          });
+
+          document.body.appendChild(a);
+          console.log("📁 Element added to DOM");
+
+          // Thêm delay nhỏ để đảm bảo element được render
+          setTimeout(() => {
+            console.log("📁 About to trigger click...");
+            a.click();
+            console.log("📁 Click triggered");
+
+            // Cleanup sau một chút delay
+            setTimeout(() => {
+              if (a.parentNode) {
+                document.body.removeChild(a);
+                console.log("📁 Element removed from DOM");
+              }
+              URL.revokeObjectURL(url);
+              console.log("📁 Blob URL revoked");
+            }, 100);
+          }, 10);
+        } catch (error) {
+          onError?.(
+            `Error exporting CSV: ${
+              error instanceof Error ? error.message : "Unknown error"
+            }`
+          );
+          alert(
+            `Error exporting CSV: ${
+              error instanceof Error ? error.message : "Unknown error"
+            }`
+          );
+        }
+      }
+
+      // Test button
+      document.getElementById("test-export").onclick = function () {
+        console.log("🔄 Test button clicked");
+        exportCommentsToCSV(testComments, "test-sdk-export.csv", (error) => {
+          console.error("❌ Export error:", error);
+          alert("Export failed: " + error);
+        });
+      };
+    </script>
+  </body>
+</html>

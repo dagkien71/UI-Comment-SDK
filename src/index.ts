@@ -10,6 +10,8 @@ import "./styles/profile-settings-modal.css";
 import "./styles/settings-button.css";
 import "./styles/sidebar-button.css";
 import "./styles/comment-sidebar.css";
+import "./styles/comments-table.css";
+import "./styles/comments-table-button.css";
 
 // Type exports for consumers
 export * from "./types";
@@ -17,6 +19,8 @@ export * from "./types";
 // Component exports
 export { ProfileSettingsModal } from "./components/ProfileSettingsModal";
 export { SettingsButton } from "./components/SettingsButton";
+export { CommentsTable } from "./components/CommentsTable";
+export { CommentsTableButton } from "./components/CommentsTableButton";
 
 // Storage and utilities
 export { CommentStorage } from "./storage/CommentStorage";

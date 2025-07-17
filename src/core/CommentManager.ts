@@ -44,7 +44,8 @@ export class CommentManager {
   private activeOverlay: HTMLElement | null = null; // For event blocking
   private mode: CommentMode = "normal";
   private root: HTMLElement;
-  private mutationTimeout: number | undefined = undefined;
+  private mutationTimeout: ReturnType<typeof setTimeout> | undefined =
+    undefined;
   private escKeyHandler: ((e: KeyboardEvent) => void) | null = null;
 
   // Performance optimizations
@@ -322,7 +323,8 @@ export class CommentManager {
       return;
     }
 
-    const target = e.target as HTMLElement;
+    const target = e.target;
+    if (!(target instanceof HTMLElement)) return;
     if (target.hasAttribute("data-uicm-element")) return;
 
     const highlightLayer = document.getElementById("uicm-highlight-layer");
@@ -352,7 +354,8 @@ export class CommentManager {
       return;
     }
 
-    const target = e.target as HTMLElement;
+    const target = e.target;
+    if (!(target instanceof HTMLElement)) return;
     if (target.hasAttribute("data-uicm-element")) return;
 
     const highlightId = target.dataset.uicmHighlight;
@@ -464,7 +467,11 @@ export class CommentManager {
     // Add global document click listener for outside clicks
     const globalClickHandler = (e: Event) => {
       // Check if click is outside modal/form
-      const target = e.target as Node;
+      const target = e.target as HTMLElement | null;
+      // Ignore if click is on an element with 'uicm-allow-bubble' class (for export/download, etc.)
+      if (target && target.closest(".uicm-allow-bubble")) {
+        return;
+      }
       const isInsideModal =
         target &&
         this.activeModal &&

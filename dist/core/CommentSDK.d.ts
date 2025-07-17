@@ -5,13 +5,17 @@ export declare class CommentSDK {
     private debugIcon;
     private settingsButton;
     private sidebarButton;
+    private commentsTableButton;
     private sidebar;
     private commentModal;
+    private commentsTable;
     private root;
     private isInitialized;
     private comments;
     private currentUser;
     constructor(config: CommentSDKConfig);
+    private createCustomCursor;
+    private setCustomCursor;
     private validateConfig;
     init(): Promise<void>;
     syncCommentsFromManager(): void;
@@ -27,6 +31,8 @@ export declare class CommentSDK {
     private getElementPosition;
     private findElementByXPath;
     private generateId;
+    private toggleCommentsTable;
+    private openCommentsTable;
     destroy(): void;
     getComments(): Comment[];
     getCurrentUser(): User;

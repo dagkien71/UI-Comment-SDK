@@ -58,3 +58,7 @@
   position: relative;
   z-index: 100 !important;
 }
+
+button {
+  cursor: pointer !important;
+}

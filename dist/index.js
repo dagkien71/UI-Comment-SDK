@@ -11,567 +11,6 @@ exports.CommentStatus = void 0;
     CommentStatus["ARCHIVED"] = "archived";
 })(exports.CommentStatus || (exports.CommentStatus = {}));
 
-const ROLE_COLORS = {
-    developer: {
-        bg: "#dbeafe",
-        text: "#1e40af",
-        border: "#3b82f6",
-    },
-    designer: {
-        bg: "#fef3c7",
-        text: "#92400e",
-        border: "#f59e0b",
-    },
-    "product-manager": {
-        bg: "#dcfce7",
-        text: "#166534",
-        border: "#22c55e",
-    },
-    qa: {
-        bg: "#fce7f3",
-        text: "#be185d",
-        border: "#ec4899",
-    },
-    stakeholder: {
-        bg: "#e0e7ff",
-        text: "#3730a3",
-        border: "#6366f1",
-    },
-    other: {
-        bg: "#f3f4f6",
-        text: "#374151",
-        border: "#6b7280",
-    },
-};
-function getRoleColor(role) {
-    return ROLE_COLORS[role] || ROLE_COLORS.other;
-}
-function getRoleDisplayName(role) {
-    const displayNames = {
-        developer: "Developer",
-        designer: "Designer",
-        "product-manager": "Product Manager",
-        qa: "QA",
-        stakeholder: "Stakeholder",
-        other: "Other",
-    };
-    return displayNames[role] || "Other";
-}
-
-function styleInject(css, ref) {
-  if ( ref === void 0 ) ref = {};
-  var insertAt = ref.insertAt;
-
-  if (!css || typeof document === 'undefined') { return; }
-
-  var head = document.head || document.getElementsByTagName('head')[0];
-  var style = document.createElement('style');
-  style.type = 'text/css';
-
-  if (insertAt === 'top') {
-    if (head.firstChild) {
-      head.insertBefore(style, head.firstChild);
-    } else {
-      head.appendChild(style);
-    }
-  } else {
-    head.appendChild(style);
-  }
-
-  if (style.styleSheet) {
-    style.styleSheet.cssText = css;
-  } else {
-    style.appendChild(document.createTextNode(css));
-  }
-}
-
-var css_248z$8 = "/* Comment Sidebar - Optimized */\n.uicm-comment-sidebar {\n  position: fixed;\n  top: 0;\n  right: 0;\n  width: 320px;\n  height: 100vh;\n  background: white;\n  border-left: 1px solid #e5e7eb;\n  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);\n  z-index: 9999999999;\n  transform: translateX(100%);\n  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  display: flex;\n  flex-direction: column;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif;\n  visibility: visible;\n  opacity: 1;\n  pointer-events: auto;\n}\n\n.uicm-comment-sidebar.show {\n  transform: translateX(0);\n}\n\n/* Header */\n.uicm-sidebar-header {\n  padding: 16px 20px;\n  border-bottom: 1px solid #e5e7eb;\n  background: linear-gradient(135deg, #f8fafc, #f1f5f9);\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n\n.uicm-sidebar-title {\n  margin: 0;\n  font-size: 16px;\n  font-weight: 600;\n  color: #1e293b;\n}\n\n.uicm-sidebar-close {\n  background: none;\n  border: none;\n  font-size: 18px;\n  cursor: pointer;\n  color: #64748b;\n  padding: 4px;\n  border-radius: 4px;\n  transition: all 0.2s ease;\n}\n\n.uicm-sidebar-close:hover {\n  background-color: #f1f5f9;\n  color: #374151;\n}\n\n/* Tabs */\n.uicm-sidebar-tabs {\n  display: flex;\n  background: linear-gradient(135deg, #f8fafc, #f1f5f9);\n  border-bottom: 1px solid #e5e7eb;\n  padding: 0;\n  position: relative;\n}\n\n.uicm-sidebar-tabs::after {\n  content: \"\";\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  height: 1px;\n  background: linear-gradient(90deg, transparent, #e5e7eb, transparent);\n}\n\n.uicm-sidebar-tab {\n  flex: 1;\n  padding: 16px 20px;\n  background: none;\n  border: none;\n  font-size: 13px;\n  font-weight: 600;\n  color: #64748b;\n  cursor: pointer;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  border-bottom: 3px solid transparent;\n  position: relative;\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 6px;\n}\n\n.uicm-sidebar-tab::before {\n  content: \"\";\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.05),\n    rgba(59, 130, 246, 0.02)\n  );\n  opacity: 0;\n  transition: opacity 0.3s ease;\n}\n\n.uicm-sidebar-tab:hover {\n  color: #374151;\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.08),\n    rgba(59, 130, 246, 0.04)\n  );\n}\n\n.uicm-sidebar-tab:hover::before {\n  opacity: 1;\n}\n\n.uicm-sidebar-tab.active {\n  color: #1e40af;\n  border-bottom-color: #3b82f6;\n  background: linear-gradient(135deg, #ffffff, #f8fafc);\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);\n  position: relative;\n}\n\n.uicm-sidebar-tab.active::after {\n  content: \"\";\n  position: absolute;\n  bottom: -1px;\n  left: 0;\n  right: 0;\n  height: 1px;\n  background: #3b82f6;\n  box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);\n}\n\n.uicm-sidebar-tab.active:hover {\n  color: #1e3a8a;\n  background: linear-gradient(135deg, #ffffff, #f1f5f9);\n}\n\n/* Tab indicators */\n.uicm-sidebar-tab::after {\n  content: \"\";\n  position: absolute;\n  bottom: 0;\n  left: 50%;\n  transform: translateX(-50%);\n  width: 0;\n  height: 3px;\n  background: linear-gradient(90deg, #3b82f6, #06b6d4);\n  border-radius: 2px 2px 0 0;\n  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n}\n\n.uicm-sidebar-tab.active::after {\n  width: 60%;\n}\n\n/* Filter Toggle */\n.uicm-sidebar-filter-toggle {\n  background: linear-gradient(135deg, #374151, #4b5563);\n  border-top: none;\n  color: white;\n  font-size: 13px;\n  font-weight: 600;\n  cursor: pointer;\n  padding: 12px 20px;\n  width: 100%;\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  position: relative;\n}\n\n.uicm-filter-toggle-icon {\n  font-size: 14px;\n  opacity: 0.7;\n}\n\n.uicm-filter-toggle-text {\n  font-size: 13px;\n  font-weight: 600;\n  color: inherit;\n}\n\n.uicm-filter-toggle-arrow {\n  font-size: 10px;\n  opacity: 0.6;\n  transition: transform 0.3s ease;\n}\n\n.uicm-sidebar-filter-toggle:hover .uicm-filter-toggle-arrow {\n  transform: rotate(180deg);\n}\n\n/* Filters */\n.uicm-sidebar-filters {\n  background: linear-gradient(135deg, #f8fafc, #f1f5f9);\n  border-bottom: 1px solid #e5e7eb;\n  overflow: hidden;\n  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  max-height: 0;\n}\n\n.uicm-sidebar-filters-closed {\n  max-height: 0;\n}\n\n.uicm-sidebar-filters-open {\n  max-height: 200px;\n}\n\n.uicm-sidebar-filters::before {\n  content: \"\";\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  height: 1px;\n  background: linear-gradient(90deg, transparent, #e5e7eb, transparent);\n}\n\n.uicm-sidebar-filter-header {\n  padding: 12px 20px 8px;\n  display: flex;\n  align-items: center;\n  gap: 8px;\n}\n\n.uicm-sidebar-filter-icon {\n  font-size: 14px;\n  color: #64748b;\n}\n\n.uicm-sidebar-filter-title {\n  font-size: 12px;\n  font-weight: 600;\n  color: #64748b;\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n}\n\n.uicm-sidebar-filter-buttons {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 8px;\n  padding: 0 20px 16px;\n}\n\n.uicm-status-filter-btn {\n  background: linear-gradient(\n    135deg,\n    rgba(255, 255, 255, 0.9),\n    rgba(248, 250, 252, 0.8)\n  );\n  border: 1px solid rgba(255, 255, 255, 0.4);\n  color: #374151;\n  font-size: 11px;\n  font-weight: 600;\n  padding: 8px 12px;\n  border-radius: 8px;\n  cursor: pointer;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);\n  position: relative;\n  overflow: hidden;\n}\n\n.uicm-status-filter-btn::before {\n  content: \"\";\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.1),\n    rgba(59, 130, 246, 0.05)\n  );\n  opacity: 0;\n  transition: opacity 0.3s ease;\n}\n\n.uicm-status-filter-btn:hover {\n  background: linear-gradient(\n    135deg,\n    rgba(255, 255, 255, 1),\n    rgba(248, 250, 252, 0.9)\n  );\n  border-color: rgba(59, 130, 246, 0.3);\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);\n}\n\n.uicm-status-filter-btn:hover::before {\n  opacity: 1;\n}\n\n.uicm-status-filter-btn.active {\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.15),\n    rgba(59, 130, 246, 0.1)\n  );\n  border-color: rgba(59, 130, 246, 0.4);\n  color: #1e40af;\n  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);\n}\n\n.uicm-status-filter-btn.active:hover {\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.2),\n    rgba(59, 130, 246, 0.15)\n  );\n}\n\n.uicm-filter-btn-icon {\n  font-size: 12px;\n  margin-right: 4px;\n}\n\n.uicm-filter-btn-text {\n  font-size: 11px;\n  font-weight: 600;\n  text-transform: uppercase;\n  letter-spacing: 0.3px;\n}\n\n/* Stats */\n.uicm-sidebar-stats {\n  padding: 12px 20px;\n  background: linear-gradient(135deg, #f8fafc, #f1f5f9);\n  border-bottom: 1px solid #e5e7eb;\n}\n\n.uicm-sidebar-stats-content {\n  font-size: 12px;\n  color: #64748b;\n  text-align: center;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n}\n\n/* Comments List */\n.uicm-sidebar-comments-list {\n  flex: 1;\n  overflow-y: auto;\n  padding: 0;\n  scrollbar-width: thin;\n  scrollbar-color: #cbd5e1 #f1f5f9;\n}\n\n.uicm-sidebar-comments-list::-webkit-scrollbar {\n  width: 6px;\n}\n\n.uicm-sidebar-comments-list::-webkit-scrollbar-track {\n  background: #f1f5f9;\n  border-radius: 3px;\n}\n\n.uicm-sidebar-comments-list::-webkit-scrollbar-thumb {\n  background: #cbd5e1;\n  border-radius: 3px;\n}\n\n.uicm-sidebar-comments-list::-webkit-scrollbar-thumb:hover {\n  background: #94a3b8;\n}\n\n.uicm-sidebar-comment-item {\n  background: rgba(255, 255, 255, 0.8);\n  border: none;\n  border-bottom: 1px solid rgba(229, 231, 235, 0.5);\n  border-radius: 0;\n  padding: 16px 20px;\n  margin-bottom: 0;\n  cursor: pointer;\n  transition: all 0.2s ease;\n}\n\n.uicm-sidebar-comment-item:hover {\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);\n}\n\n.uicm-sidebar-comment-header {\n  display: flex;\n  align-items: flex-start;\n  gap: 12px;\n  margin-bottom: 8px;\n}\n\n.uicm-sidebar-comment-avatar {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: linear-gradient(135deg, #3b82f6, #8b5cf6);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: white;\n  font-weight: 600;\n  font-size: 14px;\n  flex-shrink: 0;\n}\n\n.uicm-sidebar-comment-user-info {\n  flex: 1;\n  min-width: 0;\n}\n\n.uicm-sidebar-comment-name-row {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-bottom: 2px;\n}\n\n.uicm-sidebar-comment-name {\n  font-weight: 600;\n  color: #1f2937;\n  font-size: 14px;\n}\n\n.uicm-sidebar-comment-role {\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.1),\n    rgba(139, 92, 246, 0.1)\n  );\n  color: #3b82f6;\n  font-size: 10px;\n  font-weight: 600;\n  padding: 2px 6px;\n  border-radius: 6px;\n  border: 1px solid rgba(59, 130, 246, 0.2);\n  text-transform: uppercase;\n  letter-spacing: 0.3px;\n}\n\n.uicm-sidebar-comment-time {\n  font-size: 11px;\n  color: #6b7280;\n  margin-left: auto;\n}\n\n.uicm-sidebar-comment-page {\n  font-size: 11px;\n  color: #6b7280;\n  margin-top: 2px;\n}\n\n.uicm-sidebar-comment-content {\n  color: #374151;\n  line-height: 1.4;\n  font-size: 13px;\n  margin: 0;\n  word-wrap: break-word;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n}\n\n.uicm-sidebar-comment-footer {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  margin-top: 8px;\n  gap: 8px;\n}\n\n.uicm-sidebar-comment-status {\n  font-size: 10px;\n  font-weight: 600;\n  padding: 2px 6px;\n  border-radius: 4px;\n  text-transform: uppercase;\n  letter-spacing: 0.3px;\n}\n\n.uicm-sidebar-comment-replies {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  font-size: 11px;\n  color: #6b7280;\n}\n\n.uicm-sidebar-comment-replies-icon {\n  font-size: 12px;\n}\n\n.uicm-sidebar-empty {\n  text-align: center;\n  padding: 40px 20px;\n  color: #6b7280;\n}\n\n.uicm-sidebar-empty-icon {\n  font-size: 48px;\n  margin-bottom: 16px;\n  opacity: 0.5;\n}\n\n.uicm-sidebar-empty-title {\n  font-size: 16px;\n  font-weight: 600;\n  margin-bottom: 8px;\n  color: #374151;\n}\n\n.uicm-sidebar-empty-subtitle {\n  font-size: 14px;\n  color: #6b7280;\n}\n\n/* Dark theme support */\n@media (prefers-color-scheme: dark) {\n  .uicm-comment-sidebar {\n    background: #1f2937;\n    border-left-color: #374151;\n    color: #f9fafb;\n  }\n\n  .uicm-sidebar-header {\n    background: linear-gradient(135deg, #374151, #4b5563);\n    border-bottom-color: #374151;\n  }\n\n  .uicm-sidebar-title {\n    color: #f9fafb;\n  }\n\n  .uicm-sidebar-tabs {\n    background: linear-gradient(135deg, #374151, #4b5563);\n    border-bottom-color: #4b5563;\n  }\n\n  .uicm-sidebar-tabs::after {\n    background: linear-gradient(90deg, transparent, #4b5563, transparent);\n  }\n\n  .uicm-sidebar-tab {\n    color: #9ca3af;\n  }\n\n  .uicm-sidebar-tab::before {\n    background: linear-gradient(\n      135deg,\n      rgba(96, 165, 250, 0.1),\n      rgba(96, 165, 250, 0.05)\n    );\n  }\n\n  .uicm-sidebar-tab:hover {\n    color: #d1d5db;\n    background: linear-gradient(\n      135deg,\n      rgba(96, 165, 250, 0.15),\n      rgba(96, 165, 250, 0.08)\n    );\n  }\n\n  .uicm-sidebar-tab.active {\n    color: #60a5fa;\n    background: linear-gradient(135deg, #1f2937, #374151);\n    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);\n  }\n\n  .uicm-sidebar-tab.active::after {\n    background: #60a5fa;\n    box-shadow: 0 0 8px rgba(96, 165, 250, 0.4);\n  }\n\n  .uicm-sidebar-tab.active:hover {\n    color: #93c5fd;\n    background: linear-gradient(135deg, #1f2937, #4b5563);\n  }\n\n  .uicm-sidebar-tab::after {\n    background: linear-gradient(90deg, #60a5fa, #06b6d4);\n  }\n\n  .uicm-sidebar-stats {\n    background: #374151;\n    border-bottom-color: #4b5563;\n    color: #d1d5db;\n  }\n\n  .uicm-sidebar-comment-item {\n    background: #1f2937;\n    border-bottom-color: #374151;\n  }\n\n  .uicm-sidebar-comment-item:hover {\n    background-color: #374151;\n  }\n\n  .uicm-sidebar-comment-name {\n    color: #f9fafb;\n  }\n\n  .uicm-sidebar-comment-content {\n    color: #d1d5db;\n  }\n}\n\n/* Mobile Responsive */\n@media (max-width: 640px) {\n  .uicm-comment-sidebar {\n    width: 100vw;\n    right: 0;\n  }\n\n  .uicm-sidebar-header {\n    padding: 12px 16px;\n  }\n\n  .uicm-sidebar-title {\n    font-size: 14px;\n  }\n\n  .uicm-sidebar-tabs {\n    padding: 0;\n  }\n\n  .uicm-sidebar-tab {\n    padding: 12px 16px;\n    font-size: 12px;\n  }\n\n  .uicm-sidebar-stats {\n    padding: 8px 16px;\n  }\n\n  .uicm-sidebar-comment-item {\n    padding: 12px;\n    margin-bottom: 8px;\n  }\n\n  .uicm-sidebar-comment-name {\n    font-size: 13px;\n  }\n\n  .uicm-sidebar-comment-content {\n    font-size: 12px;\n  }\n}\n";
-styleInject(css_248z$8);
-
-class CommentSidebar {
-    constructor(props) {
-        this.isVisible = false;
-        this.currentTab = "active";
-        this.currentStatusFilter = "all";
-        this.isFilterOpen = false;
-        this.commentsList = null;
-        this.statsContent = null;
-        this.filterContainer = null;
-        this.filterToggleBtn = null;
-        console.log("🔧 CommentSidebar: Constructor called with", props.comments.length, "comments");
-        this.props = props;
-        this.element = this.createElement();
-        console.log("🔧 CommentSidebar: Element created:", this.element);
-        this.attachEventListeners();
-    }
-    formatTimeAgo(dateString) {
-        const now = new Date();
-        const date = new Date(dateString);
-        const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-        if (diffInSeconds < 60)
-            return "just now";
-        if (diffInSeconds < 3600)
-            return `${Math.floor(diffInSeconds / 60)}m ago`;
-        if (diffInSeconds < 86400)
-            return `${Math.floor(diffInSeconds / 3600)}h ago`;
-        if (diffInSeconds < 2592000)
-            return `${Math.floor(diffInSeconds / 86400)}d ago`;
-        return date.toLocaleDateString();
-    }
-    getStatusColor(status) {
-        switch (status) {
-            case exports.CommentStatus.BUG:
-                return { bg: "#dc3545", text: "white" };
-            case exports.CommentStatus.FEATURE_REQUEST:
-                return { bg: "#ffc107", text: "black" };
-            case exports.CommentStatus.DEV_COMPLETED:
-                return { bg: "#3b82f6", text: "white" };
-            case exports.CommentStatus.DONE:
-                return { bg: "#28a745", text: "white" };
-            case exports.CommentStatus.ARCHIVED:
-                return { bg: "#6c757d", text: "white" };
-            default:
-                return { bg: "#007bff", text: "white" };
-        }
-    }
-    getPageName(url) {
-        try {
-            const urlObj = new URL(url);
-            const path = urlObj.pathname;
-            // Extract page name from path
-            if (path === "/" || path === "")
-                return "Home";
-            const segments = path.split("/").filter(Boolean);
-            if (segments.length === 0)
-                return "Home";
-            // Convert path to readable name
-            const pageName = segments[segments.length - 1]
-                .split("-")
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(" ");
-            return pageName || "Unknown Page";
-        }
-        catch {
-            return "Unknown Page";
-        }
-    }
-    getFilteredComments() {
-        let filteredComments;
-        if (this.currentTab === "active") {
-            filteredComments = this.props.comments.filter((c) => c.status !== "archived");
-        }
-        else {
-            filteredComments = this.props.comments.filter((c) => c.status === "archived");
-        }
-        // Apply status filter if not "all"
-        if (this.currentStatusFilter !== "all") {
-            filteredComments = filteredComments.filter((c) => c.status === this.currentStatusFilter);
-        }
-        return filteredComments;
-    }
-    switchTab(tab) {
-        this.currentTab = tab;
-        this.updateCommentsDisplay();
-        this.updateStats();
-        this.updateTabStates();
-    }
-    switchStatusFilter(status) {
-        this.currentStatusFilter = status;
-        this.updateCommentsDisplay();
-        this.updateStats();
-        this.updateFilterStates();
-    }
-    toggleFilter() {
-        this.isFilterOpen = !this.isFilterOpen;
-        if (this.filterContainer) {
-            if (this.isFilterOpen) {
-                this.filterContainer.classList.remove("uicm-sidebar-filters-closed");
-                this.filterContainer.classList.add("uicm-sidebar-filters-open");
-            }
-            else {
-                this.filterContainer.classList.remove("uicm-sidebar-filters-open");
-                this.filterContainer.classList.add("uicm-sidebar-filters-closed");
-            }
-        }
-        if (this.filterToggleBtn) {
-            const arrow = this.filterToggleBtn.querySelector(".uicm-filter-toggle-arrow");
-            if (arrow) {
-                arrow.textContent = this.isFilterOpen ? "▲" : "▼";
-            }
-        }
-    }
-    updateCommentsDisplay() {
-        if (!this.commentsList)
-            return;
-        this.commentsList.innerHTML = "";
-        const filteredComments = this.getFilteredComments();
-        if (filteredComments.length === 0) {
-            const emptyState = document.createElement("div");
-            emptyState.className = "uicm-sidebar-empty";
-            const emptyText = this.currentTab === "active"
-                ? "No active comments yet"
-                : "No archived comments";
-            const emptySubtext = this.currentTab === "active"
-                ? "Start commenting on any element to see them here"
-                : "Archived comments will appear here";
-            emptyState.innerHTML = `
-        <div class="uicm-sidebar-empty-icon">��</div>
-        <div class="uicm-sidebar-empty-title">${emptyText}</div>
-        <div class="uicm-sidebar-empty-subtitle">${emptySubtext}</div>
-      `;
-            this.commentsList.appendChild(emptyState);
-        }
-        else {
-            filteredComments.forEach((comment) => {
-                const commentItem = this.createCommentItem(comment);
-                this.commentsList.appendChild(commentItem);
-            });
-        }
-    }
-    updateStats() {
-        if (!this.statsContent)
-            return;
-        const activeComments = this.props.comments.filter((c) => c.status !== "archived").length;
-        const archivedComments = this.props.comments.filter((c) => c.status === "archived").length;
-        const totalReplies = this.props.comments.reduce((sum, comment) => sum + comment.replies.length, 0);
-        this.statsContent.innerHTML = `
-      <span>📝 ${this.currentTab === "active" ? activeComments : archivedComments} ${this.currentTab === "active" ? "active" : "archived"}</span>
-      <span>💬 ${totalReplies} replies</span>
-      <span>📊 ${activeComments + archivedComments} total</span>
-    `;
-    }
-    createCommentItem(comment) {
-        const item = document.createElement("div");
-        item.className = "uicm-sidebar-comment-item";
-        // Click to navigate
-        item.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log("🔧 Sidebar: Comment item clicked:", comment.id);
-            this.props.onNavigateToComment(comment);
-        });
-        // Header with avatar, name, role, and time
-        const header = document.createElement("div");
-        header.className = "uicm-sidebar-comment-header";
-        // Avatar
-        const avatar = document.createElement("div");
-        avatar.className = "uicm-sidebar-comment-avatar";
-        let avatarChar = "?";
-        if (comment &&
-            comment.createdBy &&
-            typeof comment.createdBy.name === "string" &&
-            comment.createdBy.name.length > 0) {
-            avatarChar = comment.createdBy.name.charAt(0).toUpperCase();
-        }
-        else {
-            console.warn("Sidebar: Comment missing createdBy or name", comment);
-        }
-        avatar.textContent = avatarChar;
-        // User info container
-        const userInfo = document.createElement("div");
-        userInfo.className = "uicm-sidebar-comment-user-info";
-        // Name and role row
-        const nameRow = document.createElement("div");
-        nameRow.className = "uicm-sidebar-comment-name-row";
-        const name = document.createElement("span");
-        name.className = "uicm-sidebar-comment-name";
-        name.textContent = comment.createdBy.name;
-        // Role badge
-        const roleBadge = document.createElement("span");
-        roleBadge.className = "uicm-sidebar-comment-role";
-        const roleColors = getRoleColor(comment.role);
-        roleBadge.style.backgroundColor = roleColors.bg;
-        roleBadge.style.color = roleColors.text;
-        roleBadge.style.borderColor = roleColors.border;
-        roleBadge.textContent = getRoleDisplayName(comment.role);
-        // Time
-        const time = document.createElement("span");
-        time.className = "uicm-sidebar-comment-time";
-        time.textContent = this.formatTimeAgo(comment.createdAt);
-        nameRow.appendChild(name);
-        nameRow.appendChild(roleBadge);
-        nameRow.appendChild(time);
-        // Page name
-        const pageName = document.createElement("div");
-        pageName.className = "uicm-sidebar-comment-page";
-        pageName.textContent = this.getPageName(comment.url);
-        userInfo.appendChild(nameRow);
-        userInfo.appendChild(pageName);
-        header.appendChild(avatar);
-        header.appendChild(userInfo);
-        // Content
-        const content = document.createElement("div");
-        content.className = "uicm-sidebar-comment-content";
-        content.textContent = comment.content;
-        // Footer with status and reply count
-        const footer = document.createElement("div");
-        footer.className = "uicm-sidebar-comment-footer";
-        // Status badge
-        const statusBadge = document.createElement("span");
-        statusBadge.className = "uicm-sidebar-comment-status";
-        const statusColors = this.getStatusColor(comment.status);
-        statusBadge.style.backgroundColor = statusColors.bg;
-        statusBadge.style.color = statusColors.text;
-        statusBadge.textContent = comment?.status?.toUpperCase();
-        // Reply count
-        const replyCount = document.createElement("span");
-        replyCount.className = "uicm-sidebar-comment-replies";
-        const replyIcon = document.createElement("span");
-        replyIcon.className = "uicm-sidebar-comment-replies-icon";
-        replyIcon.textContent = "💬";
-        replyCount.appendChild(replyIcon);
-        replyCount.appendChild(document.createTextNode(`${comment.replies.length}`));
-        footer.appendChild(statusBadge);
-        footer.appendChild(replyCount);
-        item.appendChild(header);
-        item.appendChild(content);
-        item.appendChild(footer);
-        return item;
-    }
-    createElement() {
-        const sidebar = document.createElement("div");
-        sidebar.className = "uicm-comment-sidebar";
-        // Header
-        const header = document.createElement("div");
-        header.className = "uicm-sidebar-header";
-        const title = document.createElement("h3");
-        title.className = "uicm-sidebar-title";
-        title.textContent = "All Comments";
-        const closeButton = document.createElement("button");
-        closeButton.className = "uicm-sidebar-close";
-        closeButton.innerHTML = "×";
-        closeButton.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.props.onClose();
-        });
-        header.appendChild(title);
-        header.appendChild(closeButton);
-        // Tabs
-        const tabsContainer = document.createElement("div");
-        tabsContainer.className = "uicm-sidebar-tabs";
-        const activeTab = document.createElement("button");
-        activeTab.className = "uicm-sidebar-tab uicm-sidebar-tab-active";
-        activeTab.textContent = "Active";
-        activeTab.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.switchTab("active");
-        });
-        const archiveTab = document.createElement("button");
-        archiveTab.className = "uicm-sidebar-tab";
-        archiveTab.textContent = "Archive";
-        archiveTab.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.switchTab("archive");
-        });
-        tabsContainer.appendChild(activeTab);
-        tabsContainer.appendChild(archiveTab);
-        // Filter Toggle Button
-        this.filterToggleBtn = document.createElement("button");
-        this.filterToggleBtn.className = "uicm-sidebar-filter-toggle";
-        this.filterToggleBtn.innerHTML = `
-      <span class="uicm-filter-toggle-icon">🔍</span>
-      <span class="uicm-filter-toggle-text">Filter</span>
-      <span class="uicm-filter-toggle-arrow">▼</span>
-    `;
-        this.filterToggleBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.toggleFilter();
-        });
-        // Status Filters
-        this.filterContainer = document.createElement("div");
-        this.filterContainer.className =
-            "uicm-sidebar-filters uicm-sidebar-filters-closed";
-        const filterHeader = document.createElement("div");
-        filterHeader.className = "uicm-sidebar-filter-header";
-        const filterIcon = document.createElement("span");
-        filterIcon.className = "uicm-sidebar-filter-icon";
-        filterIcon.innerHTML = "🔍";
-        const filterTitle = document.createElement("div");
-        filterTitle.className = "uicm-sidebar-filter-title";
-        filterTitle.textContent = "Filter by Status";
-        filterHeader.appendChild(filterIcon);
-        filterHeader.appendChild(filterTitle);
-        const filterButtons = document.createElement("div");
-        filterButtons.className = "uicm-sidebar-filter-buttons";
-        // All filter button
-        const allFilterBtn = document.createElement("button");
-        allFilterBtn.className = "uicm-status-filter-btn active";
-        allFilterBtn.setAttribute("data-status", "all");
-        allFilterBtn.innerHTML = `
-      <span class="uicm-filter-btn-icon">📋</span>
-      <span class="uicm-filter-btn-text">All</span>
-    `;
-        allFilterBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.switchStatusFilter("all");
-        });
-        // Status filter buttons
-        const statusFilters = [
-            {
-                status: exports.CommentStatus.BUG,
-                label: "Bug",
-                icon: "🐛",
-                color: "#dc3545",
-                colorDark: "#c82333",
-                colorDarker: "#a71e2a",
-                colorRgb: "220, 53, 69",
-            },
-            {
-                status: exports.CommentStatus.FEATURE_REQUEST,
-                label: "Feature",
-                icon: "💡",
-                color: "#ffc107",
-                colorDark: "#e0a800",
-                colorDarker: "#d39e00",
-                colorRgb: "255, 193, 7",
-            },
-            {
-                status: exports.CommentStatus.DEV_COMPLETED,
-                label: "Dev Done",
-                icon: "✅",
-                color: "#3b82f6",
-                colorDark: "#2563eb",
-                colorDarker: "#1d4ed8",
-                colorRgb: "59, 130, 246",
-            },
-            {
-                status: exports.CommentStatus.DONE,
-                label: "Done",
-                icon: "🎉",
-                color: "#28a745",
-                colorDark: "#218838",
-                colorDarker: "#1e7e34",
-                colorRgb: "40, 167, 69",
-            },
-        ];
-        statusFilters.forEach(({ status, label, icon, color, colorDark, colorDarker, colorRgb }) => {
-            const filterBtn = document.createElement("button");
-            filterBtn.className = "uicm-status-filter-btn";
-            filterBtn.setAttribute("data-status", status);
-            filterBtn.setAttribute("data-color", color);
-            filterBtn.innerHTML = `
-        <span class="uicm-filter-btn-icon">${icon}</span>
-        <span class="uicm-filter-btn-text">${label}</span>
-      `;
-            // Set CSS custom properties for color coding
-            filterBtn.style.setProperty("--status-color", color);
-            filterBtn.style.setProperty("--status-color-dark", colorDark);
-            filterBtn.style.setProperty("--status-color-darker", colorDarker);
-            filterBtn.style.setProperty("--status-color-rgb", colorRgb);
-            filterBtn.addEventListener("click", (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                this.switchStatusFilter(status);
-            });
-            filterButtons.appendChild(filterBtn);
-        });
-        this.filterContainer.appendChild(filterHeader);
-        this.filterContainer.appendChild(filterButtons);
-        // Stats
-        const stats = document.createElement("div");
-        stats.className = "uicm-sidebar-stats";
-        const activeComments = this.props.comments.filter((c) => c.status !== "archived").length;
-        const archivedComments = this.props.comments.filter((c) => c.status === "archived").length;
-        const totalReplies = this.props.comments.reduce((sum, comment) => sum + comment.replies.length, 0);
-        this.statsContent = document.createElement("div");
-        this.statsContent.className = "uicm-sidebar-stats-content";
-        this.statsContent.innerHTML = `
-      <span>📝 ${activeComments} active</span>
-      <span>💬 ${totalReplies} replies</span>
-      <span>📊 ${activeComments + archivedComments} total</span>
-    `;
-        stats.appendChild(this.statsContent);
-        // Comments list
-        this.commentsList = document.createElement("div");
-        this.commentsList.className = "uicm-sidebar-comments-list";
-        // Populate comments based on current tab
-        this.updateCommentsDisplay();
-        sidebar.appendChild(header);
-        sidebar.appendChild(tabsContainer);
-        sidebar.appendChild(this.filterToggleBtn);
-        sidebar.appendChild(this.filterContainer);
-        sidebar.appendChild(stats);
-        sidebar.appendChild(this.commentsList);
-        return sidebar;
-    }
-    attachEventListeners() {
-        // ESC key to close
-        const escHandler = (e) => {
-            if (e.key === "Escape" && this.isVisible) {
-                this.props.onClose();
-            }
-        };
-        document.addEventListener("keydown", escHandler);
-        // Clean up on destroy
-        this.element.addEventListener("destroy", () => {
-            document.removeEventListener("keydown", escHandler);
-        });
-    }
-    show() {
-        this.isVisible = true;
-        document.body.appendChild(this.element);
-        this.element.offsetHeight;
-        this.element.classList.add("show");
-    }
-    hide() {
-        console.log("🔧 CommentSidebar: hide() called");
-        this.isVisible = false;
-        // Remove show class to trigger slide out animation
-        this.element.classList.remove("show");
-        // Remove from DOM after animation
-        setTimeout(() => {
-            if (this.element.parentNode) {
-                this.element.parentNode.removeChild(this.element);
-                console.log("🔧 CommentSidebar: Element removed from DOM");
-            }
-        }, 300);
-    }
-    updateComments(comments) {
-        this.props.comments = comments;
-        this.updateCommentsDisplay();
-        this.updateStats();
-        this.updateTabStates();
-        this.updateFilterStates();
-    }
-    updateTabStates() {
-        const activeTab = this.element.querySelector(".uicm-sidebar-tab.active");
-        const archiveTab = this.element.querySelector(".uicm-sidebar-tab.archive");
-        if (activeTab) {
-            activeTab.classList.toggle("active", this.currentTab === "active");
-        }
-        if (archiveTab) {
-            archiveTab.classList.toggle("active", this.currentTab === "archive");
-        }
-    }
-    updateFilterStates() {
-        if (!this.filterContainer)
-            return;
-        const filterButtons = this.filterContainer.querySelectorAll(".uicm-status-filter-btn");
-        filterButtons.forEach((btn) => {
-            const status = btn.getAttribute("data-status");
-            if (status === this.currentStatusFilter ||
-                (status === "all" && this.currentStatusFilter === "all")) {
-                btn.classList.add("active");
-            }
-            else {
-                btn.classList.remove("active");
-            }
-        });
-    }
-    getElement() {
-        return this.element;
-    }
-    destroy() {
-        this.hide();
-        this.element.dispatchEvent(new Event("destroy"));
-    }
-}
-
 class ImageCompressor {
     /**
      * Compress image before converting to base64
@@ -1485,6 +924,53 @@ function getXPath(element) {
     return `/${paths.join("/")}`;
 }
 
+const ROLE_COLORS = {
+    developer: {
+        bg: "#dbeafe",
+        text: "#1e40af",
+        border: "#3b82f6",
+    },
+    designer: {
+        bg: "#fef3c7",
+        text: "#92400e",
+        border: "#f59e0b",
+    },
+    "product-manager": {
+        bg: "#dcfce7",
+        text: "#166534",
+        border: "#22c55e",
+    },
+    qa: {
+        bg: "#fce7f3",
+        text: "#be185d",
+        border: "#ec4899",
+    },
+    stakeholder: {
+        bg: "#e0e7ff",
+        text: "#3730a3",
+        border: "#6366f1",
+    },
+    other: {
+        bg: "#f3f4f6",
+        text: "#374151",
+        border: "#6b7280",
+    },
+};
+function getRoleColor(role) {
+    return ROLE_COLORS[role] || ROLE_COLORS.other;
+}
+function getRoleDisplayName(role) {
+    const displayNames = {
+        developer: "Developer",
+        designer: "Designer",
+        "product-manager": "Product Manager",
+        qa: "QA",
+        stakeholder: "Stakeholder",
+        other: "Other",
+    };
+    return displayNames[role] || "Other";
+}
+
 class CommentModal {
     constructor(props) {
         this.imageModal = null;
@@ -2198,6 +1684,1288 @@ class CommentModal {
         }
         document.removeEventListener("click", this.handleOutsideClick);
         this.element.remove();
+    }
+}
+
+function styleInject(css, ref) {
+  if ( ref === void 0 ) ref = {};
+  var insertAt = ref.insertAt;
+
+  if (!css || typeof document === 'undefined') { return; }
+
+  var head = document.head || document.getElementsByTagName('head')[0];
+  var style = document.createElement('style');
+  style.type = 'text/css';
+
+  if (insertAt === 'top') {
+    if (head.firstChild) {
+      head.insertBefore(style, head.firstChild);
+    } else {
+      head.appendChild(style);
+    }
+  } else {
+    head.appendChild(style);
+  }
+
+  if (style.styleSheet) {
+    style.styleSheet.cssText = css;
+  } else {
+    style.appendChild(document.createTextNode(css));
+  }
+}
+
+var css_248z$a = "/* Comment Sidebar - Optimized */\n.uicm-comment-sidebar {\n  position: fixed;\n  top: 0;\n  right: 0;\n  width: 320px;\n  height: 100vh;\n  background: white;\n  border-left: 1px solid #e5e7eb;\n  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);\n  z-index: 9999999999;\n  transform: translateX(100%);\n  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  display: flex;\n  flex-direction: column;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif;\n  visibility: visible;\n  opacity: 1;\n  pointer-events: auto;\n}\n\n.uicm-comment-sidebar.show {\n  transform: translateX(0);\n}\n\n/* Header */\n.uicm-sidebar-header {\n  padding: 16px 20px;\n  border-bottom: 1px solid #e5e7eb;\n  background: linear-gradient(135deg, #f8fafc, #f1f5f9);\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n\n.uicm-sidebar-title {\n  margin: 0;\n  font-size: 16px;\n  font-weight: 600;\n  color: #1e293b;\n}\n\n.uicm-sidebar-close {\n  background: none;\n  border: none;\n  font-size: 18px;\n  cursor: pointer;\n  color: #64748b;\n  padding: 4px;\n  border-radius: 4px;\n  transition: all 0.2s ease;\n}\n\n.uicm-sidebar-close:hover {\n  background-color: #f1f5f9;\n  color: #374151;\n}\n\n/* Tabs */\n.uicm-sidebar-tabs {\n  display: flex;\n  background: linear-gradient(135deg, #f8fafc, #f1f5f9);\n  border-bottom: 1px solid #e5e7eb;\n  padding: 0;\n  position: relative;\n}\n\n.uicm-sidebar-tabs::after {\n  content: \"\";\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  height: 1px;\n  background: linear-gradient(90deg, transparent, #e5e7eb, transparent);\n}\n\n.uicm-sidebar-tab {\n  flex: 1;\n  padding: 16px 20px;\n  background: none;\n  border: none;\n  font-size: 13px;\n  font-weight: 600;\n  color: #64748b;\n  cursor: pointer;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  border-bottom: 3px solid transparent;\n  position: relative;\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 6px;\n}\n\n.uicm-sidebar-tab::before {\n  content: \"\";\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.05),\n    rgba(59, 130, 246, 0.02)\n  );\n  opacity: 0;\n  transition: opacity 0.3s ease;\n}\n\n.uicm-sidebar-tab:hover {\n  color: #374151;\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.08),\n    rgba(59, 130, 246, 0.04)\n  );\n}\n\n.uicm-sidebar-tab:hover::before {\n  opacity: 1;\n}\n\n.uicm-sidebar-tab.active {\n  color: #1e40af;\n  border-bottom-color: #3b82f6;\n  background: linear-gradient(135deg, #ffffff, #f8fafc);\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);\n  position: relative;\n}\n\n.uicm-sidebar-tab.active::after {\n  content: \"\";\n  position: absolute;\n  bottom: -1px;\n  left: 0;\n  right: 0;\n  height: 1px;\n  background: #3b82f6;\n  box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);\n}\n\n.uicm-sidebar-tab.active:hover {\n  color: #1e3a8a;\n  background: linear-gradient(135deg, #ffffff, #f1f5f9);\n}\n\n/* Tab indicators */\n.uicm-sidebar-tab::after {\n  content: \"\";\n  position: absolute;\n  bottom: 0;\n  left: 50%;\n  transform: translateX(-50%);\n  width: 0;\n  height: 3px;\n  background: linear-gradient(90deg, #3b82f6, #06b6d4);\n  border-radius: 2px 2px 0 0;\n  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n}\n\n.uicm-sidebar-tab.active::after {\n  width: 60%;\n}\n\n/* Filter Toggle */\n.uicm-sidebar-filter-toggle {\n  background: linear-gradient(135deg, #374151, #4b5563);\n  border-top: none;\n  color: white;\n  font-size: 13px;\n  font-weight: 600;\n  cursor: pointer;\n  padding: 12px 20px;\n  width: 100%;\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  position: relative;\n}\n\n.uicm-filter-toggle-icon {\n  font-size: 14px;\n  opacity: 0.7;\n}\n\n.uicm-filter-toggle-text {\n  font-size: 13px;\n  font-weight: 600;\n  color: inherit;\n}\n\n.uicm-filter-toggle-arrow {\n  font-size: 10px;\n  opacity: 0.6;\n  transition: transform 0.3s ease;\n}\n\n.uicm-sidebar-filter-toggle:hover .uicm-filter-toggle-arrow {\n  transform: rotate(180deg);\n}\n\n/* Filters */\n.uicm-sidebar-filters {\n  background: linear-gradient(135deg, #f8fafc, #f1f5f9);\n  border-bottom: 1px solid #e5e7eb;\n  overflow: hidden;\n  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  max-height: 0;\n}\n\n.uicm-sidebar-filters-closed {\n  max-height: 0;\n}\n\n.uicm-sidebar-filters-open {\n  max-height: 200px;\n}\n\n.uicm-sidebar-filters::before {\n  content: \"\";\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  height: 1px;\n  background: linear-gradient(90deg, transparent, #e5e7eb, transparent);\n}\n\n.uicm-sidebar-filter-header {\n  padding: 12px 20px 8px;\n  display: flex;\n  align-items: center;\n  gap: 8px;\n}\n\n.uicm-sidebar-filter-icon {\n  font-size: 14px;\n  color: #64748b;\n}\n\n.uicm-sidebar-filter-title {\n  font-size: 12px;\n  font-weight: 600;\n  color: #64748b;\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n}\n\n.uicm-sidebar-filter-buttons {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 8px;\n  padding: 0 20px 16px;\n}\n\n.uicm-status-filter-btn {\n  background: linear-gradient(\n    135deg,\n    rgba(255, 255, 255, 0.9),\n    rgba(248, 250, 252, 0.8)\n  );\n  border: 1px solid rgba(255, 255, 255, 0.4);\n  color: #374151;\n  font-size: 11px;\n  font-weight: 600;\n  padding: 8px 12px;\n  border-radius: 8px;\n  cursor: pointer;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);\n  position: relative;\n  overflow: hidden;\n}\n\n.uicm-status-filter-btn::before {\n  content: \"\";\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.1),\n    rgba(59, 130, 246, 0.05)\n  );\n  opacity: 0;\n  transition: opacity 0.3s ease;\n}\n\n.uicm-status-filter-btn:hover {\n  background: linear-gradient(\n    135deg,\n    rgba(255, 255, 255, 1),\n    rgba(248, 250, 252, 0.9)\n  );\n  border-color: rgba(59, 130, 246, 0.3);\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);\n}\n\n.uicm-status-filter-btn:hover::before {\n  opacity: 1;\n}\n\n.uicm-status-filter-btn.active {\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.15),\n    rgba(59, 130, 246, 0.1)\n  );\n  border-color: rgba(59, 130, 246, 0.4);\n  color: #1e40af;\n  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);\n}\n\n.uicm-status-filter-btn.active:hover {\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.2),\n    rgba(59, 130, 246, 0.15)\n  );\n}\n\n.uicm-filter-btn-icon {\n  font-size: 12px;\n  margin-right: 4px;\n}\n\n.uicm-filter-btn-text {\n  font-size: 11px;\n  font-weight: 600;\n  text-transform: uppercase;\n  letter-spacing: 0.3px;\n}\n\n/* Stats */\n.uicm-sidebar-stats {\n  padding: 12px 20px;\n  background: linear-gradient(135deg, #f8fafc, #f1f5f9);\n  border-bottom: 1px solid #e5e7eb;\n}\n\n.uicm-sidebar-stats-content {\n  font-size: 12px;\n  color: #64748b;\n  text-align: center;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n}\n\n/* Comments List */\n.uicm-sidebar-comments-list {\n  flex: 1;\n  overflow-y: auto;\n  padding: 0;\n  scrollbar-width: thin;\n  scrollbar-color: #cbd5e1 #f1f5f9;\n}\n\n.uicm-sidebar-comments-list::-webkit-scrollbar {\n  width: 6px;\n}\n\n.uicm-sidebar-comments-list::-webkit-scrollbar-track {\n  background: #f1f5f9;\n  border-radius: 3px;\n}\n\n.uicm-sidebar-comments-list::-webkit-scrollbar-thumb {\n  background: #cbd5e1;\n  border-radius: 3px;\n}\n\n.uicm-sidebar-comments-list::-webkit-scrollbar-thumb:hover {\n  background: #94a3b8;\n}\n\n.uicm-sidebar-comment-item {\n  background: rgba(255, 255, 255, 0.8);\n  border: none;\n  border-bottom: 1px solid rgba(229, 231, 235, 0.5);\n  border-radius: 0;\n  padding: 16px 20px;\n  margin-bottom: 0;\n  cursor: pointer;\n  transition: all 0.2s ease;\n}\n\n.uicm-sidebar-comment-item:hover {\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);\n}\n\n.uicm-sidebar-comment-header {\n  display: flex;\n  align-items: flex-start;\n  gap: 12px;\n  margin-bottom: 8px;\n}\n\n.uicm-sidebar-comment-avatar {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: linear-gradient(135deg, #3b82f6, #8b5cf6);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: white;\n  font-weight: 600;\n  font-size: 14px;\n  flex-shrink: 0;\n}\n\n.uicm-sidebar-comment-user-info {\n  flex: 1;\n  min-width: 0;\n}\n\n.uicm-sidebar-comment-name-row {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-bottom: 2px;\n}\n\n.uicm-sidebar-comment-name {\n  font-weight: 600;\n  color: #1f2937;\n  font-size: 14px;\n}\n\n.uicm-sidebar-comment-role {\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.1),\n    rgba(139, 92, 246, 0.1)\n  );\n  color: #3b82f6;\n  font-size: 10px;\n  font-weight: 600;\n  padding: 2px 6px;\n  border-radius: 6px;\n  border: 1px solid rgba(59, 130, 246, 0.2);\n  text-transform: uppercase;\n  letter-spacing: 0.3px;\n}\n\n.uicm-sidebar-comment-time {\n  font-size: 11px;\n  color: #6b7280;\n  margin-left: auto;\n}\n\n.uicm-sidebar-comment-page {\n  font-size: 11px;\n  color: #6b7280;\n  margin-top: 2px;\n}\n\n.uicm-sidebar-comment-content {\n  color: #374151;\n  line-height: 1.4;\n  font-size: 13px;\n  margin: 0;\n  word-wrap: break-word;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n}\n\n.uicm-sidebar-comment-footer {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  margin-top: 8px;\n  gap: 8px;\n}\n\n.uicm-sidebar-comment-status {\n  font-size: 10px;\n  font-weight: 600;\n  padding: 2px 6px;\n  border-radius: 4px;\n  text-transform: uppercase;\n  letter-spacing: 0.3px;\n}\n\n.uicm-sidebar-comment-replies {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  font-size: 11px;\n  color: #6b7280;\n}\n\n.uicm-sidebar-comment-replies-icon {\n  font-size: 12px;\n}\n\n.uicm-sidebar-empty {\n  text-align: center;\n  padding: 40px 20px;\n  color: #6b7280;\n}\n\n.uicm-sidebar-empty-icon {\n  font-size: 48px;\n  margin-bottom: 16px;\n  opacity: 0.5;\n}\n\n.uicm-sidebar-empty-title {\n  font-size: 16px;\n  font-weight: 600;\n  margin-bottom: 8px;\n  color: #374151;\n}\n\n.uicm-sidebar-empty-subtitle {\n  font-size: 14px;\n  color: #6b7280;\n}\n\n/* Dark theme support */\n@media (prefers-color-scheme: dark) {\n  .uicm-comment-sidebar {\n    background: #1f2937;\n    border-left-color: #374151;\n    color: #f9fafb;\n  }\n\n  .uicm-sidebar-header {\n    background: linear-gradient(135deg, #374151, #4b5563);\n    border-bottom-color: #374151;\n  }\n\n  .uicm-sidebar-title {\n    color: #f9fafb;\n  }\n\n  .uicm-sidebar-tabs {\n    background: linear-gradient(135deg, #374151, #4b5563);\n    border-bottom-color: #4b5563;\n  }\n\n  .uicm-sidebar-tabs::after {\n    background: linear-gradient(90deg, transparent, #4b5563, transparent);\n  }\n\n  .uicm-sidebar-tab {\n    color: #9ca3af;\n  }\n\n  .uicm-sidebar-tab::before {\n    background: linear-gradient(\n      135deg,\n      rgba(96, 165, 250, 0.1),\n      rgba(96, 165, 250, 0.05)\n    );\n  }\n\n  .uicm-sidebar-tab:hover {\n    color: #d1d5db;\n    background: linear-gradient(\n      135deg,\n      rgba(96, 165, 250, 0.15),\n      rgba(96, 165, 250, 0.08)\n    );\n  }\n\n  .uicm-sidebar-tab.active {\n    color: #60a5fa;\n    background: linear-gradient(135deg, #1f2937, #374151);\n    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);\n  }\n\n  .uicm-sidebar-tab.active::after {\n    background: #60a5fa;\n    box-shadow: 0 0 8px rgba(96, 165, 250, 0.4);\n  }\n\n  .uicm-sidebar-tab.active:hover {\n    color: #93c5fd;\n    background: linear-gradient(135deg, #1f2937, #4b5563);\n  }\n\n  .uicm-sidebar-tab::after {\n    background: linear-gradient(90deg, #60a5fa, #06b6d4);\n  }\n\n  .uicm-sidebar-stats {\n    background: #374151;\n    border-bottom-color: #4b5563;\n    color: #d1d5db;\n  }\n\n  .uicm-sidebar-comment-item {\n    background: #1f2937;\n    border-bottom-color: #374151;\n  }\n\n  .uicm-sidebar-comment-item:hover {\n    background-color: #374151;\n  }\n\n  .uicm-sidebar-comment-name {\n    color: #f9fafb;\n  }\n\n  .uicm-sidebar-comment-content {\n    color: #d1d5db;\n  }\n}\n\n/* Mobile Responsive */\n@media (max-width: 640px) {\n  .uicm-comment-sidebar {\n    width: 100vw;\n    right: 0;\n  }\n\n  .uicm-sidebar-header {\n    padding: 12px 16px;\n  }\n\n  .uicm-sidebar-title {\n    font-size: 14px;\n  }\n\n  .uicm-sidebar-tabs {\n    padding: 0;\n  }\n\n  .uicm-sidebar-tab {\n    padding: 12px 16px;\n    font-size: 12px;\n  }\n\n  .uicm-sidebar-stats {\n    padding: 8px 16px;\n  }\n\n  .uicm-sidebar-comment-item {\n    padding: 12px;\n    margin-bottom: 8px;\n  }\n\n  .uicm-sidebar-comment-name {\n    font-size: 13px;\n  }\n\n  .uicm-sidebar-comment-content {\n    font-size: 12px;\n  }\n}\n";
+styleInject(css_248z$a);
+
+class CommentSidebar {
+    constructor(props) {
+        this.isVisible = false;
+        this.currentTab = "active";
+        this.currentStatusFilter = "all";
+        this.isFilterOpen = false;
+        this.commentsList = null;
+        this.statsContent = null;
+        this.filterContainer = null;
+        this.filterToggleBtn = null;
+        console.log("🔧 CommentSidebar: Constructor called with", props.comments.length, "comments");
+        this.props = props;
+        this.element = this.createElement();
+        console.log("🔧 CommentSidebar: Element created:", this.element);
+        this.attachEventListeners();
+    }
+    formatTimeAgo(dateString) {
+        const now = new Date();
+        const date = new Date(dateString);
+        const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+        if (diffInSeconds < 60)
+            return "just now";
+        if (diffInSeconds < 3600)
+            return `${Math.floor(diffInSeconds / 60)}m ago`;
+        if (diffInSeconds < 86400)
+            return `${Math.floor(diffInSeconds / 3600)}h ago`;
+        if (diffInSeconds < 2592000)
+            return `${Math.floor(diffInSeconds / 86400)}d ago`;
+        return date.toLocaleDateString();
+    }
+    getStatusColor(status) {
+        switch (status) {
+            case exports.CommentStatus.BUG:
+                return { bg: "#dc3545", text: "white" };
+            case exports.CommentStatus.FEATURE_REQUEST:
+                return { bg: "#ffc107", text: "black" };
+            case exports.CommentStatus.DEV_COMPLETED:
+                return { bg: "#3b82f6", text: "white" };
+            case exports.CommentStatus.DONE:
+                return { bg: "#28a745", text: "white" };
+            case exports.CommentStatus.ARCHIVED:
+                return { bg: "#6c757d", text: "white" };
+            default:
+                return { bg: "#007bff", text: "white" };
+        }
+    }
+    getPageName(url) {
+        try {
+            const urlObj = new URL(url);
+            const path = urlObj.pathname;
+            // Extract page name from path
+            if (path === "/" || path === "")
+                return "Home";
+            const segments = path.split("/").filter(Boolean);
+            if (segments.length === 0)
+                return "Home";
+            // Convert path to readable name
+            const pageName = segments[segments.length - 1]
+                .split("-")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ");
+            return pageName || "Unknown Page";
+        }
+        catch {
+            return "Unknown Page";
+        }
+    }
+    getFilteredComments() {
+        let filteredComments;
+        if (this.currentTab === "active") {
+            filteredComments = this.props.comments.filter((c) => c.status !== "archived");
+        }
+        else {
+            filteredComments = this.props.comments.filter((c) => c.status === "archived");
+        }
+        // Apply status filter if not "all"
+        if (this.currentStatusFilter !== "all") {
+            filteredComments = filteredComments.filter((c) => c.status === this.currentStatusFilter);
+        }
+        return filteredComments;
+    }
+    switchTab(tab) {
+        this.currentTab = tab;
+        this.updateCommentsDisplay();
+        this.updateStats();
+        this.updateTabStates();
+    }
+    switchStatusFilter(status) {
+        this.currentStatusFilter = status;
+        this.updateCommentsDisplay();
+        this.updateStats();
+        this.updateFilterStates();
+    }
+    toggleFilter() {
+        this.isFilterOpen = !this.isFilterOpen;
+        if (this.filterContainer) {
+            if (this.isFilterOpen) {
+                this.filterContainer.classList.remove("uicm-sidebar-filters-closed");
+                this.filterContainer.classList.add("uicm-sidebar-filters-open");
+            }
+            else {
+                this.filterContainer.classList.remove("uicm-sidebar-filters-open");
+                this.filterContainer.classList.add("uicm-sidebar-filters-closed");
+            }
+        }
+        if (this.filterToggleBtn) {
+            const arrow = this.filterToggleBtn.querySelector(".uicm-filter-toggle-arrow");
+            if (arrow) {
+                arrow.textContent = this.isFilterOpen ? "▲" : "▼";
+            }
+        }
+    }
+    updateCommentsDisplay() {
+        if (!this.commentsList)
+            return;
+        this.commentsList.innerHTML = "";
+        const filteredComments = this.getFilteredComments();
+        if (filteredComments.length === 0) {
+            const emptyState = document.createElement("div");
+            emptyState.className = "uicm-sidebar-empty";
+            const emptyText = this.currentTab === "active"
+                ? "No active comments yet"
+                : "No archived comments";
+            const emptySubtext = this.currentTab === "active"
+                ? "Start commenting on any element to see them here"
+                : "Archived comments will appear here";
+            emptyState.innerHTML = `
+        <div class="uicm-sidebar-empty-icon">��</div>
+        <div class="uicm-sidebar-empty-title">${emptyText}</div>
+        <div class="uicm-sidebar-empty-subtitle">${emptySubtext}</div>
+      `;
+            this.commentsList.appendChild(emptyState);
+        }
+        else {
+            filteredComments.forEach((comment) => {
+                const commentItem = this.createCommentItem(comment);
+                this.commentsList.appendChild(commentItem);
+            });
+        }
+    }
+    updateStats() {
+        if (!this.statsContent)
+            return;
+        const activeComments = this.props.comments.filter((c) => c.status !== "archived").length;
+        const archivedComments = this.props.comments.filter((c) => c.status === "archived").length;
+        const totalReplies = this.props.comments.reduce((sum, comment) => sum + comment.replies.length, 0);
+        this.statsContent.innerHTML = `
+      <span>📝 ${this.currentTab === "active" ? activeComments : archivedComments} ${this.currentTab === "active" ? "active" : "archived"}</span>
+      <span>💬 ${totalReplies} replies</span>
+      <span>📊 ${activeComments + archivedComments} total</span>
+    `;
+    }
+    createCommentItem(comment) {
+        const item = document.createElement("div");
+        item.className = "uicm-sidebar-comment-item";
+        // Click to navigate
+        item.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log("🔧 Sidebar: Comment item clicked:", comment.id);
+            this.props.onNavigateToComment(comment);
+        });
+        // Header with avatar, name, role, and time
+        const header = document.createElement("div");
+        header.className = "uicm-sidebar-comment-header";
+        // Avatar
+        const avatar = document.createElement("div");
+        avatar.className = "uicm-sidebar-comment-avatar";
+        let avatarChar = "?";
+        if (comment &&
+            comment.createdBy &&
+            typeof comment.createdBy.name === "string" &&
+            comment.createdBy.name.length > 0) {
+            avatarChar = comment.createdBy.name.charAt(0).toUpperCase();
+        }
+        else {
+            console.warn("Sidebar: Comment missing createdBy or name", comment);
+        }
+        avatar.textContent = avatarChar;
+        // User info container
+        const userInfo = document.createElement("div");
+        userInfo.className = "uicm-sidebar-comment-user-info";
+        // Name and role row
+        const nameRow = document.createElement("div");
+        nameRow.className = "uicm-sidebar-comment-name-row";
+        const name = document.createElement("span");
+        name.className = "uicm-sidebar-comment-name";
+        name.textContent = comment.createdBy.name;
+        // Role badge
+        const roleBadge = document.createElement("span");
+        roleBadge.className = "uicm-sidebar-comment-role";
+        const roleColors = getRoleColor(comment.role);
+        roleBadge.style.backgroundColor = roleColors.bg;
+        roleBadge.style.color = roleColors.text;
+        roleBadge.style.borderColor = roleColors.border;
+        roleBadge.textContent = getRoleDisplayName(comment.role);
+        // Time
+        const time = document.createElement("span");
+        time.className = "uicm-sidebar-comment-time";
+        time.textContent = this.formatTimeAgo(comment.createdAt);
+        nameRow.appendChild(name);
+        nameRow.appendChild(roleBadge);
+        nameRow.appendChild(time);
+        // Page name
+        const pageName = document.createElement("div");
+        pageName.className = "uicm-sidebar-comment-page";
+        pageName.textContent = this.getPageName(comment.url);
+        userInfo.appendChild(nameRow);
+        userInfo.appendChild(pageName);
+        header.appendChild(avatar);
+        header.appendChild(userInfo);
+        // Content
+        const content = document.createElement("div");
+        content.className = "uicm-sidebar-comment-content";
+        content.textContent = comment.content;
+        // Footer with status and reply count
+        const footer = document.createElement("div");
+        footer.className = "uicm-sidebar-comment-footer";
+        // Status badge
+        const statusBadge = document.createElement("span");
+        statusBadge.className = "uicm-sidebar-comment-status";
+        const statusColors = this.getStatusColor(comment.status);
+        statusBadge.style.backgroundColor = statusColors.bg;
+        statusBadge.style.color = statusColors.text;
+        statusBadge.textContent = comment?.status?.toUpperCase();
+        // Reply count
+        const replyCount = document.createElement("span");
+        replyCount.className = "uicm-sidebar-comment-replies";
+        const replyIcon = document.createElement("span");
+        replyIcon.className = "uicm-sidebar-comment-replies-icon";
+        replyIcon.textContent = "💬";
+        replyCount.appendChild(replyIcon);
+        replyCount.appendChild(document.createTextNode(`${comment.replies.length}`));
+        footer.appendChild(statusBadge);
+        footer.appendChild(replyCount);
+        item.appendChild(header);
+        item.appendChild(content);
+        item.appendChild(footer);
+        return item;
+    }
+    createElement() {
+        const sidebar = document.createElement("div");
+        sidebar.className = "uicm-comment-sidebar";
+        // Header
+        const header = document.createElement("div");
+        header.className = "uicm-sidebar-header";
+        const title = document.createElement("h3");
+        title.className = "uicm-sidebar-title";
+        title.textContent = "All Comments";
+        const closeButton = document.createElement("button");
+        closeButton.className = "uicm-sidebar-close";
+        closeButton.innerHTML = "×";
+        closeButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.props.onClose();
+        });
+        header.appendChild(title);
+        header.appendChild(closeButton);
+        // Tabs
+        const tabsContainer = document.createElement("div");
+        tabsContainer.className = "uicm-sidebar-tabs";
+        const activeTab = document.createElement("button");
+        activeTab.className = "uicm-sidebar-tab uicm-sidebar-tab-active";
+        activeTab.textContent = "Active";
+        activeTab.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.switchTab("active");
+        });
+        const archiveTab = document.createElement("button");
+        archiveTab.className = "uicm-sidebar-tab";
+        archiveTab.textContent = "Archive";
+        archiveTab.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.switchTab("archive");
+        });
+        tabsContainer.appendChild(activeTab);
+        tabsContainer.appendChild(archiveTab);
+        // Filter Toggle Button
+        this.filterToggleBtn = document.createElement("button");
+        this.filterToggleBtn.className = "uicm-sidebar-filter-toggle";
+        this.filterToggleBtn.innerHTML = `
+      <span class="uicm-filter-toggle-icon">🔍</span>
+      <span class="uicm-filter-toggle-text">Filter</span>
+      <span class="uicm-filter-toggle-arrow">▼</span>
+    `;
+        this.filterToggleBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.toggleFilter();
+        });
+        // Status Filters
+        this.filterContainer = document.createElement("div");
+        this.filterContainer.className =
+            "uicm-sidebar-filters uicm-sidebar-filters-closed";
+        const filterHeader = document.createElement("div");
+        filterHeader.className = "uicm-sidebar-filter-header";
+        const filterIcon = document.createElement("span");
+        filterIcon.className = "uicm-sidebar-filter-icon";
+        filterIcon.innerHTML = "🔍";
+        const filterTitle = document.createElement("div");
+        filterTitle.className = "uicm-sidebar-filter-title";
+        filterTitle.textContent = "Filter by Status";
+        filterHeader.appendChild(filterIcon);
+        filterHeader.appendChild(filterTitle);
+        const filterButtons = document.createElement("div");
+        filterButtons.className = "uicm-sidebar-filter-buttons";
+        // All filter button
+        const allFilterBtn = document.createElement("button");
+        allFilterBtn.className = "uicm-status-filter-btn active";
+        allFilterBtn.setAttribute("data-status", "all");
+        allFilterBtn.innerHTML = `
+      <span class="uicm-filter-btn-icon">📋</span>
+      <span class="uicm-filter-btn-text">All</span>
+    `;
+        allFilterBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.switchStatusFilter("all");
+        });
+        // Status filter buttons
+        const statusFilters = [
+            {
+                status: exports.CommentStatus.BUG,
+                label: "Bug",
+                icon: "🐛",
+                color: "#dc3545",
+                colorDark: "#c82333",
+                colorDarker: "#a71e2a",
+                colorRgb: "220, 53, 69",
+            },
+            {
+                status: exports.CommentStatus.FEATURE_REQUEST,
+                label: "Feature",
+                icon: "💡",
+                color: "#ffc107",
+                colorDark: "#e0a800",
+                colorDarker: "#d39e00",
+                colorRgb: "255, 193, 7",
+            },
+            {
+                status: exports.CommentStatus.DEV_COMPLETED,
+                label: "Dev Done",
+                icon: "✅",
+                color: "#3b82f6",
+                colorDark: "#2563eb",
+                colorDarker: "#1d4ed8",
+                colorRgb: "59, 130, 246",
+            },
+            {
+                status: exports.CommentStatus.DONE,
+                label: "Done",
+                icon: "🎉",
+                color: "#28a745",
+                colorDark: "#218838",
+                colorDarker: "#1e7e34",
+                colorRgb: "40, 167, 69",
+            },
+        ];
+        statusFilters.forEach(({ status, label, icon, color, colorDark, colorDarker, colorRgb }) => {
+            const filterBtn = document.createElement("button");
+            filterBtn.className = "uicm-status-filter-btn";
+            filterBtn.setAttribute("data-status", status);
+            filterBtn.setAttribute("data-color", color);
+            filterBtn.innerHTML = `
+        <span class="uicm-filter-btn-icon">${icon}</span>
+        <span class="uicm-filter-btn-text">${label}</span>
+      `;
+            // Set CSS custom properties for color coding
+            filterBtn.style.setProperty("--status-color", color);
+            filterBtn.style.setProperty("--status-color-dark", colorDark);
+            filterBtn.style.setProperty("--status-color-darker", colorDarker);
+            filterBtn.style.setProperty("--status-color-rgb", colorRgb);
+            filterBtn.addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.switchStatusFilter(status);
+            });
+            filterButtons.appendChild(filterBtn);
+        });
+        this.filterContainer.appendChild(filterHeader);
+        this.filterContainer.appendChild(filterButtons);
+        // Stats
+        const stats = document.createElement("div");
+        stats.className = "uicm-sidebar-stats";
+        const activeComments = this.props.comments.filter((c) => c.status !== "archived").length;
+        const archivedComments = this.props.comments.filter((c) => c.status === "archived").length;
+        const totalReplies = this.props.comments.reduce((sum, comment) => sum + comment.replies.length, 0);
+        this.statsContent = document.createElement("div");
+        this.statsContent.className = "uicm-sidebar-stats-content";
+        this.statsContent.innerHTML = `
+      <span>📝 ${activeComments} active</span>
+      <span>💬 ${totalReplies} replies</span>
+      <span>📊 ${activeComments + archivedComments} total</span>
+    `;
+        stats.appendChild(this.statsContent);
+        // Comments list
+        this.commentsList = document.createElement("div");
+        this.commentsList.className = "uicm-sidebar-comments-list";
+        // Populate comments based on current tab
+        this.updateCommentsDisplay();
+        sidebar.appendChild(header);
+        sidebar.appendChild(tabsContainer);
+        sidebar.appendChild(this.filterToggleBtn);
+        sidebar.appendChild(this.filterContainer);
+        sidebar.appendChild(stats);
+        sidebar.appendChild(this.commentsList);
+        return sidebar;
+    }
+    attachEventListeners() {
+        // ESC key to close
+        const escHandler = (e) => {
+            if (e.key === "Escape" && this.isVisible) {
+                this.props.onClose();
+            }
+        };
+        document.addEventListener("keydown", escHandler);
+        // Clean up on destroy
+        this.element.addEventListener("destroy", () => {
+            document.removeEventListener("keydown", escHandler);
+        });
+    }
+    show() {
+        this.isVisible = true;
+        document.body.appendChild(this.element);
+        this.element.offsetHeight;
+        this.element.classList.add("show");
+    }
+    hide() {
+        console.log("🔧 CommentSidebar: hide() called");
+        this.isVisible = false;
+        // Remove show class to trigger slide out animation
+        this.element.classList.remove("show");
+        // Remove from DOM after animation
+        setTimeout(() => {
+            if (this.element.parentNode) {
+                this.element.parentNode.removeChild(this.element);
+                console.log("🔧 CommentSidebar: Element removed from DOM");
+            }
+        }, 300);
+    }
+    updateComments(comments) {
+        this.props.comments = comments;
+        this.updateCommentsDisplay();
+        this.updateStats();
+        this.updateTabStates();
+        this.updateFilterStates();
+    }
+    updateTabStates() {
+        const activeTab = this.element.querySelector(".uicm-sidebar-tab.active");
+        const archiveTab = this.element.querySelector(".uicm-sidebar-tab.archive");
+        if (activeTab) {
+            activeTab.classList.toggle("active", this.currentTab === "active");
+        }
+        if (archiveTab) {
+            archiveTab.classList.toggle("active", this.currentTab === "archive");
+        }
+    }
+    updateFilterStates() {
+        if (!this.filterContainer)
+            return;
+        const filterButtons = this.filterContainer.querySelectorAll(".uicm-status-filter-btn");
+        filterButtons.forEach((btn) => {
+            const status = btn.getAttribute("data-status");
+            if (status === this.currentStatusFilter ||
+                (status === "all" && this.currentStatusFilter === "all")) {
+                btn.classList.add("active");
+            }
+            else {
+                btn.classList.remove("active");
+            }
+        });
+    }
+    getElement() {
+        return this.element;
+    }
+    destroy() {
+        this.hide();
+        this.element.dispatchEvent(new Event("destroy"));
+    }
+}
+
+class CommentsTable {
+    constructor(props) {
+        this.selectedComments = new Set();
+        this.sortConfig = { key: "createdAt", direction: "desc" };
+        this.filterConfig = {};
+        this.filteredComments = [];
+        this.destroyed = false;
+        this.imageModal = null; // <--- Thêm biến này
+        this.handleEscKey = (e) => {
+            if (e.key === "Escape") {
+                this.props.onClose();
+            }
+        };
+        this.escHandler = null;
+        this.props = props;
+        this.element = this.createElement();
+        this.updateFilteredComments();
+        this.render();
+        this.attachEventListeners();
+    }
+    createElement() {
+        const modal = document.createElement("div");
+        modal.className = "uicm-comments-table-modal";
+        modal.innerHTML = `
+      <div class="uicm-comments-table-overlay"></div>
+      <div class="uicm-comments-table-container">
+        <div class="uicm-comments-table-header">
+          <h2>Comments Management</h2>
+          <button class="uicm-comments-table-close" aria-label="Close">×</button>
+        </div>
+        
+        <div class="uicm-comments-table-toolbar">
+          <div class="uicm-comments-table-filters">
+            <input type="text" class="uicm-search-input" placeholder="Search comments...">
+            
+            <select class="uicm-status-filter">
+              <option value="">All Status</option>
+              <option value="bug">Bug</option>
+              <option value="feature_request">Feature Request</option>
+              <option value="dev_completed">Dev Completed</option>
+              <option value="done">Done</option>
+              <option value="archived">Archived</option>
+            </select>
+            
+            <input type="date" class="uicm-date-start" placeholder="Start Date">
+            <input type="date" class="uicm-date-end" placeholder="End Date">
+            
+            <button class="uicm-clear-filters uicm-allow-bubble">Clear Filters</button>
+          </div>
+          
+          <div class="uicm-comments-table-actions">
+            <button class="uicm-delete-selected uicm-allow-bubble" disabled>Delete Selected</button>
+            <button class="uicm-export-excel uicm-allow-bubble">Export CSV</button>
+          </div>
+        </div>
+        
+        <div class="uicm-comments-table-wrapper">
+          <table class="uicm-comments-table">
+            <thead>
+              <tr>
+                <th>
+                  <input type="checkbox" class="uicm-select-all">
+                </th>
+                <th class="sortable" data-key="createdAt">
+                  Date Created
+                  <span class="sort-indicator">↓</span>
+                </th>
+                <th class="sortable" data-key="author">
+                  Author
+                  <span class="sort-indicator"></span>
+                </th>
+                <th class="sortable" data-key="status">
+                  Status
+                  <span class="sort-indicator"></span>
+                </th>
+                <th class="sortable" data-key="content">
+                  Content
+                  <span class="sort-indicator"></span>
+                </th>
+                <th>Attachments</th>
+                <th>URL</th>
+                <th>Replies</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody class="uicm-comments-table-body">
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="uicm-comments-table-footer">
+          <div class="uicm-comments-count">
+            Total: <span class="total-count">0</span> comments
+            (<span class="selected-count">0</span> selected)
+          </div>
+        </div>
+      </div>
+    `;
+        return modal;
+    }
+    updateFilteredComments() {
+        console.log("🔄 Updating filtered comments...");
+        console.log("📊 Total source comments:", this.props.comments.length);
+        console.log("🔍 Current filter config:", this.filterConfig);
+        let filtered = [...this.props.comments];
+        // Apply search filter
+        if (this.filterConfig.searchText?.trim()) {
+            const searchText = this.filterConfig.searchText.toLowerCase();
+            filtered = filtered.filter((comment) => comment.content.toLowerCase().includes(searchText) ||
+                comment.createdBy.name.toLowerCase().includes(searchText));
+        }
+        // Apply status filter
+        if (this.filterConfig.status?.length) {
+            filtered = filtered.filter((comment) => this.filterConfig.status.includes(comment.status));
+        }
+        // Apply author filter
+        if (this.filterConfig.author?.length) {
+            filtered = filtered.filter((comment) => this.filterConfig.author.includes(comment.createdBy.name));
+        }
+        // Apply date range filter
+        if (this.filterConfig.dateRange?.start ||
+            this.filterConfig.dateRange?.end) {
+            filtered = filtered.filter((comment) => {
+                const commentDate = new Date(comment.createdAt);
+                const start = this.filterConfig.dateRange?.start
+                    ? new Date(this.filterConfig.dateRange.start)
+                    : null;
+                const end = this.filterConfig.dateRange?.end
+                    ? new Date(this.filterConfig.dateRange.end)
+                    : null;
+                if (start && commentDate < start)
+                    return false;
+                if (end && commentDate > end)
+                    return false;
+                return true;
+            });
+        }
+        // Apply sorting
+        filtered.sort((a, b) => {
+            let aValue, bValue;
+            switch (this.sortConfig.key) {
+                case "author":
+                    aValue = a.createdBy.name;
+                    bValue = b.createdBy.name;
+                    break;
+                case "statusText":
+                    aValue = this.getStatusDisplayName(a.status);
+                    bValue = this.getStatusDisplayName(b.status);
+                    break;
+                default:
+                    aValue = a[this.sortConfig.key];
+                    bValue = b[this.sortConfig.key];
+            }
+            if (aValue < bValue)
+                return this.sortConfig.direction === "asc" ? -1 : 1;
+            if (aValue > bValue)
+                return this.sortConfig.direction === "asc" ? 1 : -1;
+            return 0;
+        });
+        this.filteredComments = filtered;
+        console.log("✅ Filtered comments updated:", this.filteredComments.length);
+    }
+    render() {
+        const tbody = this.element.querySelector(".uicm-comments-table-body");
+        const totalCount = this.element.querySelector(".total-count");
+        const selectedCount = this.element.querySelector(".selected-count");
+        tbody.innerHTML = "";
+        this.filteredComments.forEach((comment) => {
+            const row = this.createCommentRow(comment);
+            tbody.appendChild(row);
+        });
+        totalCount.textContent = this.filteredComments.length.toString();
+        selectedCount.textContent = this.selectedComments.size.toString();
+        // Update delete button state
+        const deleteButton = this.element.querySelector(".uicm-delete-selected");
+        deleteButton.disabled = this.selectedComments.size === 0;
+        // Update select all checkbox
+        const selectAllCheckbox = this.element.querySelector(".uicm-select-all");
+        if (this.filteredComments.length === 0) {
+            selectAllCheckbox.indeterminate = false;
+            selectAllCheckbox.checked = false;
+        }
+        else if (this.selectedComments.size === this.filteredComments.length) {
+            selectAllCheckbox.indeterminate = false;
+            selectAllCheckbox.checked = true;
+        }
+        else if (this.selectedComments.size > 0) {
+            selectAllCheckbox.indeterminate = true;
+            selectAllCheckbox.checked = false;
+        }
+        else {
+            selectAllCheckbox.indeterminate = false;
+            selectAllCheckbox.checked = false;
+        }
+    }
+    createCommentRow(comment) {
+        const row = document.createElement("tr");
+        row.className = "uicm-comment-row";
+        row.dataset.commentId = comment.id;
+        const isSelected = this.selectedComments.has(comment.id);
+        const statusColor = this.getStatusColor(comment.status);
+        const statusName = this.getStatusDisplayName(comment.status);
+        const roleColor = getRoleColor(comment.createdBy.role || "other");
+        const formattedDate = new Date(comment.createdAt).toLocaleString();
+        const attachmentsCell = document.createElement("td");
+        attachmentsCell.className = "attachments-cell";
+        if (comment.attachments && comment.attachments.length > 0) {
+            comment.attachments.forEach((att) => {
+                if (att.type === "image") {
+                    const thumb = document.createElement("img");
+                    thumb.src = att.url;
+                    thumb.alt = att.filename;
+                    thumb.className = "uicm-attachment-thumb";
+                    thumb.style.width = "36px";
+                    thumb.style.height = "36px";
+                    thumb.style.objectFit = "cover";
+                    thumb.style.borderRadius = "6px";
+                    thumb.style.marginRight = "4px";
+                    thumb.style.cursor = "pointer";
+                    thumb.title = att.filename;
+                    thumb.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (this.imageModal) {
+                            this.imageModal.destroy();
+                            this.imageModal = null;
+                        }
+                        this.imageModal = new ImageModal(att.url);
+                        this.imageModal.show();
+                    });
+                    attachmentsCell.appendChild(thumb);
+                }
+                else {
+                    const fileIcon = document.createElement("span");
+                    fileIcon.innerHTML = "📎";
+                    fileIcon.style.fontSize = "18px";
+                    fileIcon.style.marginRight = "2px";
+                    fileIcon.title = att.filename;
+                    attachmentsCell.appendChild(fileIcon);
+                    const fileName = document.createElement("span");
+                    fileName.textContent = att.filename;
+                    fileName.style.fontSize = "12px";
+                    fileName.style.marginRight = "6px";
+                    attachmentsCell.appendChild(fileName);
+                }
+            });
+        }
+        else {
+            attachmentsCell.textContent = "-";
+        }
+        row.innerHTML = `
+      <td>
+        <input type="checkbox" class="uicm-comment-select" ${isSelected ? "checked" : ""}>
+      </td>
+      <td class="date-cell">${formattedDate}</td>
+      <td class="author-cell">
+        <span class="author-name" style="color: ${roleColor}">${comment.createdBy.name}</span>
+        <small class="author-role">${getRoleDisplayName(comment.createdBy.role || "other")}</small>
+      </td>
+      <td class="status-cell">
+        <span class="status-badge" style="background-color: ${statusColor}">${statusName}</span>
+      </td>
+      <td class="content-cell">
+        <div class="comment-content">${this.truncateText(comment.content, 100)}</div>
+      </td>
+    `;
+        row.appendChild(attachmentsCell);
+        row.innerHTML += `
+      <td class="url-cell">
+        <span class="url-text" title="${comment.url}">${this.truncateText(comment.url, 50)}</span>
+      </td>
+      <td class="replies-cell">
+        <span class="replies-count">${comment.replies.length}</span>
+      </td>
+      <td class="actions-cell">
+        <button class="uicm-edit-comment" data-comment-id="${comment.id}" style="display: none;" disabled>Edit</button>
+        <button class="uicm-delete-comment uicm-allow-bubble" data-comment-id="${comment.id}">Delete</button>
+      </td>
+    `;
+        return row;
+    }
+    attachEventListeners() {
+        // Close button
+        const closeButton = this.element.querySelector(".uicm-comments-table-close");
+        closeButton.addEventListener("click", (e) => {
+            console.log("❌ Close button clicked");
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            this.closeModal();
+        }, true);
+        // Overlay click to close
+        const overlay = this.element.querySelector(".uicm-comments-table-overlay");
+        overlay.addEventListener("click", (e) => {
+            console.log("🖱️ Overlay clicked, target:", e.target);
+            // Only close if clicking directly on overlay, not on child elements
+            if (e.target === overlay) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                this.closeModal();
+            }
+        }, true);
+        // Search input with debounce
+        const searchInput = this.element.querySelector(".uicm-search-input");
+        let searchDebounce = null;
+        searchInput.addEventListener("input", (e) => {
+            if (searchDebounce)
+                clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(() => {
+                this.filterConfig.searchText = e.target.value;
+                this.updateFilteredComments();
+                this.render();
+            }, 300);
+        });
+        // Status filter (single select)
+        const statusFilter = this.element.querySelector(".uicm-status-filter");
+        statusFilter.addEventListener("change", () => {
+            const value = statusFilter.value;
+            this.filterConfig.status = value ? [value] : undefined;
+            this.updateFilteredComments();
+            this.render();
+        });
+        // Date filters
+        const dateStart = this.element.querySelector(".uicm-date-start");
+        const dateEnd = this.element.querySelector(".uicm-date-end");
+        dateStart.addEventListener("change", (e) => {
+            if (!this.filterConfig.dateRange)
+                this.filterConfig.dateRange = {};
+            this.filterConfig.dateRange.start = e.target.value;
+            this.updateFilteredComments();
+            this.render();
+        });
+        dateEnd.addEventListener("change", (e) => {
+            if (!this.filterConfig.dateRange)
+                this.filterConfig.dateRange = {};
+            this.filterConfig.dateRange.end = e.target.value;
+            this.updateFilteredComments();
+            this.render();
+        });
+        // Clear filters
+        const clearFilters = this.element.querySelector(".uicm-clear-filters");
+        clearFilters.addEventListener("click", () => {
+            console.log("🔄 Clearing all filters...");
+            console.log("📊 Before clear - filtered comments:", this.filteredComments.length);
+            console.log("📊 Before clear - total comments:", this.props.comments.length);
+            // Clear any pending debounce
+            if (searchDebounce) {
+                clearTimeout(searchDebounce);
+                searchDebounce = null;
+            }
+            // Reset filter config completely
+            this.filterConfig = {
+                status: undefined,
+                author: undefined,
+                dateRange: undefined,
+                searchText: undefined,
+            };
+            // Reset form values
+            searchInput.value = "";
+            statusFilter.value = "";
+            dateStart.value = "";
+            dateEnd.value = "";
+            // Force re-filter and render immediately
+            this.updateFilteredComments();
+            this.render();
+            console.log("📊 After clear - filtered comments:", this.filteredComments.length);
+            console.log("✅ All filters cleared and UI updated");
+            // Optional: Force trigger events for any external listeners
+            setTimeout(() => {
+                const inputEvent = new Event("input", { bubbles: true });
+                const changeEvent = new Event("change", { bubbles: true });
+                searchInput.dispatchEvent(inputEvent);
+                statusFilter.dispatchEvent(changeEvent);
+                dateStart.dispatchEvent(changeEvent);
+                dateEnd.dispatchEvent(changeEvent);
+            }, 0);
+        });
+        // Sort headers
+        const sortableHeaders = this.element.querySelectorAll(".sortable");
+        sortableHeaders.forEach((header) => {
+            header.addEventListener("click", () => {
+                const key = header.getAttribute("data-key");
+                if (this.sortConfig.key === key) {
+                    this.sortConfig.direction =
+                        this.sortConfig.direction === "asc" ? "desc" : "asc";
+                }
+                else {
+                    this.sortConfig.key = key;
+                    this.sortConfig.direction = "asc";
+                }
+                this.updateSortIndicators();
+                this.updateFilteredComments();
+                this.render();
+            });
+        });
+        // Select all checkbox
+        const selectAllCheckbox = this.element.querySelector(".uicm-select-all");
+        selectAllCheckbox.addEventListener("change", () => {
+            if (selectAllCheckbox.checked) {
+                this.filteredComments.forEach((comment) => this.selectedComments.add(comment.id));
+            }
+            else {
+                this.selectedComments.clear();
+            }
+            this.render();
+        });
+        // Table event delegation
+        const table = this.element.querySelector(".uicm-comments-table");
+        table.addEventListener("click", (e) => {
+            const target = e.target;
+            // Comment selection
+            if (target.classList.contains("uicm-comment-select")) {
+                const checkbox = target;
+                const row = checkbox.closest(".uicm-comment-row");
+                const commentId = row.dataset.commentId;
+                if (checkbox.checked) {
+                    this.selectedComments.add(commentId);
+                }
+                else {
+                    this.selectedComments.delete(commentId);
+                }
+                this.render();
+            }
+            // Delete single comment
+            if (target.classList.contains("uicm-delete-comment")) {
+                const commentId = target.dataset.commentId;
+                this.deleteComment(commentId);
+            }
+        });
+        // Delete selected
+        const deleteSelected = this.element.querySelector(".uicm-delete-selected");
+        deleteSelected.addEventListener("click", () => {
+            this.deleteSelectedComments();
+        });
+        // Export CSV
+        const exportExcel = this.element.querySelector(".uicm-export-excel");
+        exportExcel.addEventListener("click", (e) => {
+            console.log("🔄 Export button clicked");
+            e.preventDefault();
+            e.stopPropagation();
+            console.log("📊 Filtered comments count:", this.filteredComments.length);
+            console.log("📊 Sample comment:", this.filteredComments[0]);
+            exportCommentsToCSV(this.filteredComments, "comments_export.csv", { separator: ";" }, (error) => {
+                console.error("❌ Export error:", error);
+                alert("Export failed: " + error);
+            });
+        });
+        // ESC key to close
+        this.escHandler = (e) => {
+            if (e.key === "Escape") {
+                console.log("🔑 ESC key pressed, closing modal...");
+                e.preventDefault();
+                e.stopPropagation();
+                this.closeModal();
+            }
+        };
+        document.addEventListener("keydown", this.escHandler, true);
+        // Prevent event propagation outside modal (but allow close buttons to work)
+        this.element.addEventListener("mousedown", (e) => {
+            const target = e.target;
+            // Allow close button and overlay clicks to bubble
+            if (!target.classList.contains("uicm-comments-table-overlay") &&
+                !target.classList.contains("uicm-comments-table-close") &&
+                !target.classList.contains("uicm-allow-bubble")) {
+                e.stopPropagation();
+            }
+        }, true);
+        this.element.addEventListener("click", (e) => {
+            const target = e.target;
+            // Allow close button and overlay clicks to bubble
+            if (!target.classList.contains("uicm-comments-table-overlay") &&
+                !target.classList.contains("uicm-comments-table-close") &&
+                !target.classList.contains("uicm-allow-bubble")) {
+                e.stopPropagation();
+            }
+        }, true);
+        this.element.addEventListener("keydown", (e) => {
+            // Allow ESC to bubble for closing, block others
+            if (e.key !== "Escape") {
+                e.stopPropagation();
+            }
+        }, true);
+    }
+    updateSortIndicators() {
+        const headers = this.element.querySelectorAll(".sortable");
+        headers.forEach((header) => {
+            const indicator = header.querySelector(".sort-indicator");
+            const key = header.getAttribute("data-key");
+            if (key === this.sortConfig.key) {
+                indicator.textContent = this.sortConfig.direction === "asc" ? "↑" : "↓";
+            }
+            else {
+                indicator.textContent = "";
+            }
+        });
+    }
+    async deleteComment(commentId) {
+        if (!window.confirm("Are you sure you want to delete this comment?"))
+            return;
+        try {
+            // Gọi callback để xóa ở API/localStorage nếu có
+            if (this.props.onDeleteComments) {
+                await this.props.onDeleteComments([commentId]);
+            }
+            // Xóa khỏi UI sau khi API thành công hoặc nếu không có callback
+            this.props.comments = this.props.comments.filter((c) => c.id !== commentId);
+            this.filteredComments = this.filteredComments.filter((c) => c.id !== commentId);
+            this.selectedComments.delete(commentId);
+            this.render();
+        }
+        catch (error) {
+            alert("Failed to delete comment from server/localStorage!");
+            console.error(error);
+        }
+    }
+    async deleteSelectedComments() {
+        if (this.selectedComments.size === 0)
+            return;
+        if (confirm(`Are you sure you want to delete ${this.selectedComments.size} selected comments?`)) {
+            await this.props.onDeleteComments(Array.from(this.selectedComments));
+            this.selectedComments.clear();
+            this.updateFilteredComments();
+            this.render();
+        }
+    }
+    getStatusColor(status) {
+        switch (status) {
+            case exports.CommentStatus.BUG:
+                return "#ef4444";
+            case exports.CommentStatus.FEATURE_REQUEST:
+                return "#f59e0b";
+            case exports.CommentStatus.DEV_COMPLETED:
+                return "#3b82f6";
+            case exports.CommentStatus.DONE:
+                return "#10b981";
+            case exports.CommentStatus.ARCHIVED:
+                return "#6b7280";
+            default:
+                return "#6b7280";
+        }
+    }
+    getStatusDisplayName(status) {
+        switch (status) {
+            case exports.CommentStatus.BUG:
+                return "Bug";
+            case exports.CommentStatus.FEATURE_REQUEST:
+                return "Feature Request";
+            case exports.CommentStatus.DEV_COMPLETED:
+                return "Dev Completed";
+            case exports.CommentStatus.DONE:
+                return "Done";
+            case exports.CommentStatus.ARCHIVED:
+                return "Archived";
+            default:
+                return "Unknown";
+        }
+    }
+    truncateText(text, maxLength) {
+        if (text.length <= maxLength)
+            return text;
+        return text.substring(0, maxLength) + "...";
+    }
+    closeModal() {
+        console.log("🔄 CommentsTable closeModal called, destroyed:", this.destroyed);
+        if (this.destroyed) {
+            console.log("⚠️ Modal already destroyed, ignoring close request");
+            return;
+        }
+        this.destroyed = true;
+        console.log("✅ Destroying CommentsTable modal...");
+        // Clean up event listeners first
+        if (this.escHandler) {
+            document.removeEventListener("keydown", this.escHandler);
+            this.escHandler = null;
+        }
+        // Remove from DOM
+        if (this.element.parentNode) {
+            this.element.parentNode.removeChild(this.element);
+            console.log("✅ Modal removed from DOM");
+        }
+        // Call onClose callback
+        try {
+            this.props.onClose();
+            console.log("✅ onClose callback executed");
+        }
+        catch (error) {
+            console.error("❌ Error in onClose callback:", error);
+        }
+    }
+    getElement() {
+        return this.element;
+    }
+    destroy() {
+        console.log("🔄 CommentsTable destroy() called");
+        if (this.destroyed) {
+            console.log("⚠️ Already destroyed, skipping");
+            return;
+        }
+        this.destroyed = true;
+        if (this.escHandler) {
+            document.removeEventListener("keydown", this.escHandler);
+            this.escHandler = null;
+            console.log("✅ Event listeners removed");
+        }
+        if (this.element.parentNode) {
+            this.element.parentNode.removeChild(this.element);
+            console.log("✅ Element removed from DOM");
+        }
+        if (this.imageModal) {
+            this.imageModal.destroy();
+            this.imageModal = null;
+        }
+    }
+}
+function exportCommentsToCSV(comments, filename = "comments_export.csv", options = { separator: "," }, onError) {
+    try {
+        // Validate input
+        if (!comments || !Array.isArray(comments) || comments.length === 0) {
+            const msg = "Không có dữ liệu hợp lệ để xuất!";
+            onError?.(msg);
+            alert(msg);
+            return;
+        }
+        // Normalize data
+        const data = comments.map((c) => ({
+            ID: c?.id ?? "",
+            Content: c?.content ?? "",
+            Author: c?.createdBy?.name ?? "",
+            Role: c?.createdBy?.role ?? "",
+            Status: c?.status ?? "",
+            "Created Date": c?.createdAt ? new Date(c.createdAt).toISOString() : "",
+            URL: c?.url ?? "",
+            "Replies Count": Array.isArray(c?.replies) ? c.replies.length : 0,
+            Attachments: Array.isArray(c?.attachments)
+                ? c.attachments.map((a) => a.filename).join("; ")
+                : "",
+            XPath: c?.xpath ?? "",
+        }));
+        if (!data.length) {
+            const msg = "Không có dữ liệu hợp lệ để xuất!";
+            onError?.(msg);
+            alert(msg);
+            return;
+        }
+        // Escape CSV values
+        const escapeCsvValue = (value) => {
+            if (value == null)
+                return "";
+            const str = String(value)
+                .replace(/"/g, '""') // Thoát dấu ngoặc kép
+                .replace(/^([=+\-@])/g, "'$1"); // Ngăn CSV injection
+            return `"${str.replace(/\n/g, " ")}"`;
+        };
+        // Create CSV
+        const separator = options.separator || ",";
+        const headers = Object.keys(data[0]);
+        const csvRows = [headers.join(separator)];
+        for (const row of data) {
+            const values = headers.map((h) => escapeCsvValue(row[h]));
+            csvRows.push(values.join(separator));
+        }
+        // Add UTF-8 BOM for Excel compatibility
+        const BOM = "\uFEFF";
+        const csvString = BOM + csvRows.join("\n");
+        console.log("Nội dung CSV:", csvString); // Debug nội dung
+        // Create and download file
+        const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+        const blobUrl = URL.createObjectURL(blob);
+        console.log("URL Blob:", blobUrl); // Debug URL
+        const safeFilename = filename.endsWith(".csv")
+            ? filename
+            : `${filename}.csv`;
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = safeFilename;
+        document.body.appendChild(a);
+        a.addEventListener("click", (e) => {
+            e.stopPropagation(); // Ngăn sự kiện nhấp chuột lan đến globalClickHandler
+        });
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => {
+            URL.revokeObjectURL(blobUrl);
+        }, 5000);
+        console.log("✅ Tải file CSV thành công");
+    }
+    catch (error) {
+        const msg = "Lỗi khi xuất CSV: " +
+            (error instanceof Error ? error.message : "Lỗi không xác định");
+        onError?.(msg);
+        alert(msg);
+        console.error(error);
+    }
+}
+
+class CommentsTableButton {
+    constructor(props) {
+        this.props = props;
+        this.element = this.createElement();
+        this.attachEventListeners();
+    }
+    createElement() {
+        const button = document.createElement("button");
+        button.className = `uicm-comments-table-btn uicm-comments-table-btn--${this.props.theme}`;
+        button.setAttribute("aria-label", "Open Comments Table");
+        button.title = "View All Comments in Table";
+        if (this.props.isVisible !== true) {
+            button.style.display = "none";
+            button.style.opacity = "0";
+            button.style.transform = "scale(0.8) translateY(20px)";
+        }
+        this.updateButtonContent(button);
+        return button;
+    }
+    updateButtonContent(buttonElement) {
+        buttonElement.innerHTML = `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    `;
+    }
+    updateContent() {
+        if (this.element) {
+            this.updateButtonContent(this.element);
+        }
+    }
+    attachEventListeners() {
+        this.element.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.props.onClick();
+        });
+    }
+    updateCommentsCount(count) {
+        this.props.commentsCount = count;
+        this.updateContent();
+    }
+    updateTheme(theme) {
+        this.element.className = this.element.className.replace(/uicm-comments-table-btn--(light|dark)/, `uicm-comments-table-btn--${theme}`);
+        this.props.theme = theme;
+    }
+    getElement() {
+        return this.element;
+    }
+    destroy() {
+        if (this.element.parentNode) {
+            this.element.parentNode.removeChild(this.element);
+        }
+    }
+    setVisible(visible) {
+        if (visible) {
+            this.element.style.display = "flex";
+            setTimeout(() => {
+                this.element.style.opacity = "1";
+                this.element.style.transform = "scale(1) translateY(0)";
+            }, 10);
+        }
+        else {
+            this.element.style.opacity = "0";
+            this.element.style.transform = "scale(0.8) translateY(20px)";
+            setTimeout(() => {
+                this.element.style.display = "none";
+            }, 300);
+        }
     }
 }
 
@@ -4290,6 +5058,8 @@ class CommentManager {
                 return;
             }
             const target = e.target;
+            if (!(target instanceof HTMLElement))
+                return;
             if (target.hasAttribute("data-uicm-element"))
                 return;
             const highlightLayer = document.getElementById("uicm-highlight-layer");
@@ -4316,6 +5086,8 @@ class CommentManager {
                 return;
             }
             const target = e.target;
+            if (!(target instanceof HTMLElement))
+                return;
             if (target.hasAttribute("data-uicm-element"))
                 return;
             const highlightId = target.dataset.uicmHighlight;
@@ -4571,6 +5343,10 @@ class CommentManager {
         const globalClickHandler = (e) => {
             // Check if click is outside modal/form
             const target = e.target;
+            // Ignore if click is on an element with 'uicm-allow-bubble' class (for export/download, etc.)
+            if (target && target.closest(".uicm-allow-bubble")) {
+                return;
+            }
             const isInsideModal = target &&
                 this.activeModal &&
                 this.activeModal.getElement &&
@@ -5162,6 +5938,7 @@ class CommentSDK {
     constructor(config) {
         this.sidebar = null;
         this.commentModal = null; // Add modal reference
+        this.commentsTable = null;
         this.isInitialized = false;
         this.comments = [];
         this.config = {
@@ -5179,6 +5956,39 @@ class CommentSDK {
             userProfileStorage.saveUserProfile(this.currentUser);
         }
         this.validateConfig();
+    }
+    createCustomCursor() {
+        // SVG chỉ có icon 💬, không background
+        const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+        <text x="20" y="28" font-size="24" text-anchor="middle" fill="#00bcd4" font-family="Arial" font-weight="bold">💬</text>
+      </svg>
+    `;
+        // Encode SVG cho data URL
+        const encodedSvg = encodeURIComponent(svg);
+        const dataUrl = `data:image/svg+xml,${encodedSvg}`;
+        return `url('${dataUrl}') 20 20, auto`;
+    }
+    setCustomCursor(enable) {
+        const cursor = enable ? this.createCustomCursor() : "";
+        document.body.style.cursor = cursor;
+        // Apply to all SDK layers that may override cursor
+        const layers = [
+            ".uicm-overlay",
+            ".uicm-comment-modal",
+            ".uicm-comment-form",
+            ".uicm-comment-bubble",
+            "#uicm-root",
+            "#uicm-highlight-layer",
+            "#uicm-interaction-layer",
+        ];
+        layers.forEach((sel) => {
+            document.querySelectorAll(sel).forEach((el) => {
+                if (el instanceof HTMLElement) {
+                    el.style.cursor = cursor;
+                }
+            });
+        });
     }
     validateConfig() {
         if (!this.config.projectId) {
@@ -5204,7 +6014,6 @@ class CommentSDK {
                 currentUser: this.currentUser,
                 theme: this.config.theme,
                 onLoadComments: async () => {
-                    console.log("🔄 onLoadComments called - returning SDK comments:", this.comments.length);
                     // Return SDK comments and sync to CommentManager
                     return this.comments;
                 },
@@ -5214,15 +6023,7 @@ class CommentSDK {
                         id: this.generateId(),
                         createdAt: new Date().toISOString(),
                     };
-                    console.log("onSaveComment - SDK comments before push:", {
-                        count: this.comments.length,
-                        comments: this.comments.map((c) => ({
-                            id: c.id,
-                            content: c.content.substring(0, 30),
-                        })),
-                    });
                     this.comments.push(newComment);
-                    console.log("onSaveComment - SDK comments after push:", this.comments.length);
                     await this.config.onUpdate(this.comments);
                     return newComment;
                 },
@@ -5264,16 +6065,7 @@ class CommentSDK {
     syncCommentsFromManager() {
         if (this.commentManager) {
             const managerComments = this.commentManager.getComments();
-            console.log("🔄 Syncing comments from manager:", {
-                managerCommentsCount: managerComments.length,
-                sdkCommentsCount: this.comments.length,
-                managerComments: managerComments.map((c) => ({
-                    id: c.id,
-                    content: c.content.substring(0, 30),
-                })),
-            });
             this.comments = [...managerComments];
-            console.log("✅ Synced comments from manager:", this.comments.length);
         }
         else {
             console.warn("⚠️ CommentManager not available for sync");
@@ -5282,21 +6074,15 @@ class CommentSDK {
     // Load comments from API directly into SDK
     async loadCommentsFromAPI() {
         try {
-            console.log("🔄 Loading comments from API into SDK...");
             const data = await this.config.onFetchJsonFile();
             const allComments = data?.comments || [];
             const currentUrl = window.location.href;
             // Filter comments to only show those from the current URL
             this.comments = allComments.filter((comment) => comment.url === currentUrl);
-            console.log("📂 Loaded comments into SDK:", {
-                totalFromAPI: allComments.length,
-                filteredForCurrentURL: this.comments.length,
-                currentURL: currentUrl,
-                sdkComments: this.comments.map((c) => ({
-                    id: c.id,
-                    content: c.content.substring(0, 30) + "...",
-                })),
-            });
+            // Update comments count in table button
+            if (this.commentsTableButton) {
+                this.commentsTableButton.updateCommentsCount(this.comments.length);
+            }
         }
         catch (error) {
             console.error("Failed to load comments from API into SDK:", error);
@@ -5335,10 +6121,18 @@ class CommentSDK {
             onClick: () => this.openSidebar(),
             isVisible: false,
         });
+        // Comments table button
+        this.commentsTableButton = new CommentsTableButton({
+            onClick: () => this.toggleCommentsTable(),
+            theme: this.config.theme,
+            commentsCount: this.comments.length,
+            isVisible: false,
+        });
         // Add to DOM
         document.body.appendChild(this.debugIcon.getElement());
         document.body.appendChild(this.settingsButton.getElement());
         document.body.appendChild(this.sidebarButton.getElement());
+        document.body.appendChild(this.commentsTableButton.getElement());
     }
     async toggleMode() {
         const currentMode = this.commentManager.getMode();
@@ -5354,15 +6148,11 @@ class CommentSDK {
         }
         await this.commentManager.setMode(newMode);
         this.debugIcon.updateState(newMode === "comment");
-        // Show sidebar and settings icons for keyboard shortcut too
         this.settingsButton.setVisible(newMode === "comment");
         this.sidebarButton.setVisible(newMode === "comment");
-        if (newMode === "comment") {
-            document.body.style.cursor = "crosshair";
-        }
-        else {
-            document.body.style.cursor = "";
-        }
+        this.commentsTableButton.setVisible(newMode === "comment");
+        // Apply custom cursor
+        this.setCustomCursor(newMode === "comment");
     }
     async setMode(mode) {
         if (!this.isInitialized) {
@@ -5372,12 +6162,9 @@ class CommentSDK {
         this.debugIcon.updateState(mode === "comment");
         this.settingsButton.setVisible(mode === "comment");
         this.sidebarButton.setVisible(mode === "comment");
-        if (mode === "comment") {
-            document.body.style.cursor = "crosshair";
-        }
-        else {
-            document.body.style.cursor = "";
-        }
+        this.commentsTableButton.setVisible(mode === "comment");
+        // Apply custom cursor
+        this.setCustomCursor(mode === "comment");
     }
     openSidebar() {
         if (this.sidebar) {
@@ -5407,14 +6194,8 @@ class CommentSDK {
         this.sidebar.show();
     }
     navigateToComment(comment) {
-        console.log("🔧 SDK: Navigating to comment:", {
-            id: comment.id,
-            url: comment.url,
-            currentUrl: window.location.href,
-        });
         // Check if comment is from a different URL
         if (comment.url !== window.location.href) {
-            console.log("🔄 Comment is from different URL, navigating...");
             // Set a flag to indicate we're navigating from sidebar
             window.uicmIsNavigatingFromSidebar = true;
             // Navigate to the comment's URL with hash for comment ID
@@ -5440,7 +6221,6 @@ class CommentSDK {
             this.openCommentModal(comment, element);
         }
         else {
-            console.warn("⚠️ Could not find element for comment:", comment.id);
             // Still try to open modal even if element not found
             this.openCommentModal(comment, null);
         }
@@ -5513,6 +6293,93 @@ class CommentSDK {
     generateId() {
         return `comment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     }
+    toggleCommentsTable() {
+        console.log("🔄 Toggling CommentsTable...");
+        // If modal is already open, close it
+        if (this.commentsTable) {
+            console.log("📋 CommentsTable is open, closing...");
+            this.commentsTable.destroy();
+            this.commentsTable = null;
+            // Restore SDK cursor if in comment mode
+            if (this.commentManager.getMode() === "comment") {
+                this.setCustomCursor(true);
+                console.log("🖱️ Custom cursor restored");
+            }
+            return;
+        }
+        // Otherwise open the modal
+        this.openCommentsTable();
+    }
+    openCommentsTable() {
+        console.log("🔄 Opening CommentsTable...");
+        console.log("📊 Total comments available:", this.comments.length);
+        // Close sidebar and comment modal if open
+        if (this.sidebar) {
+            this.sidebar.destroy();
+            this.sidebar = null;
+        }
+        if (this.commentModal) {
+            this.commentModal.destroy();
+            this.commentModal = null;
+        }
+        // Create and show comments table
+        this.commentsTable = new CommentsTable({
+            comments: this.comments,
+            currentUser: this.currentUser,
+            onClose: () => {
+                console.log("🔄 CommentsTable onClose callback triggered");
+                // Always remove modal from DOM if exists
+                if (this.commentsTable) {
+                    const modalEl = this.commentsTable.getElement();
+                    if (modalEl.parentNode) {
+                        modalEl.parentNode.removeChild(modalEl);
+                        console.log("✅ Modal removed from DOM by SDK");
+                    }
+                }
+                // Restore SDK cursor if in comment mode
+                if (this.commentManager.getMode() === "comment") {
+                    this.setCustomCursor(true);
+                    console.log("🖱️ Custom cursor restored");
+                }
+                // Always set commentsTable = null
+                this.commentsTable = null;
+                console.log("✅ CommentsTable reference cleared");
+            },
+            onDeleteComments: async (commentIds) => {
+                // Remove comments from array
+                this.comments = this.comments.filter((comment) => !commentIds.includes(comment.id));
+                // Update via API
+                await this.config.onUpdate(this.comments);
+                // Update comments count in button
+                this.commentsTableButton.updateCommentsCount(this.comments.length);
+                // Update comment manager
+                if (this.commentManager) {
+                    await this.commentManager.loadComments();
+                }
+            },
+            onUpdateComment: async (updatedComment) => {
+                // Update local array
+                const index = this.comments.findIndex((c) => c.id === updatedComment.id);
+                if (index !== -1) {
+                    this.comments[index] = updatedComment;
+                    await this.config.onUpdate(this.comments);
+                    // Update comment manager
+                    if (this.commentManager) {
+                        await this.commentManager.loadComments();
+                    }
+                }
+            },
+        });
+        document.body.appendChild(this.commentsTable.getElement());
+        // Set cursor: auto for modal and all children
+        const modal = this.commentsTable.getElement();
+        modal.style.cursor = "auto";
+        modal.querySelectorAll("*").forEach((el) => {
+            el.style.cursor = "auto";
+        });
+        // Also set body cursor to auto while modal is open
+        document.body.style.cursor = "auto";
+    }
     destroy() {
         if (this.sidebar) {
             this.sidebar.destroy();
@@ -5523,6 +6390,10 @@ class CommentSDK {
         if (this.commentModal) {
             this.commentModal.destroy();
             this.commentModal = null;
+        }
+        if (this.commentsTable) {
+            this.commentsTable.destroy();
+            this.commentsTable = null;
         }
         this.isInitialized = false;
     }
@@ -5537,11 +6408,9 @@ class CommentSDK {
         const hash = window.location.hash;
         if (hash && hash.startsWith("#comment-")) {
             const commentId = hash.substring(9); // Remove '#comment-' prefix
-            console.log("🔧 SDK: Found comment ID in hash:", commentId);
             // Find the comment
             const comment = this.comments.find((c) => c.id === commentId);
             if (comment) {
-                console.log("🔧 SDK: Found comment, opening modal...");
                 // Clear the hash
                 window.location.hash = "";
                 // Open comment modal after a short delay to ensure page is loaded
@@ -5556,28 +6425,34 @@ function initCommentSDK(config) {
     return new CommentSDK(config);
 }
 
-var css_248z$7 = "/* SDK Layers */\n#uicm-root {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  pointer-events: none;\n  z-index: 999998;\n}\n\n/* Base layer for background element highlights */\n#uicm-highlight-layer {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  pointer-events: none;\n  z-index: 1;\n}\n\n/* Unified interaction layer for bubbles and forms */\n#uicm-interaction-layer {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  pointer-events: none;\n  z-index: 2;\n}\n\n/* Overlay for blocking events when modal/form is active */\n.uicm-overlay {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100vw;\n  height: 100vh;\n  background-color: rgba(0, 0, 0, 0.1);\n  z-index: 999997;\n  pointer-events: auto;\n  cursor: pointer;\n}\n\n/* Modal and form should appear above overlay */\n.uicm-comment-modal,\n.uicm-comment-form {\n  z-index: 999999 !important; /* Higher than overlay */\n  pointer-events: auto !important;\n  position: relative; /* Ensure z-index takes effect */\n}\n\n/* Bubbles should be clickable in interaction layer */\n.uicm-comment-bubble {\n  pointer-events: auto !important;\n  position: relative;\n  z-index: 100 !important;\n}\n";
+var css_248z$9 = "/* SDK Layers */\n#uicm-root {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  pointer-events: none;\n  z-index: 999998;\n}\n\n/* Base layer for background element highlights */\n#uicm-highlight-layer {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  pointer-events: none;\n  z-index: 1;\n}\n\n/* Unified interaction layer for bubbles and forms */\n#uicm-interaction-layer {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  pointer-events: none;\n  z-index: 2;\n}\n\n/* Overlay for blocking events when modal/form is active */\n.uicm-overlay {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100vw;\n  height: 100vh;\n  background-color: rgba(0, 0, 0, 0.1);\n  z-index: 999997;\n  pointer-events: auto;\n  cursor: pointer;\n}\n\n/* Modal and form should appear above overlay */\n.uicm-comment-modal,\n.uicm-comment-form {\n  z-index: 999999 !important; /* Higher than overlay */\n  pointer-events: auto !important;\n  position: relative; /* Ensure z-index takes effect */\n}\n\n/* Bubbles should be clickable in interaction layer */\n.uicm-comment-bubble {\n  pointer-events: auto !important;\n  position: relative;\n  z-index: 100 !important;\n}\n\nbutton {\n  cursor: pointer !important;\n}\n";
+styleInject(css_248z$9);
+
+var css_248z$8 = "/* Image Modal Styles */\n.uicm-image-modal {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100vw;\n  height: 100vh;\n  background: rgba(0, 0, 0, 0.9);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  z-index: 999999;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity 0.3s ease, visibility 0.3s ease;\n  pointer-events: auto;\n}\n\n.uicm-image-modal.show {\n  opacity: 1;\n  visibility: visible;\n}\n\n.uicm-image-container {\n  position: relative;\n  max-width: 80vw;\n  max-height: 80vh;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.uicm-image-container img {\n  max-width: 100%;\n  max-height: 100%;\n  object-fit: contain;\n  border-radius: 8px;\n  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);\n  transition: transform 0.3s ease;\n  cursor: zoom-in;\n  user-select: none;\n}\n\n.uicm-image-close {\n  position: absolute;\n  top: -40px;\n  right: 0;\n  background: none;\n  border: none;\n  color: white;\n  font-size: 32px;\n  cursor: pointer;\n  width: 40px;\n  height: 40px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 50%;\n  transition: background-color 0.2s ease;\n}\n\n.uicm-image-close:hover {\n  background-color: rgba(255, 255, 255, 0.1);\n}\n\n.uicm-image-download {\n  position: absolute;\n  top: -40px;\n  right: 50px;\n  background: none;\n  border: none;\n  color: white;\n  font-size: 20px;\n  cursor: pointer;\n  width: 40px;\n  height: 40px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 50%;\n  transition: background-color 0.2s ease;\n}\n\n.uicm-image-download:hover {\n  background-color: rgba(255, 255, 255, 0.1);\n}\n\n.uicm-image-zoom-in:hover,\n.uicm-image-zoom-out:hover,\n.uicm-image-reset:hover {\n  background-color: rgba(255, 255, 255, 0.1);\n}\n\n/* Mobile responsive */\n@media (max-width: 768px) {\n  .uicm-image-container {\n    max-width: 95vw;\n    max-height: 90vh;\n  }\n\n  .uicm-image-close {\n    top: -50px;\n    right: 10px;\n    width: 36px;\n    height: 36px;\n    font-size: 28px;\n  }\n\n  .uicm-image-download {\n    top: -50px;\n    right: 50px;\n    width: 36px;\n    height: 36px;\n    font-size: 18px;\n  }\n\n  .uicm-image-zoom-in,\n  .uicm-image-zoom-out,\n  .uicm-image-reset {\n    top: -50px;\n    width: 36px;\n    height: 36px;\n    font-size: 14px;\n  }\n\n  .uicm-image-zoom-in {\n    right: 90px;\n  }\n\n  .uicm-image-zoom-out {\n    right: 130px;\n  }\n\n  .uicm-image-reset {\n    right: 170px;\n  }\n}\n";
+styleInject(css_248z$8);
+
+var css_248z$7 = "/* Modern Comment Modal - Optimized */\n.uicm-comment-modal {\n  background: linear-gradient(145deg, #ffffff, #f8fafc);\n  border-radius: 16px;\n  border: 1px solid #e5e7eb;\n  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);\n  width: 380px;\n  position: relative;\n  overflow: hidden;\n  font-family: \"Inter\", sans-serif;\n  animation: uicm-modal-slide-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n}\n\n.uicm-comment-modal:hover {\n  transform: translateY(-2px);\n  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.15), 0 20px 40px rgba(30, 0, 0, 0.1),\n    0 0 0 1px rgba(255, 255, 255, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.9);\n}\n\n/* Header */\n.uicm-modal-header-bar {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  height: 4px;\n  background: linear-gradient(\n    135deg,\n    var(--uicm-accent, #3b82f6) 0%,\n    #8b5cf6 25%,\n    #06b6d4 50%,\n    #10b981 75%,\n    #f59e0b 100%\n  );\n  border-radius: 20px 20px 0 0;\n}\n\n.uicm-modal-header {\n  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);\n  border-bottom: 1px solid #e5e7eb;\n  border-radius: 16px 16px 0 0;\n  position: relative;\n  padding: 0;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);\n}\n\n.uicm-modal-header::before {\n  content: \"\";\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  height: 3px;\n  background: linear-gradient(90deg, #3b82f6, #06b6d4, #10b981);\n  border-radius: 12px 12px 0 0;\n}\n\n.uicm-modal-header-content {\n  display: flex;\n  flex-direction: column;\n  padding: 0;\n}\n\n/* Top Section */\n.uicm-modal-top-section {\n  display: flex;\n  justify-content: space-between;\n  align-items: flex-start;\n  padding: 24px 28px 16px;\n  gap: 20px;\n}\n\n.uicm-modal-title-section {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  flex: 1;\n  min-width: 0;\n}\n\n.uicm-modal-title {\n  margin: 0;\n  font-size: 24px;\n  font-weight: 700;\n  color: #1f2937;\n  letter-spacing: -0.025em;\n  line-height: 1.2;\n}\n\n.uicm-modal-description {\n  margin: 0;\n  font-size: 14px;\n  color: #6b7280;\n  font-weight: 500;\n  line-height: 1.4;\n}\n\n/* Close Button */\n.uicm-close-button {\n  background: linear-gradient(\n    145deg,\n    rgba(239, 68, 68, 0.1),\n    rgba(220, 38, 38, 0.08)\n  );\n  border: 1px solid rgba(239, 68, 68, 0.2);\n  color: #dc2626;\n  font-size: 18px;\n  font-weight: bold;\n  cursor: pointer;\n  width: 36px;\n  height: 36px;\n  padding: 8px;\n  border-radius: 10px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);\n  flex-shrink: 0;\n}\n\n.uicm-close-button:hover {\n  background: linear-gradient(\n    145deg,\n    rgba(239, 68, 68, 0.15),\n    rgba(220, 38, 38, 0.12)\n  );\n  border-color: rgba(239, 68, 68, 0.3);\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);\n}\n\n/* Bottom Section */\n.uicm-modal-bottom-section {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  padding: 0 28px 24px;\n  gap: 12px;\n}\n\n/* Status Select */\n.uicm-status-select {\n  background: linear-gradient(\n    145deg,\n    rgba(255, 255, 255, 0.9),\n    rgba(248, 250, 252, 0.8)\n  );\n  backdrop-filter: blur(8px);\n  border: 1px solid rgba(255, 255, 255, 0.4);\n  color: #374151;\n  font-size: 14px;\n  font-weight: 600;\n  padding: 10px 16px;\n  border-radius: 12px;\n  cursor: pointer;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);\n  width: 85%;\n}\n\n.uicm-status-select:hover {\n  background: linear-gradient(\n    145deg,\n    rgba(255, 255, 255, 1),\n    rgba(248, 250, 252, 0.9)\n  );\n  border-color: rgba(59, 130, 246, 0.3);\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);\n}\n\n.uicm-status-select:focus {\n  outline: none;\n  border-color: rgba(59, 130, 246, 0.5);\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n}\n\n/* Status colors */\n.uicm-status-select[data-status=\"bug\"] {\n  color: #dc3545;\n  font-weight: 700;\n}\n.uicm-status-select[data-status=\"feature_request\"] {\n  color: #ffc107;\n  font-weight: 700;\n}\n.uicm-status-select[data-status=\"dev_completed\"] {\n  color: #3b82f6;\n  font-weight: 700;\n}\n.uicm-status-select[data-status=\"done\"] {\n  color: #28a745;\n  font-weight: 700;\n}\n.uicm-status-select[data-status=\"archived\"] {\n  color: #6c757d;\n  font-weight: 700;\n}\n\n.uicm-status-select option[value=\"bug\"] {\n  color: #dc3545;\n}\n.uicm-status-select option[value=\"feature_request\"] {\n  color: #ffc107;\n}\n.uicm-status-select option[value=\"dev_completed\"] {\n  color: #3b82f6;\n}\n.uicm-status-select option[value=\"done\"] {\n  color: #28a745;\n}\n.uicm-status-select option[value=\"archived\"] {\n  color: #6c757d;\n}\n\n/* Delete Button */\n.uicm-delete-button {\n  background: linear-gradient(\n    145deg,\n    rgba(239, 68, 68, 0.1),\n    rgba(220, 38, 38, 0.08)\n  );\n  border: 1px solid rgba(239, 68, 68, 0.2);\n  color: #dc2626;\n  font-size: 16px;\n  font-weight: 600;\n  cursor: pointer;\n  width: 36px;\n  height: 36px;\n  padding: 8px;\n  border-radius: 10px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);\n  flex-shrink: 0;\n}\n\n.uicm-delete-button:hover {\n  background: linear-gradient(\n    145deg,\n    rgba(239, 68, 68, 0.15),\n    rgba(220, 38, 38, 0.12)\n  );\n  border-color: rgba(239, 68, 68, 0.3);\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);\n}\n\n.uicm-delete-button:disabled {\n  opacity: 0.5;\n  cursor: not-allowed;\n  transform: none;\n}\n\n/* Comments List */\n.uicm-comments-list {\n  padding: 5px;\n  max-height: 300px;\n  overflow-y: auto;\n  scrollbar-width: thin;\n  scrollbar-color: #cbd5e1 #f1f5f9;\n}\n\n.uicm-comment-item {\n  margin-bottom: 6px;\n  padding: 16px;\n  background: rgba(255, 255, 255, 0.8);\n  border-radius: 12px;\n  border: 1px solid rgba(229, 231, 235, 0.5);\n  display: flex;\n  gap: 12px;\n  align-items: flex-start;\n}\n\n.uicm-comment-item:last-child {\n  margin-bottom: 0;\n}\n\n/* Comment Avatar */\n.uicm-comment-avatar {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: linear-gradient(135deg, #3b82f6, #8b5cf6);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: white;\n  font-weight: 600;\n  font-size: 14px;\n  flex-shrink: 0;\n}\n\n/* Comment Content */\n.uicm-comment-content {\n  flex: 1;\n  min-width: 0;\n}\n\n.uicm-comment-header {\n  display: flex;\n  align-items: center;\n  margin-bottom: 8px;\n  gap: 8px;\n}\n\n.uicm-author-name {\n  font-weight: 600;\n  color: #1f2937;\n  font-size: 14px;\n}\n\n.uicm-role-badge {\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.1),\n    rgba(139, 92, 246, 0.1)\n  );\n  color: #3b82f6;\n  font-size: 11px;\n  font-weight: 600;\n  padding: 2px 8px;\n  border-radius: 8px;\n  border: 1px solid rgba(59, 130, 246, 0.2);\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n}\n\n.uicm-comment-time {\n  font-size: 12px;\n  color: #6b7280;\n  margin-left: auto;\n}\n\n.uicm-comment-text {\n  color: #374151;\n  line-height: 1.5;\n  font-size: 14px;\n  margin: 0;\n  word-wrap: break-word;\n}\n\n/* Reply Form */\n.uicm-reply-form {\n  margin-top: 4px;\n  padding: 16px;\n  border-top: 1px solid #e5e7eb;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n}\n\n/* Hide reply header (avatar and name) */\n.uicm-reply-header {\n  display: none;\n}\n\n/* File previews at top */\n.uicm-reply-form .uicm-file-preview-container {\n  order: 1;\n  margin-bottom: 8px;\n  overflow-x: auto;\n}\n\n.uicm-reply-input-container {\n  position: relative;\n  order: 2;\n  flex: 1;\n  display: flex;\n  gap: 8px;\n  align-items: flex-start;\n}\n\n.uicm-reply-input {\n  flex: 1;\n  background: rgba(255, 255, 255, 0.9);\n  border: 1px solid #d1d5db;\n  border-radius: 10px;\n  padding: 12px 16px;\n  font-size: 14px;\n  color: #374151;\n  resize: vertical;\n  min-height: 60px;\n  transition: all 0.2s ease;\n  box-sizing: border-box;\n}\n\n.uicm-reply-input:focus {\n  outline: none;\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n}\n\n.uicm-reply-input::placeholder {\n  color: #9ca3af;\n}\n\n/* Character Counter */\n.uicm-reply-char-counter {\n  position: absolute;\n  display: none;\n  bottom: 8px;\n  right: 12px;\n  font-size: 11px;\n  color: #6b7280;\n  background: rgba(255, 255, 255, 0.9);\n  padding: 2px 6px;\n  border-radius: 4px;\n  z-index: 1;\n}\n\n.uicm-reply-char-counter.uicm-warning {\n  color: #f59e0b;\n}\n\n.uicm-reply-char-counter.uicm-error {\n  color: #dc2626;\n}\n\n/* Reply Actions - at the very bottom */\n.uicm-reply-actions {\n  display: flex;\n  justify-content: flex-end;\n  gap: 8px;\n  order: 3;\n  margin-top: 8px;\n  padding-top: 12px;\n  border-top: 1px solid #e5e7eb;\n}\n\n.uicm-reply-send {\n  background: linear-gradient(135deg, #3b82f6, #8b5cf6);\n  color: white;\n  border: none;\n  padding: 8px 16px;\n  border-radius: 8px;\n  font-size: 13px;\n  font-weight: 600;\n  cursor: pointer;\n  transition: all 0.2s ease;\n}\n\n.uicm-reply-send:hover:not(:disabled) {\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);\n}\n\n.uicm-reply-send:disabled {\n  opacity: 0.5;\n  cursor: not-allowed;\n  transform: none;\n}\n\n/* Status Badge */\n.uicm-status-badge {\n  display: inline-flex;\n  align-items: center;\n  padding: 4px 8px;\n  border-radius: 6px;\n  font-size: 11px;\n  font-weight: 600;\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n}\n\n.uicm-status-badge.status-bug {\n  background: rgba(220, 53, 69, 0.1);\n  color: #dc3545;\n}\n.uicm-status-badge.status-feature_request {\n  background: rgba(255, 193, 7, 0.1);\n  color: #ffc107;\n}\n.uicm-status-badge.status-dev_completed {\n  background: rgba(59, 130, 246, 0.1);\n  color: #3b82f6;\n}\n.uicm-status-badge.status-done {\n  background: rgba(40, 167, 69, 0.1);\n  color: #28a745;\n}\n.uicm-status-badge.status-archived {\n  background: rgba(108, 117, 125, 0.1);\n  color: #6c757d;\n}\n\n/* File Upload */\n.uicm-file-upload-section {\n  margin-top: 16px;\n}\n\n.uicm-file-upload-button {\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.1),\n    rgba(139, 92, 246, 0.1)\n  );\n  border: 1px solid rgba(59, 130, 246, 0.2);\n  color: #3b82f6;\n  padding: 8px 16px;\n  border-radius: 8px;\n  font-size: 13px;\n  font-weight: 600;\n  cursor: pointer;\n  transition: all 0.2s ease;\n}\n\n.uicm-file-upload-button:hover {\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.15),\n    rgba(139, 92, 246, 0.15)\n  );\n  transform: translateY(-1px);\n}\n\n/* Reply File Upload Button (small) */\n.uicm-reply-file-upload-button {\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.1),\n    rgba(139, 92, 246, 0.1)\n  );\n  border: 1px solid rgba(59, 130, 246, 0.2);\n  color: #3b82f6;\n  padding: 8px;\n  border-radius: 8px;\n  font-size: 16px;\n  cursor: pointer;\n  transition: all 0.2s ease;\n  width: 36px;\n  height: 36px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-shrink: 0;\n}\n\n.uicm-reply-file-upload-button:hover {\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.15),\n    rgba(139, 92, 246, 0.15)\n  );\n  transform: translateY(-1px);\n  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);\n}\n\n/* File upload button next to textarea */\n.uicm-reply-form .uicm-file-upload-button {\n  width: 36px;\n  height: 36px;\n  padding: 8px;\n  font-size: 16px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-shrink: 0;\n}\n\n.uicm-file-preview-container {\n  display: flex;\n  flex-wrap: nowrap;\n  gap: 8px;\n  margin-top: 12px;\n  overflow-x: auto;\n  overflow-y: hidden;\n  padding-bottom: 4px;\n  scrollbar-width: thin;\n  scrollbar-color: #cbd5e1 #f1f5f9;\n}\n\n.uicm-file-preview-container::-webkit-scrollbar {\n  height: 4px;\n}\n\n.uicm-file-preview-container::-webkit-scrollbar-track {\n  background: #f1f5f9;\n  border-radius: 2px;\n}\n\n.uicm-file-preview-container::-webkit-scrollbar-thumb {\n  background: #cbd5e1;\n  border-radius: 2px;\n}\n\n.uicm-file-preview-container::-webkit-scrollbar-thumb:hover {\n  background: #94a3b8;\n}\n\n.uicm-file-preview-item {\n  position: relative;\n  background: rgba(255, 255, 255, 0.9);\n  border: 1px solid #e5e7eb;\n  border-radius: 8px;\n  padding: 6px;\n  max-width: 80px;\n  min-width: 80px;\n}\n\n/* Reply File Preview Container (small) */\n.uicm-reply-file-preview-container {\n  display: flex;\n  flex-wrap: nowrap;\n  gap: 4px;\n  margin-bottom: 8px;\n  max-width: 100%;\n  overflow-x: auto;\n  overflow-y: hidden;\n  padding-bottom: 4px;\n  scrollbar-width: thin;\n  scrollbar-color: #cbd5e1 #f1f5f9;\n}\n\n.uicm-reply-file-preview-container::-webkit-scrollbar {\n  height: 4px;\n}\n\n.uicm-reply-file-preview-container::-webkit-scrollbar-track {\n  background: #f1f5f9;\n  border-radius: 2px;\n}\n\n.uicm-reply-file-preview-container::-webkit-scrollbar-thumb {\n  background: #cbd5e1;\n  border-radius: 2px;\n}\n\n.uicm-reply-file-preview-container::-webkit-scrollbar-thumb:hover {\n  background: #94a3b8;\n}\n\n.uicm-reply-file-preview-item {\n  position: relative;\n  background: rgba(255, 255, 255, 0.9);\n  border: 1px solid #e5e7eb;\n  border-radius: 6px;\n  padding: 4px;\n  max-width: 50px;\n  min-width: 50px;\n}\n\n.uicm-file-preview-remove {\n  position: absolute;\n  top: -16px;\n  right: -16px;\n  background: linear-gradient(135deg, #ef4444, #dc2626);\n  color: white;\n  border: 2px solid #ffffff;\n  border-radius: 100%;\n  width: 20px;\n  height: 20px;\n  font-size: 15px;\n  font-weight: bold;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);\n  transition: all 0.2s ease;\n}\n\nbutton.uicm-file-preview-remove {\n  padding: 0 !important;\n}\n\n.uicm-file-preview-remove:hover {\n  background: linear-gradient(135deg, #dc2626, #b91c1c);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);\n}\n\n.uicm-file-preview-info {\n  text-align: center;\n  margin-top: 4px;\n}\n\n.uicm-file-preview-size {\n  font-size: 10px;\n  color: #6b7280;\n  margin-top: 2px;\n}\n\n.uicm-file-preview-image {\n  width: 100%;\n  height: 60px;\n  object-fit: cover;\n  border-radius: 4px;\n  margin-bottom: 4px;\n}\n\n.uicm-file-preview-icon {\n  width: 30px;\n  height: 30px;\n  margin: 0 auto 4px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: #f3f4f6;\n  border-radius: 4px;\n  color: #6b7280;\n  font-size: 12px;\n}\n\n/* Reply File Preview (small) */\n.uicm-reply-file-preview-image {\n  width: 100%;\n  height: 30px;\n  object-fit: cover;\n  border-radius: 3px;\n  margin-bottom: 2px;\n}\n\n.uicm-reply-file-preview-icon {\n  width: 16px;\n  height: 16px;\n  margin: 0 auto 2px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: #f3f4f6;\n  border-radius: 3px;\n  color: #6b7280;\n  font-size: 8px;\n}\n\n/* Comment Attachments */\n.uicm-comment-attachments {\n  margin-top: 12px;\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n}\n\n.uicm-attachment-item {\n  background: rgba(255, 255, 255, 0.9);\n  border: 1px solid #e5e7eb;\n  border-radius: 8px;\n  padding: 8px;\n  max-width: 120px;\n  cursor: pointer;\n  transition: all 0.2s ease;\n}\n\n.uicm-attachment-item:hover {\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);\n}\n\n.uicm-attachment-image {\n  width: 100%;\n  height: 80px;\n  object-fit: cover;\n  border-radius: 4px;\n  margin-bottom: 4px;\n}\n\n.uicm-attachment-image:hover {\n  opacity: 0.8;\n}\n\n.uicm-attachment-icon {\n  width: 40px;\n  height: 40px;\n  margin: 0 auto 4px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: #f3f4f6;\n  border-radius: 4px;\n  color: #6b7280;\n}\n\n.uicm-attachment-info {\n  text-align: center;\n}\n\n.uicm-attachment-name {\n  font-size: 11px;\n  color: #374151;\n  font-weight: 500;\n  word-break: break-word;\n  line-height: 1.3;\n}\n\n.uicm-attachment-size {\n  font-size: 10px;\n  color: #6b7280;\n  margin-top: 2px;\n}\n\n/* Animations */\n@keyframes uicm-modal-slide-in {\n  0% {\n    opacity: 0;\n    transform: scale(0.9) translateY(-20px);\n  }\n  100% {\n    opacity: 1;\n    transform: scale(1) translateY(0);\n  }\n}\n\n/* Scrollbar */\n.uicm-comments-list::-webkit-scrollbar {\n  width: 6px;\n}\n\n.uicm-comments-list::-webkit-scrollbar-track {\n  background: #f1f5f9;\n  border-radius: 3px;\n}\n\n.uicm-comments-list::-webkit-scrollbar-thumb {\n  background: #cbd5e1;\n  border-radius: 3px;\n}\n\n.uicm-comments-list::-webkit-scrollbar-thumb:hover {\n  background: #94a3b8;\n}\n\n/* Mobile Responsive */\n@media (max-width: 480px) {\n  .uicm-comment-modal {\n    min-width: 320px;\n    max-width: 95vw;\n    margin: 20px;\n  }\n\n  .uicm-modal-top-section {\n    padding: 20px 20px 12px;\n  }\n\n  .uicm-modal-title {\n    font-size: 20px;\n  }\n\n  .uicm-modal-description {\n    font-size: 13px;\n  }\n\n  .uicm-modal-bottom-section {\n    padding: 0 20px 20px;\n  }\n\n  .uicm-status-select {\n    width: 80%;\n  }\n\n  .uicm-delete-button {\n    width: 32px;\n    height: 32px;\n  }\n\n  .uicm-close-button {\n    width: 32px;\n    height: 32px;\n    font-size: 16px;\n  }\n\n  .uicm-comments-list,\n  .uicm-reply-form {\n    padding: 16px 20px;\n  }\n\n  .uicm-reply-actions {\n    flex-direction: column;\n  }\n\n  .uicm-reply-cancel,\n  .uicm-reply-send {\n    width: 100%;\n  }\n\n  .uicm-comment-item {\n    padding: 12px;\n  }\n\n  .uicm-comment-avatar {\n    width: 28px;\n    height: 28px;\n    font-size: 12px;\n  }\n\n  .uicm-reply-avatar {\n    width: 24px;\n    height: 24px;\n    font-size: 11px;\n  }\n}\n";
 styleInject(css_248z$7);
 
-var css_248z$6 = "/* Image Modal Styles */\n.uicm-image-modal {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100vw;\n  height: 100vh;\n  background: rgba(0, 0, 0, 0.9);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  z-index: 999999;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity 0.3s ease, visibility 0.3s ease;\n  pointer-events: auto;\n}\n\n.uicm-image-modal.show {\n  opacity: 1;\n  visibility: visible;\n}\n\n.uicm-image-container {\n  position: relative;\n  max-width: 80vw;\n  max-height: 80vh;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.uicm-image-container img {\n  max-width: 100%;\n  max-height: 100%;\n  object-fit: contain;\n  border-radius: 8px;\n  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);\n  transition: transform 0.3s ease;\n  cursor: zoom-in;\n  user-select: none;\n}\n\n.uicm-image-close {\n  position: absolute;\n  top: -40px;\n  right: 0;\n  background: none;\n  border: none;\n  color: white;\n  font-size: 32px;\n  cursor: pointer;\n  width: 40px;\n  height: 40px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 50%;\n  transition: background-color 0.2s ease;\n}\n\n.uicm-image-close:hover {\n  background-color: rgba(255, 255, 255, 0.1);\n}\n\n.uicm-image-download {\n  position: absolute;\n  top: -40px;\n  right: 50px;\n  background: none;\n  border: none;\n  color: white;\n  font-size: 20px;\n  cursor: pointer;\n  width: 40px;\n  height: 40px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 50%;\n  transition: background-color 0.2s ease;\n}\n\n.uicm-image-download:hover {\n  background-color: rgba(255, 255, 255, 0.1);\n}\n\n.uicm-image-zoom-in:hover,\n.uicm-image-zoom-out:hover,\n.uicm-image-reset:hover {\n  background-color: rgba(255, 255, 255, 0.1);\n}\n\n/* Mobile responsive */\n@media (max-width: 768px) {\n  .uicm-image-container {\n    max-width: 95vw;\n    max-height: 90vh;\n  }\n\n  .uicm-image-close {\n    top: -50px;\n    right: 10px;\n    width: 36px;\n    height: 36px;\n    font-size: 28px;\n  }\n\n  .uicm-image-download {\n    top: -50px;\n    right: 50px;\n    width: 36px;\n    height: 36px;\n    font-size: 18px;\n  }\n\n  .uicm-image-zoom-in,\n  .uicm-image-zoom-out,\n  .uicm-image-reset {\n    top: -50px;\n    width: 36px;\n    height: 36px;\n    font-size: 14px;\n  }\n\n  .uicm-image-zoom-in {\n    right: 90px;\n  }\n\n  .uicm-image-zoom-out {\n    right: 130px;\n  }\n\n  .uicm-image-reset {\n    right: 170px;\n  }\n}\n";
+var css_248z$6 = "/* Comment Bubble Styles */\n.uicm-comment-bubble {\n  position: absolute;\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background-color: #007bff;\n  border: 2px solid white;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 16px;\n  font-weight: bold;\n  color: white;\n  z-index: 9999;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);\n  transition: all 0.2s ease;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif;\n}\n\n.uicm-comment-bubble:hover {\n  transform: scale(1.1);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n}\n\n.uicm-comment-bubble:active {\n  transform: scale(0.95);\n}\n\n/* Comment Count Badge */\n.uicm-comment-count-badge {\n  position: absolute;\n  top: -6px;\n  right: -6px;\n  border-radius: 50%;\n  width: 18px;\n  height: 18px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 10px;\n  font-weight: bold;\n  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);\n  z-index: 101;\n  transition: all 0.2s ease;\n  border: 2px solid;\n}\n\n.uicm-comment-count-badge:hover {\n  transform: scale(1.1);\n}\n";
 styleInject(css_248z$6);
 
-var css_248z$5 = "/* Modern Comment Modal - Optimized */\n.uicm-comment-modal {\n  background: linear-gradient(145deg, #ffffff, #f8fafc);\n  border-radius: 16px;\n  border: 1px solid #e5e7eb;\n  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);\n  width: 380px;\n  position: relative;\n  overflow: hidden;\n  font-family: \"Inter\", sans-serif;\n  animation: uicm-modal-slide-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n}\n\n.uicm-comment-modal:hover {\n  transform: translateY(-2px);\n  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.15), 0 20px 40px rgba(30, 0, 0, 0.1),\n    0 0 0 1px rgba(255, 255, 255, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.9);\n}\n\n/* Header */\n.uicm-modal-header-bar {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  height: 4px;\n  background: linear-gradient(\n    135deg,\n    var(--uicm-accent, #3b82f6) 0%,\n    #8b5cf6 25%,\n    #06b6d4 50%,\n    #10b981 75%,\n    #f59e0b 100%\n  );\n  border-radius: 20px 20px 0 0;\n}\n\n.uicm-modal-header {\n  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);\n  border-bottom: 1px solid #e5e7eb;\n  border-radius: 16px 16px 0 0;\n  position: relative;\n  padding: 0;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);\n}\n\n.uicm-modal-header::before {\n  content: \"\";\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  height: 3px;\n  background: linear-gradient(90deg, #3b82f6, #06b6d4, #10b981);\n  border-radius: 12px 12px 0 0;\n}\n\n.uicm-modal-header-content {\n  display: flex;\n  flex-direction: column;\n  padding: 0;\n}\n\n/* Top Section */\n.uicm-modal-top-section {\n  display: flex;\n  justify-content: space-between;\n  align-items: flex-start;\n  padding: 24px 28px 16px;\n  gap: 20px;\n}\n\n.uicm-modal-title-section {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  flex: 1;\n  min-width: 0;\n}\n\n.uicm-modal-title {\n  margin: 0;\n  font-size: 24px;\n  font-weight: 700;\n  color: #1f2937;\n  letter-spacing: -0.025em;\n  line-height: 1.2;\n}\n\n.uicm-modal-description {\n  margin: 0;\n  font-size: 14px;\n  color: #6b7280;\n  font-weight: 500;\n  line-height: 1.4;\n}\n\n/* Close Button */\n.uicm-close-button {\n  background: linear-gradient(\n    145deg,\n    rgba(239, 68, 68, 0.1),\n    rgba(220, 38, 38, 0.08)\n  );\n  border: 1px solid rgba(239, 68, 68, 0.2);\n  color: #dc2626;\n  font-size: 18px;\n  font-weight: bold;\n  cursor: pointer;\n  width: 36px;\n  height: 36px;\n  padding: 8px;\n  border-radius: 10px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);\n  flex-shrink: 0;\n}\n\n.uicm-close-button:hover {\n  background: linear-gradient(\n    145deg,\n    rgba(239, 68, 68, 0.15),\n    rgba(220, 38, 38, 0.12)\n  );\n  border-color: rgba(239, 68, 68, 0.3);\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);\n}\n\n/* Bottom Section */\n.uicm-modal-bottom-section {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  padding: 0 28px 24px;\n  gap: 12px;\n}\n\n/* Status Select */\n.uicm-status-select {\n  background: linear-gradient(\n    145deg,\n    rgba(255, 255, 255, 0.9),\n    rgba(248, 250, 252, 0.8)\n  );\n  backdrop-filter: blur(8px);\n  border: 1px solid rgba(255, 255, 255, 0.4);\n  color: #374151;\n  font-size: 14px;\n  font-weight: 600;\n  padding: 10px 16px;\n  border-radius: 12px;\n  cursor: pointer;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);\n  width: 85%;\n}\n\n.uicm-status-select:hover {\n  background: linear-gradient(\n    145deg,\n    rgba(255, 255, 255, 1),\n    rgba(248, 250, 252, 0.9)\n  );\n  border-color: rgba(59, 130, 246, 0.3);\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);\n}\n\n.uicm-status-select:focus {\n  outline: none;\n  border-color: rgba(59, 130, 246, 0.5);\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n}\n\n/* Status colors */\n.uicm-status-select[data-status=\"bug\"] {\n  color: #dc3545;\n  font-weight: 700;\n}\n.uicm-status-select[data-status=\"feature_request\"] {\n  color: #ffc107;\n  font-weight: 700;\n}\n.uicm-status-select[data-status=\"dev_completed\"] {\n  color: #3b82f6;\n  font-weight: 700;\n}\n.uicm-status-select[data-status=\"done\"] {\n  color: #28a745;\n  font-weight: 700;\n}\n.uicm-status-select[data-status=\"archived\"] {\n  color: #6c757d;\n  font-weight: 700;\n}\n\n.uicm-status-select option[value=\"bug\"] {\n  color: #dc3545;\n}\n.uicm-status-select option[value=\"feature_request\"] {\n  color: #ffc107;\n}\n.uicm-status-select option[value=\"dev_completed\"] {\n  color: #3b82f6;\n}\n.uicm-status-select option[value=\"done\"] {\n  color: #28a745;\n}\n.uicm-status-select option[value=\"archived\"] {\n  color: #6c757d;\n}\n\n/* Delete Button */\n.uicm-delete-button {\n  background: linear-gradient(\n    145deg,\n    rgba(239, 68, 68, 0.1),\n    rgba(220, 38, 38, 0.08)\n  );\n  border: 1px solid rgba(239, 68, 68, 0.2);\n  color: #dc2626;\n  font-size: 16px;\n  font-weight: 600;\n  cursor: pointer;\n  width: 36px;\n  height: 36px;\n  padding: 8px;\n  border-radius: 10px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);\n  flex-shrink: 0;\n}\n\n.uicm-delete-button:hover {\n  background: linear-gradient(\n    145deg,\n    rgba(239, 68, 68, 0.15),\n    rgba(220, 38, 38, 0.12)\n  );\n  border-color: rgba(239, 68, 68, 0.3);\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);\n}\n\n.uicm-delete-button:disabled {\n  opacity: 0.5;\n  cursor: not-allowed;\n  transform: none;\n}\n\n/* Comments List */\n.uicm-comments-list {\n  padding: 5px;\n  max-height: 300px;\n  overflow-y: auto;\n  scrollbar-width: thin;\n  scrollbar-color: #cbd5e1 #f1f5f9;\n}\n\n.uicm-comment-item {\n  margin-bottom: 6px;\n  padding: 16px;\n  background: rgba(255, 255, 255, 0.8);\n  border-radius: 12px;\n  border: 1px solid rgba(229, 231, 235, 0.5);\n  display: flex;\n  gap: 12px;\n  align-items: flex-start;\n}\n\n.uicm-comment-item:last-child {\n  margin-bottom: 0;\n}\n\n/* Comment Avatar */\n.uicm-comment-avatar {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: linear-gradient(135deg, #3b82f6, #8b5cf6);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: white;\n  font-weight: 600;\n  font-size: 14px;\n  flex-shrink: 0;\n}\n\n/* Comment Content */\n.uicm-comment-content {\n  flex: 1;\n  min-width: 0;\n}\n\n.uicm-comment-header {\n  display: flex;\n  align-items: center;\n  margin-bottom: 8px;\n  gap: 8px;\n}\n\n.uicm-author-name {\n  font-weight: 600;\n  color: #1f2937;\n  font-size: 14px;\n}\n\n.uicm-role-badge {\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.1),\n    rgba(139, 92, 246, 0.1)\n  );\n  color: #3b82f6;\n  font-size: 11px;\n  font-weight: 600;\n  padding: 2px 8px;\n  border-radius: 8px;\n  border: 1px solid rgba(59, 130, 246, 0.2);\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n}\n\n.uicm-comment-time {\n  font-size: 12px;\n  color: #6b7280;\n  margin-left: auto;\n}\n\n.uicm-comment-text {\n  color: #374151;\n  line-height: 1.5;\n  font-size: 14px;\n  margin: 0;\n  word-wrap: break-word;\n}\n\n/* Reply Form */\n.uicm-reply-form {\n  margin-top: 4px;\n  padding: 16px;\n  border-top: 1px solid #e5e7eb;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n}\n\n/* Hide reply header (avatar and name) */\n.uicm-reply-header {\n  display: none;\n}\n\n/* File previews at top */\n.uicm-reply-form .uicm-file-preview-container {\n  order: 1;\n  margin-bottom: 8px;\n  overflow-x: auto;\n}\n\n.uicm-reply-input-container {\n  position: relative;\n  order: 2;\n  flex: 1;\n  display: flex;\n  gap: 8px;\n  align-items: flex-start;\n}\n\n.uicm-reply-input {\n  flex: 1;\n  background: rgba(255, 255, 255, 0.9);\n  border: 1px solid #d1d5db;\n  border-radius: 10px;\n  padding: 12px 16px;\n  font-size: 14px;\n  color: #374151;\n  resize: vertical;\n  min-height: 60px;\n  transition: all 0.2s ease;\n  box-sizing: border-box;\n}\n\n.uicm-reply-input:focus {\n  outline: none;\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n}\n\n.uicm-reply-input::placeholder {\n  color: #9ca3af;\n}\n\n/* Character Counter */\n.uicm-reply-char-counter {\n  position: absolute;\n  display: none;\n  bottom: 8px;\n  right: 12px;\n  font-size: 11px;\n  color: #6b7280;\n  background: rgba(255, 255, 255, 0.9);\n  padding: 2px 6px;\n  border-radius: 4px;\n  z-index: 1;\n}\n\n.uicm-reply-char-counter.uicm-warning {\n  color: #f59e0b;\n}\n\n.uicm-reply-char-counter.uicm-error {\n  color: #dc2626;\n}\n\n/* Reply Actions - at the very bottom */\n.uicm-reply-actions {\n  display: flex;\n  justify-content: flex-end;\n  gap: 8px;\n  order: 3;\n  margin-top: 8px;\n  padding-top: 12px;\n  border-top: 1px solid #e5e7eb;\n}\n\n.uicm-reply-send {\n  background: linear-gradient(135deg, #3b82f6, #8b5cf6);\n  color: white;\n  border: none;\n  padding: 8px 16px;\n  border-radius: 8px;\n  font-size: 13px;\n  font-weight: 600;\n  cursor: pointer;\n  transition: all 0.2s ease;\n}\n\n.uicm-reply-send:hover:not(:disabled) {\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);\n}\n\n.uicm-reply-send:disabled {\n  opacity: 0.5;\n  cursor: not-allowed;\n  transform: none;\n}\n\n/* Status Badge */\n.uicm-status-badge {\n  display: inline-flex;\n  align-items: center;\n  padding: 4px 8px;\n  border-radius: 6px;\n  font-size: 11px;\n  font-weight: 600;\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n}\n\n.uicm-status-badge.status-bug {\n  background: rgba(220, 53, 69, 0.1);\n  color: #dc3545;\n}\n.uicm-status-badge.status-feature_request {\n  background: rgba(255, 193, 7, 0.1);\n  color: #ffc107;\n}\n.uicm-status-badge.status-dev_completed {\n  background: rgba(59, 130, 246, 0.1);\n  color: #3b82f6;\n}\n.uicm-status-badge.status-done {\n  background: rgba(40, 167, 69, 0.1);\n  color: #28a745;\n}\n.uicm-status-badge.status-archived {\n  background: rgba(108, 117, 125, 0.1);\n  color: #6c757d;\n}\n\n/* File Upload */\n.uicm-file-upload-section {\n  margin-top: 16px;\n}\n\n.uicm-file-upload-button {\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.1),\n    rgba(139, 92, 246, 0.1)\n  );\n  border: 1px solid rgba(59, 130, 246, 0.2);\n  color: #3b82f6;\n  padding: 8px 16px;\n  border-radius: 8px;\n  font-size: 13px;\n  font-weight: 600;\n  cursor: pointer;\n  transition: all 0.2s ease;\n}\n\n.uicm-file-upload-button:hover {\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.15),\n    rgba(139, 92, 246, 0.15)\n  );\n  transform: translateY(-1px);\n}\n\n/* Reply File Upload Button (small) */\n.uicm-reply-file-upload-button {\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.1),\n    rgba(139, 92, 246, 0.1)\n  );\n  border: 1px solid rgba(59, 130, 246, 0.2);\n  color: #3b82f6;\n  padding: 8px;\n  border-radius: 8px;\n  font-size: 16px;\n  cursor: pointer;\n  transition: all 0.2s ease;\n  width: 36px;\n  height: 36px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-shrink: 0;\n}\n\n.uicm-reply-file-upload-button:hover {\n  background: linear-gradient(\n    135deg,\n    rgba(59, 130, 246, 0.15),\n    rgba(139, 92, 246, 0.15)\n  );\n  transform: translateY(-1px);\n  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);\n}\n\n/* File upload button next to textarea */\n.uicm-reply-form .uicm-file-upload-button {\n  width: 36px;\n  height: 36px;\n  padding: 8px;\n  font-size: 16px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-shrink: 0;\n}\n\n.uicm-file-preview-container {\n  display: flex;\n  flex-wrap: nowrap;\n  gap: 8px;\n  margin-top: 12px;\n  overflow-x: auto;\n  overflow-y: hidden;\n  padding-bottom: 4px;\n  scrollbar-width: thin;\n  scrollbar-color: #cbd5e1 #f1f5f9;\n}\n\n.uicm-file-preview-container::-webkit-scrollbar {\n  height: 4px;\n}\n\n.uicm-file-preview-container::-webkit-scrollbar-track {\n  background: #f1f5f9;\n  border-radius: 2px;\n}\n\n.uicm-file-preview-container::-webkit-scrollbar-thumb {\n  background: #cbd5e1;\n  border-radius: 2px;\n}\n\n.uicm-file-preview-container::-webkit-scrollbar-thumb:hover {\n  background: #94a3b8;\n}\n\n.uicm-file-preview-item {\n  position: relative;\n  background: rgba(255, 255, 255, 0.9);\n  border: 1px solid #e5e7eb;\n  border-radius: 8px;\n  padding: 6px;\n  max-width: 80px;\n  min-width: 80px;\n}\n\n/* Reply File Preview Container (small) */\n.uicm-reply-file-preview-container {\n  display: flex;\n  flex-wrap: nowrap;\n  gap: 4px;\n  margin-bottom: 8px;\n  max-width: 100%;\n  overflow-x: auto;\n  overflow-y: hidden;\n  padding-bottom: 4px;\n  scrollbar-width: thin;\n  scrollbar-color: #cbd5e1 #f1f5f9;\n}\n\n.uicm-reply-file-preview-container::-webkit-scrollbar {\n  height: 4px;\n}\n\n.uicm-reply-file-preview-container::-webkit-scrollbar-track {\n  background: #f1f5f9;\n  border-radius: 2px;\n}\n\n.uicm-reply-file-preview-container::-webkit-scrollbar-thumb {\n  background: #cbd5e1;\n  border-radius: 2px;\n}\n\n.uicm-reply-file-preview-container::-webkit-scrollbar-thumb:hover {\n  background: #94a3b8;\n}\n\n.uicm-reply-file-preview-item {\n  position: relative;\n  background: rgba(255, 255, 255, 0.9);\n  border: 1px solid #e5e7eb;\n  border-radius: 6px;\n  padding: 4px;\n  max-width: 50px;\n  min-width: 50px;\n}\n\n.uicm-file-preview-remove {\n  position: absolute;\n  top: -16px;\n  right: -16px;\n  background: linear-gradient(135deg, #ef4444, #dc2626);\n  color: white;\n  border: 2px solid #ffffff;\n  border-radius: 100%;\n  width: 20px;\n  height: 20px;\n  font-size: 15px;\n  font-weight: bold;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);\n  transition: all 0.2s ease;\n}\n\nbutton.uicm-file-preview-remove {\n  padding: 0 !important;\n}\n\n.uicm-file-preview-remove:hover {\n  background: linear-gradient(135deg, #dc2626, #b91c1c);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);\n}\n\n.uicm-file-preview-info {\n  text-align: center;\n  margin-top: 4px;\n}\n\n.uicm-file-preview-size {\n  font-size: 10px;\n  color: #6b7280;\n  margin-top: 2px;\n}\n\n.uicm-file-preview-image {\n  width: 100%;\n  height: 60px;\n  object-fit: cover;\n  border-radius: 4px;\n  margin-bottom: 4px;\n}\n\n.uicm-file-preview-icon {\n  width: 30px;\n  height: 30px;\n  margin: 0 auto 4px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: #f3f4f6;\n  border-radius: 4px;\n  color: #6b7280;\n  font-size: 12px;\n}\n\n/* Reply File Preview (small) */\n.uicm-reply-file-preview-image {\n  width: 100%;\n  height: 30px;\n  object-fit: cover;\n  border-radius: 3px;\n  margin-bottom: 2px;\n}\n\n.uicm-reply-file-preview-icon {\n  width: 16px;\n  height: 16px;\n  margin: 0 auto 2px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: #f3f4f6;\n  border-radius: 3px;\n  color: #6b7280;\n  font-size: 8px;\n}\n\n/* Comment Attachments */\n.uicm-comment-attachments {\n  margin-top: 12px;\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n}\n\n.uicm-attachment-item {\n  background: rgba(255, 255, 255, 0.9);\n  border: 1px solid #e5e7eb;\n  border-radius: 8px;\n  padding: 8px;\n  max-width: 120px;\n  cursor: pointer;\n  transition: all 0.2s ease;\n}\n\n.uicm-attachment-item:hover {\n  transform: translateY(-1px);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);\n}\n\n.uicm-attachment-image {\n  width: 100%;\n  height: 80px;\n  object-fit: cover;\n  border-radius: 4px;\n  margin-bottom: 4px;\n}\n\n.uicm-attachment-image:hover {\n  opacity: 0.8;\n}\n\n.uicm-attachment-icon {\n  width: 40px;\n  height: 40px;\n  margin: 0 auto 4px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: #f3f4f6;\n  border-radius: 4px;\n  color: #6b7280;\n}\n\n.uicm-attachment-info {\n  text-align: center;\n}\n\n.uicm-attachment-name {\n  font-size: 11px;\n  color: #374151;\n  font-weight: 500;\n  word-break: break-word;\n  line-height: 1.3;\n}\n\n.uicm-attachment-size {\n  font-size: 10px;\n  color: #6b7280;\n  margin-top: 2px;\n}\n\n/* Animations */\n@keyframes uicm-modal-slide-in {\n  0% {\n    opacity: 0;\n    transform: scale(0.9) translateY(-20px);\n  }\n  100% {\n    opacity: 1;\n    transform: scale(1) translateY(0);\n  }\n}\n\n/* Scrollbar */\n.uicm-comments-list::-webkit-scrollbar {\n  width: 6px;\n}\n\n.uicm-comments-list::-webkit-scrollbar-track {\n  background: #f1f5f9;\n  border-radius: 3px;\n}\n\n.uicm-comments-list::-webkit-scrollbar-thumb {\n  background: #cbd5e1;\n  border-radius: 3px;\n}\n\n.uicm-comments-list::-webkit-scrollbar-thumb:hover {\n  background: #94a3b8;\n}\n\n/* Mobile Responsive */\n@media (max-width: 480px) {\n  .uicm-comment-modal {\n    min-width: 320px;\n    max-width: 95vw;\n    margin: 20px;\n  }\n\n  .uicm-modal-top-section {\n    padding: 20px 20px 12px;\n  }\n\n  .uicm-modal-title {\n    font-size: 20px;\n  }\n\n  .uicm-modal-description {\n    font-size: 13px;\n  }\n\n  .uicm-modal-bottom-section {\n    padding: 0 20px 20px;\n  }\n\n  .uicm-status-select {\n    width: 80%;\n  }\n\n  .uicm-delete-button {\n    width: 32px;\n    height: 32px;\n  }\n\n  .uicm-close-button {\n    width: 32px;\n    height: 32px;\n    font-size: 16px;\n  }\n\n  .uicm-comments-list,\n  .uicm-reply-form {\n    padding: 16px 20px;\n  }\n\n  .uicm-reply-actions {\n    flex-direction: column;\n  }\n\n  .uicm-reply-cancel,\n  .uicm-reply-send {\n    width: 100%;\n  }\n\n  .uicm-comment-item {\n    padding: 12px;\n  }\n\n  .uicm-comment-avatar {\n    width: 28px;\n    height: 28px;\n    font-size: 12px;\n  }\n\n  .uicm-reply-avatar {\n    width: 24px;\n    height: 24px;\n    font-size: 11px;\n  }\n}\n";
+var css_248z$5 = "/* Modern Comment Form with New UI */\n.uicm-comment-form {\n  background: linear-gradient(145deg, #ffffff, #f8fafc);\n  border-radius: 16px;\n  border: 1px solid #e5e7eb;\n  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);\n  width: 380px;\n  position: relative;\n  overflow: hidden;\n  font-family: \"Inter\", sans-serif;\n  animation: uicm-form-slide-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);\n  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);\n  will-change: transform, opacity;\n}\n\n.uicm-comment-form:hover {\n  transform: translateY(-2px);\n  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.15), 0 20px 40px rgba(0, 0, 0, 0.1),\n    0 0 0 1px rgba(255, 255, 255, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.9);\n}\n\n/* Gradient Header Bar */\n.uicm-comment-form::before {\n  content: \"\";\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  height: 4px;\n  background: linear-gradient(\n    135deg,\n    var(--uicm-accent, #3b82f6) 0%,\n    #8b5cf6 25%,\n    #06b6d4 50%,\n    #10b981 75%,\n    #f59e0b 100%\n  );\n  border-radius: var(--uicm-border-radius, 20px) var(--uicm-border-radius, 20px)\n    0 0;\n}\n\n/* Header Section with improved layout */\n.uicm-form-header {\n  background: #ffffff;\n  border-bottom: 1px solid #e5e7eb;\n  border-radius: 16px 16px 0 0;\n  padding: 0;\n}\n\n.uicm-form-header-content {\n  display: flex;\n  justify-content: space-between;\n  align-items: flex-start;\n  padding: 24px 24px 20px;\n  gap: 16px;\n}\n\n.uicm-form-title-section {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  flex: 1;\n}\n\n.uicm-form-title {\n  font-size: 22px;\n  font-weight: 700;\n  color: #1f2937;\n  margin: 0;\n  letter-spacing: -0.02em;\n  line-height: 1.2;\n}\n\n.uicm-form-subtitle {\n  font-size: 14px;\n  color: #6b7280;\n  margin: 0;\n  font-weight: 500;\n  line-height: 1.4;\n}\n\n.uicm-form-action-section {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  flex-shrink: 0;\n}\n\n.uicm-user-info {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  order: 2;\n  margin-bottom: 8px;\n}\n\n.uicm-user-avatar {\n  width: 40px;\n  height: 40px;\n  border-radius: 50%;\n  background: linear-gradient(135deg, #3b82f6, #06b6d4);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 16px;\n  font-weight: 600;\n  color: white;\n  transition: transform 0.2s;\n}\n\n.uicm-user-avatar:hover {\n  transform: scale(1.1);\n}\n\n.uicm-user-details {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n}\n\n.uicm-user-name-input {\n  background: transparent;\n  border: none;\n  font-size: 14px;\n  font-weight: 600;\n  color: #1f2937;\n  line-height: 1.2;\n  outline: none;\n  transition: all 0.2s ease;\n  max-width: 180px;\n  padding: 4px 8px;\n  border-radius: 6px;\n}\n\n.uicm-user-name-input:hover {\n  background: rgba(59, 130, 246, 0.05);\n}\n\n.uicm-user-name-input:focus {\n  background: rgba(59, 130, 246, 0.1);\n  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);\n}\n\n.uicm-user-name-input::placeholder {\n  color: var(--uicm-text-secondary, #64748b);\n  opacity: 0.7;\n}\n\n.uicm-user-name {\n  font-size: 16px;\n  font-weight: 700;\n  color: var(--uicm-text-primary, #0f172a);\n  line-height: 1.2;\n  letter-spacing: -0.01em;\n}\n\n.uicm-close-button {\n  background: linear-gradient(\n    145deg,\n    rgba(255, 255, 255, 0.8),\n    rgba(247, 243, 233, 0.6)\n  );\n  border: 1px solid rgba(224, 122, 95, 0.2);\n  color: #6b5b47;\n  font-size: 20px;\n  font-weight: 600;\n  cursor: pointer;\n  padding: 10px;\n  border-radius: 20px;\n  width: 40px;\n  height: 40px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 4px 12px rgba(224, 122, 95, 0.1);\n  line-height: 1;\n}\n\n/* Content Section */\n.uicm-form-content {\n  padding: 16px 20px;\n  background: #ffffff;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n}\n\n.uicm-comment-textarea {\n  flex: 1;\n  min-height: 80px;\n  max-height: 200px;\n  padding: 12px 16px;\n  border: 1px solid #d1d5db;\n  border-radius: 8px;\n  font-size: 14px;\n  line-height: 1.5;\n  color: #374151;\n  resize: none;\n  transition: all 0.2s ease;\n  background: #ffffff;\n  font-family: inherit;\n  outline: none;\n  box-sizing: border-box;\n}\n\n.uicm-comment-textarea:focus {\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n}\n\n.uicm-comment-textarea::placeholder {\n  color: #9ca3af;\n  font-style: normal;\n  opacity: 0.7;\n}\n\n/* Character Counter - Hidden like in reply form */\n.uicm-char-counter {\n  display: none;\n}\n\n/* File previews at top - with higher specificity */\n.uicm-comment-form .uicm-file-preview-container {\n  order: 1;\n  margin-bottom: 8px;\n  display: flex !important;\n  flex-wrap: nowrap !important;\n  gap: 8px;\n  overflow-x: auto !important;\n  overflow-y: hidden !important;\n  padding-bottom: 4px;\n  scrollbar-width: thin;\n  scrollbar-color: #cbd5e1 #f1f5f9;\n}\n\n.uicm-comment-form .uicm-file-preview-container::-webkit-scrollbar {\n  height: 4px;\n}\n\n.uicm-comment-form .uicm-file-preview-container::-webkit-scrollbar-track {\n  background: #f1f5f9;\n  border-radius: 2px;\n}\n\n.uicm-comment-form .uicm-file-preview-container::-webkit-scrollbar-thumb {\n  background: #cbd5e1;\n  border-radius: 2px;\n}\n\n.uicm-comment-form .uicm-file-preview-container::-webkit-scrollbar-thumb:hover {\n  background: #94a3b8;\n}\n\n/* Form input container (textarea + file upload button) */\n.uicm-form-input-container {\n  position: relative;\n  order: 2;\n  flex: 1;\n  display: flex;\n  gap: 8px;\n  align-items: flex-start;\n}\n\n/* File upload button in form input container (small like reply form) */\n.uicm-form-input-container .uicm-file-upload-button {\n  width: 36px;\n  height: 36px;\n  padding: 8px;\n  font-size: 16px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-shrink: 0;\n}\n\n/* Actions Section */\n.uicm-form-actions {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 20px;\n  order: 3;\n  margin-top: 8px;\n  padding-top: 12px;\n  border-top: 1px solid #e5e7eb;\n}\n\n.uicm-secondary-actions {\n  display: flex;\n  gap: 12px;\n  align-items: center;\n}\n\n.uicm-emoji-button,\n.uicm-mention-button {\n  background: rgba(255, 255, 255, 0.6);\n  backdrop-filter: blur(8px);\n  border: 1px solid rgba(255, 255, 255, 0.3);\n  border-radius: 12px;\n  padding: 10px 14px;\n  font-size: 16px;\n  cursor: pointer;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  color: var(--uicm-text-secondary, #64748b);\n  font-weight: 500;\n  display: flex;\n  align-items: center;\n  gap: 6px;\n}\n\n.uicm-emoji-button:hover,\n.uicm-mention-button:hover {\n  background: rgba(255, 255, 255, 0.8);\n  border-color: var(--uicm-accent, #3b82f6);\n  color: var(--uicm-accent, #3b82f6);\n  transform: translateY(-2px) scale(1.05);\n  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);\n}\n\n/* Primary actions - single button layout */\n.uicm-primary-actions {\n  display: flex;\n  justify-content: flex-end;\n  align-items: center;\n}\n\n.uicm-submit-button {\n  background: #3b82f6;\n  color: white;\n  border: none;\n  padding: 8px 20px;\n  border-radius: 8px;\n  font-size: 14px;\n  font-weight: 600;\n  cursor: pointer;\n  transition: background-color 0.2s ease;\n  display: flex;\n  align-items: center;\n  gap: 8px;\n}\n\n.uicm-submit-button:hover:not(:disabled) {\n  background: #2563eb;\n}\n\n.uicm-submit-button:disabled {\n  background: #9ca3af;\n  cursor: not-allowed;\n  transform: none;\n  box-shadow: none;\n}\n\n.uicm-submit-button kbd {\n  background: rgba(255, 255, 255, 0.2);\n  border-radius: 4px;\n  padding: 2px 6px;\n  font-size: 11px;\n  font-weight: normal;\n}\n\n/* Loading Spinner */\n.uicm-spinner {\n  width: 16px;\n  height: 16px;\n  border: 2px solid rgba(255, 255, 255, 0.3);\n  border-top: 2px solid white;\n  border-radius: 50%;\n  animation: uicm-spin 1s linear infinite;\n}\n\n/* Error Message */\n.uicm-error-message {\n  background: linear-gradient(\n    135deg,\n    rgba(239, 68, 68, 0.1),\n    rgba(220, 38, 38, 0.05)\n  );\n  border: 1px solid rgba(239, 68, 68, 0.3);\n  color: var(--uicm-danger, #ef4444);\n  padding: 12px 16px;\n  border-radius: 12px;\n  font-size: 13px;\n  margin-top: 12px;\n  font-weight: 500;\n  animation: uicm-shake 0.5s ease-in-out;\n  backdrop-filter: blur(8px);\n}\n\n/* Animations */\n@keyframes uicm-form-slide-in {\n  0% {\n    opacity: 0;\n    transform: translateY(20px) scale(0.95);\n  }\n  100% {\n    opacity: 1;\n    transform: translateY(0) scale(1);\n  }\n}\n\n@keyframes uicm-spin {\n  0% {\n    transform: rotate(0deg);\n  }\n  100% {\n    transform: rotate(360deg);\n  }\n}\n\n@keyframes uicm-shake {\n  0%,\n  100% {\n    transform: translateX(0);\n  }\n  25% {\n    transform: translateX(-4px);\n  }\n  75% {\n    transform: translateX(4px);\n  }\n}\n\n@keyframes uicm-pulse {\n  0%,\n  100% {\n    opacity: 1;\n    transform: scale(1);\n  }\n  50% {\n    opacity: 0.8;\n    transform: scale(1.1);\n  }\n}\n\n/* Paste Loading Styles */\n.uicm-paste-loading {\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%);\n  background: rgba(255, 255, 255, 0.95);\n  backdrop-filter: blur(10px);\n  border: 1px solid rgba(59, 130, 246, 0.2);\n  border-radius: 12px;\n  padding: 16px 24px;\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  font-size: 14px;\n  color: #1e293b;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);\n  z-index: 1000;\n}\n\n.uicm-loading-spinner {\n  width: 20px;\n  height: 20px;\n  border: 2px solid #e2e8f0;\n  border-top: 2px solid #3b82f6;\n  border-radius: 50%;\n  animation: uicm-spin 1s linear infinite;\n}\n\n@keyframes uicm-glow-warning {\n  0%,\n  100% {\n    text-shadow: 0 0 4px rgba(245, 158, 11, 0.5);\n  }\n  50% {\n    text-shadow: 0 0 8px rgba(245, 158, 11, 0.8);\n  }\n}\n\n@keyframes uicm-glow-error {\n  0%,\n  100% {\n    text-shadow: 0 0 4px rgba(239, 68, 68, 0.5);\n  }\n  50% {\n    text-shadow: 0 0 8px rgba(239, 68, 68, 0.8);\n  }\n}\n\n/* Mobile Responsive */\n@media (max-width: 480px) {\n  .uicm-comment-form {\n    min-width: 320px;\n    max-width: 95vw;\n    margin: 10px;\n  }\n\n  .uicm-form-header-content {\n    padding: 20px 20px 16px;\n    flex-direction: column;\n    align-items: flex-start;\n    gap: 12px;\n  }\n\n  .uicm-form-title-section {\n    width: 100%;\n  }\n\n  .uicm-form-action-section {\n    align-self: flex-end;\n  }\n\n  .uicm-form-content {\n    padding: 20px;\n  }\n\n  .uicm-form-actions {\n    flex-direction: column;\n    gap: 16px;\n  }\n\n  .uicm-primary-actions {\n    width: 100%;\n    justify-content: space-between;\n  }\n\n  .uicm-cancel-button,\n  .uicm-submit-button {\n    flex: 1;\n    text-align: center;\n  }\n\n  .uicm-secondary-actions {\n    justify-content: center;\n    width: 100%;\n  }\n\n  .uicm-user-avatar {\n    width: 40px;\n    height: 40px;\n    font-size: 16px;\n  }\n\n  .uicm-user-avatar::after {\n    width: 12px;\n    height: 12px;\n  }\n}\n\n/* Form elements should have proper event handling */\n.uicm-comment-form input,\n.uicm-comment-form textarea,\n.uicm-comment-form button,\n.uicm-comment-form select {\n  pointer-events: auto !important;\n  position: relative;\n  z-index: 1 !important;\n}\n\n/* Form should prevent event bubbling */\n.uicm-comment-form {\n  pointer-events: auto !important;\n  position: relative;\n  z-index: 999999 !important;\n}\n\n/* Header bar styling */\n.uicm-form-header-bar {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  height: 4px;\n  background: linear-gradient(90deg, #3b82f6, #06b6d4, #10b981);\n  border-radius: 8px 8px 0 0;\n  z-index: 1;\n}\n";
 styleInject(css_248z$5);
 
-var css_248z$4 = "/* Comment Bubble Styles */\n.uicm-comment-bubble {\n  position: absolute;\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background-color: #007bff;\n  border: 2px solid white;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 16px;\n  font-weight: bold;\n  color: white;\n  z-index: 9999;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);\n  transition: all 0.2s ease;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif;\n}\n\n.uicm-comment-bubble:hover {\n  transform: scale(1.1);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n}\n\n.uicm-comment-bubble:active {\n  transform: scale(0.95);\n}\n\n/* Comment Count Badge */\n.uicm-comment-count-badge {\n  position: absolute;\n  top: -6px;\n  right: -6px;\n  border-radius: 50%;\n  width: 18px;\n  height: 18px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 10px;\n  font-weight: bold;\n  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);\n  z-index: 101;\n  transition: all 0.2s ease;\n  border: 2px solid;\n}\n\n.uicm-comment-count-badge:hover {\n  transform: scale(1.1);\n}\n";
+var css_248z$4 = "/* Profile Settings Modal */\n.uicm-profile-modal {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 10000000;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto,\n    \"Helvetica Neue\", Arial, sans-serif;\n}\n\n.uicm-profile-modal-overlay {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background-color: rgba(0, 0, 0, 0.5);\n  backdrop-filter: blur(4px);\n}\n\n.uicm-profile-modal-content {\n  position: relative;\n  background: white;\n  border-radius: 12px;\n  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),\n    0 10px 10px -5px rgba(0, 0, 0, 0.04);\n  width: 90%;\n  max-width: 480px;\n  max-height: 90vh;\n  overflow: hidden;\n  animation: uicm-modal-slide-in 0.3s ease-out;\n}\n\n@keyframes uicm-modal-slide-in {\n  from {\n    opacity: 0;\n    transform: scale(0.95) translateY(-10px);\n  }\n  to {\n    opacity: 1;\n    transform: scale(1) translateY(0);\n  }\n}\n\n.uicm-profile-modal-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 24px 24px 0 24px;\n  border-bottom: 1px solid #e5e7eb;\n  padding-bottom: 20px;\n}\n\n.uicm-profile-modal-title {\n  margin: 0;\n  font-size: 20px;\n  font-weight: 600;\n  color: #111827;\n}\n\n.uicm-profile-modal-close {\n  background: none;\n  border: none;\n  cursor: pointer;\n  padding: 8px;\n  border-radius: 6px;\n  color: #6b7280;\n  transition: all 0.2s;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.uicm-profile-modal-close:hover {\n  background-color: #f3f4f6;\n  color: #374151;\n}\n\n.uicm-profile-modal-body {\n  padding: 24px;\n  max-height: 60vh;\n  overflow-y: auto;\n}\n\n.uicm-profile-avatar-section {\n  display: flex;\n  align-items: center;\n  gap: 16px;\n  margin-bottom: 32px;\n  padding: 20px;\n  background: #f9fafb;\n  border-radius: 12px;\n  border: 1px solid #e5e7eb;\n}\n\n.uicm-profile-avatar {\n  width: 64px;\n  height: 64px;\n  border-radius: 50%;\n  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-shrink: 0;\n}\n\n.uicm-profile-avatar-text {\n  font-size: 24px;\n  font-weight: 600;\n  color: white;\n  text-transform: uppercase;\n}\n\n.uicm-profile-avatar-info {\n  flex: 1;\n}\n\n.uicm-profile-avatar-label {\n  margin: 0 0 4px 0;\n  font-size: 14px;\n  font-weight: 500;\n  color: #374151;\n}\n\n.uicm-profile-avatar-subtitle {\n  margin: 0;\n  font-size: 13px;\n  color: #6b7280;\n}\n\n.uicm-profile-form {\n  display: flex;\n  flex-direction: column;\n  gap: 24px;\n}\n\n.uicm-form-group {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n\n.uicm-form-label {\n  font-size: 14px;\n  font-weight: 500;\n  color: #374151;\n  margin: 0;\n}\n\n.uicm-form-input,\n.uicm-form-select {\n  padding: 12px 16px;\n  border: 1px solid #d1d5db;\n  border-radius: 8px;\n  font-size: 14px;\n  color: #111827;\n  background: white;\n  transition: all 0.2s;\n  font-family: inherit;\n}\n\n.uicm-form-input:focus,\n.uicm-form-select:focus {\n  outline: none;\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n}\n\n.uicm-form-input-error {\n  border-color: #ef4444;\n  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);\n}\n\n.uicm-form-input-error:focus {\n  border-color: #ef4444;\n  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);\n}\n\n.uicm-form-help {\n  font-size: 12px;\n  color: #6b7280;\n  margin: 0;\n}\n\n.uicm-profile-modal-footer {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  gap: 12px;\n  padding: 20px 24px;\n  border-top: 1px solid #e5e7eb;\n  background: #f9fafb;\n}\n\n.uicm-btn {\n  padding: 10px 20px;\n  border: none;\n  border-radius: 8px;\n  font-size: 14px;\n  font-weight: 500;\n  cursor: pointer;\n  transition: all 0.2s;\n  font-family: inherit;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  min-width: 80px;\n}\n\n.uicm-btn:disabled {\n  opacity: 0.6;\n  cursor: not-allowed;\n}\n\n.uicm-btn-secondary {\n  background: white;\n  color: #374151;\n  border: 1px solid #d1d5db;\n}\n\n.uicm-btn-secondary:hover:not(:disabled) {\n  background: #f9fafb;\n  border-color: #9ca3af;\n}\n\n.uicm-btn-primary {\n  background: #3b82f6;\n  color: white;\n}\n\n.uicm-btn-primary:hover:not(:disabled) {\n  background: #2563eb;\n}\n\n/* Dark theme support */\n@media (prefers-color-scheme: dark) {\n  .uicm-profile-modal-content {\n    background: #1f2937;\n    color: #f9fafb;\n  }\n\n  .uicm-profile-modal-title {\n    color: #f9fafb;\n  }\n\n  .uicm-profile-modal-close {\n    color: #9ca3af;\n  }\n\n  .uicm-profile-modal-close:hover {\n    background-color: #374151;\n    color: #d1d5db;\n  }\n\n  .uicm-profile-avatar-section {\n    background: #374151;\n    border-color: #4b5563;\n  }\n\n  .uicm-form-label {\n    color: #d1d5db;\n  }\n\n  .uicm-form-input,\n  .uicm-form-select {\n    background: #374151;\n    border-color: #4b5563;\n    color: #f9fafb;\n  }\n\n  .uicm-form-input:focus,\n  .uicm-form-select:focus {\n    border-color: #60a5fa;\n    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);\n  }\n\n  .uicm-form-help {\n    color: #9ca3af;\n  }\n\n  .uicm-profile-modal-footer {\n    background: #374151;\n    border-color: #4b5563;\n  }\n\n  .uicm-btn-secondary {\n    background: #4b5563;\n    color: #f9fafb;\n    border-color: #6b7280;\n  }\n\n  .uicm-btn-secondary:hover:not(:disabled) {\n    background: #6b7280;\n    border-color: #9ca3af;\n  }\n}\n\n/* Mobile responsiveness */\n@media (max-width: 640px) {\n  .uicm-profile-modal-content {\n    width: 95%;\n    margin: 20px;\n  }\n\n  .uicm-profile-modal-header,\n  .uicm-profile-modal-body,\n  .uicm-profile-modal-footer {\n    padding: 16px;\n  }\n\n  .uicm-profile-avatar-section {\n    flex-direction: column;\n    text-align: center;\n    gap: 12px;\n  }\n\n  .uicm-profile-modal-footer {\n    flex-direction: column-reverse;\n    gap: 8px;\n  }\n\n  .uicm-btn {\n    width: 100%;\n  }\n}\n";
 styleInject(css_248z$4);
 
-var css_248z$3 = "/* Modern Comment Form with New UI */\n.uicm-comment-form {\n  background: linear-gradient(145deg, #ffffff, #f8fafc);\n  border-radius: 16px;\n  border: 1px solid #e5e7eb;\n  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);\n  width: 380px;\n  position: relative;\n  overflow: hidden;\n  font-family: \"Inter\", sans-serif;\n  animation: uicm-form-slide-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);\n  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);\n  will-change: transform, opacity;\n}\n\n.uicm-comment-form:hover {\n  transform: translateY(-2px);\n  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.15), 0 20px 40px rgba(0, 0, 0, 0.1),\n    0 0 0 1px rgba(255, 255, 255, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.9);\n}\n\n/* Gradient Header Bar */\n.uicm-comment-form::before {\n  content: \"\";\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  height: 4px;\n  background: linear-gradient(\n    135deg,\n    var(--uicm-accent, #3b82f6) 0%,\n    #8b5cf6 25%,\n    #06b6d4 50%,\n    #10b981 75%,\n    #f59e0b 100%\n  );\n  border-radius: var(--uicm-border-radius, 20px) var(--uicm-border-radius, 20px)\n    0 0;\n}\n\n/* Header Section with improved layout */\n.uicm-form-header {\n  background: #ffffff;\n  border-bottom: 1px solid #e5e7eb;\n  border-radius: 16px 16px 0 0;\n  padding: 0;\n}\n\n.uicm-form-header-content {\n  display: flex;\n  justify-content: space-between;\n  align-items: flex-start;\n  padding: 24px 24px 20px;\n  gap: 16px;\n}\n\n.uicm-form-title-section {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  flex: 1;\n}\n\n.uicm-form-title {\n  font-size: 22px;\n  font-weight: 700;\n  color: #1f2937;\n  margin: 0;\n  letter-spacing: -0.02em;\n  line-height: 1.2;\n}\n\n.uicm-form-subtitle {\n  font-size: 14px;\n  color: #6b7280;\n  margin: 0;\n  font-weight: 500;\n  line-height: 1.4;\n}\n\n.uicm-form-action-section {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  flex-shrink: 0;\n}\n\n.uicm-user-info {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  order: 2;\n  margin-bottom: 8px;\n}\n\n.uicm-user-avatar {\n  width: 40px;\n  height: 40px;\n  border-radius: 50%;\n  background: linear-gradient(135deg, #3b82f6, #06b6d4);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 16px;\n  font-weight: 600;\n  color: white;\n  transition: transform 0.2s;\n}\n\n.uicm-user-avatar:hover {\n  transform: scale(1.1);\n}\n\n.uicm-user-details {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n}\n\n.uicm-user-name-input {\n  background: transparent;\n  border: none;\n  font-size: 14px;\n  font-weight: 600;\n  color: #1f2937;\n  line-height: 1.2;\n  outline: none;\n  transition: all 0.2s ease;\n  max-width: 180px;\n  padding: 4px 8px;\n  border-radius: 6px;\n}\n\n.uicm-user-name-input:hover {\n  background: rgba(59, 130, 246, 0.05);\n}\n\n.uicm-user-name-input:focus {\n  background: rgba(59, 130, 246, 0.1);\n  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);\n}\n\n.uicm-user-name-input::placeholder {\n  color: var(--uicm-text-secondary, #64748b);\n  opacity: 0.7;\n}\n\n.uicm-user-name {\n  font-size: 16px;\n  font-weight: 700;\n  color: var(--uicm-text-primary, #0f172a);\n  line-height: 1.2;\n  letter-spacing: -0.01em;\n}\n\n.uicm-close-button {\n  background: linear-gradient(\n    145deg,\n    rgba(255, 255, 255, 0.8),\n    rgba(247, 243, 233, 0.6)\n  );\n  border: 1px solid rgba(224, 122, 95, 0.2);\n  color: #6b5b47;\n  font-size: 20px;\n  font-weight: 600;\n  cursor: pointer;\n  padding: 10px;\n  border-radius: 20px;\n  width: 40px;\n  height: 40px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 4px 12px rgba(224, 122, 95, 0.1);\n  line-height: 1;\n}\n\n/* Content Section */\n.uicm-form-content {\n  padding: 16px 20px;\n  background: #ffffff;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n}\n\n.uicm-comment-textarea {\n  flex: 1;\n  min-height: 80px;\n  max-height: 200px;\n  padding: 12px 16px;\n  border: 1px solid #d1d5db;\n  border-radius: 8px;\n  font-size: 14px;\n  line-height: 1.5;\n  color: #374151;\n  resize: none;\n  transition: all 0.2s ease;\n  background: #ffffff;\n  font-family: inherit;\n  outline: none;\n  box-sizing: border-box;\n}\n\n.uicm-comment-textarea:focus {\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n}\n\n.uicm-comment-textarea::placeholder {\n  color: #9ca3af;\n  font-style: normal;\n  opacity: 0.7;\n}\n\n/* Character Counter - Hidden like in reply form */\n.uicm-char-counter {\n  display: none;\n}\n\n/* File previews at top - with higher specificity */\n.uicm-comment-form .uicm-file-preview-container {\n  order: 1;\n  margin-bottom: 8px;\n  display: flex !important;\n  flex-wrap: nowrap !important;\n  gap: 8px;\n  overflow-x: auto !important;\n  overflow-y: hidden !important;\n  padding-bottom: 4px;\n  scrollbar-width: thin;\n  scrollbar-color: #cbd5e1 #f1f5f9;\n}\n\n.uicm-comment-form .uicm-file-preview-container::-webkit-scrollbar {\n  height: 4px;\n}\n\n.uicm-comment-form .uicm-file-preview-container::-webkit-scrollbar-track {\n  background: #f1f5f9;\n  border-radius: 2px;\n}\n\n.uicm-comment-form .uicm-file-preview-container::-webkit-scrollbar-thumb {\n  background: #cbd5e1;\n  border-radius: 2px;\n}\n\n.uicm-comment-form .uicm-file-preview-container::-webkit-scrollbar-thumb:hover {\n  background: #94a3b8;\n}\n\n/* Form input container (textarea + file upload button) */\n.uicm-form-input-container {\n  position: relative;\n  order: 2;\n  flex: 1;\n  display: flex;\n  gap: 8px;\n  align-items: flex-start;\n}\n\n/* File upload button in form input container (small like reply form) */\n.uicm-form-input-container .uicm-file-upload-button {\n  width: 36px;\n  height: 36px;\n  padding: 8px;\n  font-size: 16px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-shrink: 0;\n}\n\n/* Actions Section */\n.uicm-form-actions {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 20px;\n  order: 3;\n  margin-top: 8px;\n  padding-top: 12px;\n  border-top: 1px solid #e5e7eb;\n}\n\n.uicm-secondary-actions {\n  display: flex;\n  gap: 12px;\n  align-items: center;\n}\n\n.uicm-emoji-button,\n.uicm-mention-button {\n  background: rgba(255, 255, 255, 0.6);\n  backdrop-filter: blur(8px);\n  border: 1px solid rgba(255, 255, 255, 0.3);\n  border-radius: 12px;\n  padding: 10px 14px;\n  font-size: 16px;\n  cursor: pointer;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  color: var(--uicm-text-secondary, #64748b);\n  font-weight: 500;\n  display: flex;\n  align-items: center;\n  gap: 6px;\n}\n\n.uicm-emoji-button:hover,\n.uicm-mention-button:hover {\n  background: rgba(255, 255, 255, 0.8);\n  border-color: var(--uicm-accent, #3b82f6);\n  color: var(--uicm-accent, #3b82f6);\n  transform: translateY(-2px) scale(1.05);\n  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);\n}\n\n/* Primary actions - single button layout */\n.uicm-primary-actions {\n  display: flex;\n  justify-content: flex-end;\n  align-items: center;\n}\n\n.uicm-submit-button {\n  background: #3b82f6;\n  color: white;\n  border: none;\n  padding: 8px 20px;\n  border-radius: 8px;\n  font-size: 14px;\n  font-weight: 600;\n  cursor: pointer;\n  transition: background-color 0.2s ease;\n  display: flex;\n  align-items: center;\n  gap: 8px;\n}\n\n.uicm-submit-button:hover:not(:disabled) {\n  background: #2563eb;\n}\n\n.uicm-submit-button:disabled {\n  background: #9ca3af;\n  cursor: not-allowed;\n  transform: none;\n  box-shadow: none;\n}\n\n.uicm-submit-button kbd {\n  background: rgba(255, 255, 255, 0.2);\n  border-radius: 4px;\n  padding: 2px 6px;\n  font-size: 11px;\n  font-weight: normal;\n}\n\n/* Loading Spinner */\n.uicm-spinner {\n  width: 16px;\n  height: 16px;\n  border: 2px solid rgba(255, 255, 255, 0.3);\n  border-top: 2px solid white;\n  border-radius: 50%;\n  animation: uicm-spin 1s linear infinite;\n}\n\n/* Error Message */\n.uicm-error-message {\n  background: linear-gradient(\n    135deg,\n    rgba(239, 68, 68, 0.1),\n    rgba(220, 38, 38, 0.05)\n  );\n  border: 1px solid rgba(239, 68, 68, 0.3);\n  color: var(--uicm-danger, #ef4444);\n  padding: 12px 16px;\n  border-radius: 12px;\n  font-size: 13px;\n  margin-top: 12px;\n  font-weight: 500;\n  animation: uicm-shake 0.5s ease-in-out;\n  backdrop-filter: blur(8px);\n}\n\n/* Animations */\n@keyframes uicm-form-slide-in {\n  0% {\n    opacity: 0;\n    transform: translateY(20px) scale(0.95);\n  }\n  100% {\n    opacity: 1;\n    transform: translateY(0) scale(1);\n  }\n}\n\n@keyframes uicm-spin {\n  0% {\n    transform: rotate(0deg);\n  }\n  100% {\n    transform: rotate(360deg);\n  }\n}\n\n@keyframes uicm-shake {\n  0%,\n  100% {\n    transform: translateX(0);\n  }\n  25% {\n    transform: translateX(-4px);\n  }\n  75% {\n    transform: translateX(4px);\n  }\n}\n\n@keyframes uicm-pulse {\n  0%,\n  100% {\n    opacity: 1;\n    transform: scale(1);\n  }\n  50% {\n    opacity: 0.8;\n    transform: scale(1.1);\n  }\n}\n\n/* Paste Loading Styles */\n.uicm-paste-loading {\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%);\n  background: rgba(255, 255, 255, 0.95);\n  backdrop-filter: blur(10px);\n  border: 1px solid rgba(59, 130, 246, 0.2);\n  border-radius: 12px;\n  padding: 16px 24px;\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  font-size: 14px;\n  color: #1e293b;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);\n  z-index: 1000;\n}\n\n.uicm-loading-spinner {\n  width: 20px;\n  height: 20px;\n  border: 2px solid #e2e8f0;\n  border-top: 2px solid #3b82f6;\n  border-radius: 50%;\n  animation: uicm-spin 1s linear infinite;\n}\n\n@keyframes uicm-glow-warning {\n  0%,\n  100% {\n    text-shadow: 0 0 4px rgba(245, 158, 11, 0.5);\n  }\n  50% {\n    text-shadow: 0 0 8px rgba(245, 158, 11, 0.8);\n  }\n}\n\n@keyframes uicm-glow-error {\n  0%,\n  100% {\n    text-shadow: 0 0 4px rgba(239, 68, 68, 0.5);\n  }\n  50% {\n    text-shadow: 0 0 8px rgba(239, 68, 68, 0.8);\n  }\n}\n\n/* Mobile Responsive */\n@media (max-width: 480px) {\n  .uicm-comment-form {\n    min-width: 320px;\n    max-width: 95vw;\n    margin: 10px;\n  }\n\n  .uicm-form-header-content {\n    padding: 20px 20px 16px;\n    flex-direction: column;\n    align-items: flex-start;\n    gap: 12px;\n  }\n\n  .uicm-form-title-section {\n    width: 100%;\n  }\n\n  .uicm-form-action-section {\n    align-self: flex-end;\n  }\n\n  .uicm-form-content {\n    padding: 20px;\n  }\n\n  .uicm-form-actions {\n    flex-direction: column;\n    gap: 16px;\n  }\n\n  .uicm-primary-actions {\n    width: 100%;\n    justify-content: space-between;\n  }\n\n  .uicm-cancel-button,\n  .uicm-submit-button {\n    flex: 1;\n    text-align: center;\n  }\n\n  .uicm-secondary-actions {\n    justify-content: center;\n    width: 100%;\n  }\n\n  .uicm-user-avatar {\n    width: 40px;\n    height: 40px;\n    font-size: 16px;\n  }\n\n  .uicm-user-avatar::after {\n    width: 12px;\n    height: 12px;\n  }\n}\n\n/* Form elements should have proper event handling */\n.uicm-comment-form input,\n.uicm-comment-form textarea,\n.uicm-comment-form button,\n.uicm-comment-form select {\n  pointer-events: auto !important;\n  position: relative;\n  z-index: 1 !important;\n}\n\n/* Form should prevent event bubbling */\n.uicm-comment-form {\n  pointer-events: auto !important;\n  position: relative;\n  z-index: 999999 !important;\n}\n\n/* Header bar styling */\n.uicm-form-header-bar {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  height: 4px;\n  background: linear-gradient(90deg, #3b82f6, #06b6d4, #10b981);\n  border-radius: 8px 8px 0 0;\n  z-index: 1;\n}\n";
+var css_248z$3 = "/* Settings Button */\n.uicm-settings-button {\n  position: fixed;\n  bottom: 20px;\n  right: 20px;\n  width: 48px;\n  height: 48px;\n  border-radius: 50%;\n  background: white;\n  border: 2px solid #e5e7eb;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #6b7280;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),\n    0 2px 4px -1px rgba(0, 0, 0, 0.06);\n  z-index: 9999999999;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto,\n    \"Helvetica Neue\", Arial, sans-serif;\n  opacity: 1;\n  transform: scale(1) translateY(0);\n}\n\n.uicm-settings-button[style*=\"display: none\"] {\n  opacity: 0;\n  transform: scale(0.8) translateY(20px);\n  pointer-events: none;\n}\n\n.uicm-settings-button:hover {\n  background: #f9fafb;\n  border-color: #d1d5db;\n  color: #374151;\n  transform: scale(1.05);\n  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),\n    0 4px 6px -2px rgba(0, 0, 0, 0.05);\n}\n\n.uicm-settings-button:active {\n  transform: scale(0.95);\n}\n\n.uicm-settings-button:focus {\n  outline: none;\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n}\n\n/* Settings Icon */\n.uicm-settings-icon {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 100%;\n  height: 100%;\n}\n\n.uicm-gear-icon {\n  font-size: 30px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 20px;\n  height: 20px;\n  color: inherit;\n  transition: transform 0.3s ease;\n}\n\n/* Dark theme support */\n@media (prefers-color-scheme: dark) {\n  .uicm-settings-button {\n    background: #374151;\n    border-color: #4b5563;\n    color: #d1d5db;\n  }\n\n  .uicm-settings-button:hover {\n    background: #4b5563;\n    border-color: #6b7280;\n    color: #f9fafb;\n  }\n\n  .uicm-settings-button:focus {\n    border-color: #60a5fa;\n    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);\n  }\n}\n\n/* Mobile responsiveness */\n@media (max-width: 640px) {\n  .uicm-settings-button {\n    bottom: 16px;\n    right: 16px;\n    width: 44px;\n    height: 44px;\n  }\n\n  .uicm-gear-icon {\n    font-size: 18px;\n    width: 18px;\n    height: 18px;\n  }\n}\n";
 styleInject(css_248z$3);
 
-var css_248z$2 = "/* Profile Settings Modal */\n.uicm-profile-modal {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 10000000;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto,\n    \"Helvetica Neue\", Arial, sans-serif;\n}\n\n.uicm-profile-modal-overlay {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background-color: rgba(0, 0, 0, 0.5);\n  backdrop-filter: blur(4px);\n}\n\n.uicm-profile-modal-content {\n  position: relative;\n  background: white;\n  border-radius: 12px;\n  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),\n    0 10px 10px -5px rgba(0, 0, 0, 0.04);\n  width: 90%;\n  max-width: 480px;\n  max-height: 90vh;\n  overflow: hidden;\n  animation: uicm-modal-slide-in 0.3s ease-out;\n}\n\n@keyframes uicm-modal-slide-in {\n  from {\n    opacity: 0;\n    transform: scale(0.95) translateY(-10px);\n  }\n  to {\n    opacity: 1;\n    transform: scale(1) translateY(0);\n  }\n}\n\n.uicm-profile-modal-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 24px 24px 0 24px;\n  border-bottom: 1px solid #e5e7eb;\n  padding-bottom: 20px;\n}\n\n.uicm-profile-modal-title {\n  margin: 0;\n  font-size: 20px;\n  font-weight: 600;\n  color: #111827;\n}\n\n.uicm-profile-modal-close {\n  background: none;\n  border: none;\n  cursor: pointer;\n  padding: 8px;\n  border-radius: 6px;\n  color: #6b7280;\n  transition: all 0.2s;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.uicm-profile-modal-close:hover {\n  background-color: #f3f4f6;\n  color: #374151;\n}\n\n.uicm-profile-modal-body {\n  padding: 24px;\n  max-height: 60vh;\n  overflow-y: auto;\n}\n\n.uicm-profile-avatar-section {\n  display: flex;\n  align-items: center;\n  gap: 16px;\n  margin-bottom: 32px;\n  padding: 20px;\n  background: #f9fafb;\n  border-radius: 12px;\n  border: 1px solid #e5e7eb;\n}\n\n.uicm-profile-avatar {\n  width: 64px;\n  height: 64px;\n  border-radius: 50%;\n  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-shrink: 0;\n}\n\n.uicm-profile-avatar-text {\n  font-size: 24px;\n  font-weight: 600;\n  color: white;\n  text-transform: uppercase;\n}\n\n.uicm-profile-avatar-info {\n  flex: 1;\n}\n\n.uicm-profile-avatar-label {\n  margin: 0 0 4px 0;\n  font-size: 14px;\n  font-weight: 500;\n  color: #374151;\n}\n\n.uicm-profile-avatar-subtitle {\n  margin: 0;\n  font-size: 13px;\n  color: #6b7280;\n}\n\n.uicm-profile-form {\n  display: flex;\n  flex-direction: column;\n  gap: 24px;\n}\n\n.uicm-form-group {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n\n.uicm-form-label {\n  font-size: 14px;\n  font-weight: 500;\n  color: #374151;\n  margin: 0;\n}\n\n.uicm-form-input,\n.uicm-form-select {\n  padding: 12px 16px;\n  border: 1px solid #d1d5db;\n  border-radius: 8px;\n  font-size: 14px;\n  color: #111827;\n  background: white;\n  transition: all 0.2s;\n  font-family: inherit;\n}\n\n.uicm-form-input:focus,\n.uicm-form-select:focus {\n  outline: none;\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n}\n\n.uicm-form-input-error {\n  border-color: #ef4444;\n  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);\n}\n\n.uicm-form-input-error:focus {\n  border-color: #ef4444;\n  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);\n}\n\n.uicm-form-help {\n  font-size: 12px;\n  color: #6b7280;\n  margin: 0;\n}\n\n.uicm-profile-modal-footer {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  gap: 12px;\n  padding: 20px 24px;\n  border-top: 1px solid #e5e7eb;\n  background: #f9fafb;\n}\n\n.uicm-btn {\n  padding: 10px 20px;\n  border: none;\n  border-radius: 8px;\n  font-size: 14px;\n  font-weight: 500;\n  cursor: pointer;\n  transition: all 0.2s;\n  font-family: inherit;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  min-width: 80px;\n}\n\n.uicm-btn:disabled {\n  opacity: 0.6;\n  cursor: not-allowed;\n}\n\n.uicm-btn-secondary {\n  background: white;\n  color: #374151;\n  border: 1px solid #d1d5db;\n}\n\n.uicm-btn-secondary:hover:not(:disabled) {\n  background: #f9fafb;\n  border-color: #9ca3af;\n}\n\n.uicm-btn-primary {\n  background: #3b82f6;\n  color: white;\n}\n\n.uicm-btn-primary:hover:not(:disabled) {\n  background: #2563eb;\n}\n\n/* Dark theme support */\n@media (prefers-color-scheme: dark) {\n  .uicm-profile-modal-content {\n    background: #1f2937;\n    color: #f9fafb;\n  }\n\n  .uicm-profile-modal-title {\n    color: #f9fafb;\n  }\n\n  .uicm-profile-modal-close {\n    color: #9ca3af;\n  }\n\n  .uicm-profile-modal-close:hover {\n    background-color: #374151;\n    color: #d1d5db;\n  }\n\n  .uicm-profile-avatar-section {\n    background: #374151;\n    border-color: #4b5563;\n  }\n\n  .uicm-form-label {\n    color: #d1d5db;\n  }\n\n  .uicm-form-input,\n  .uicm-form-select {\n    background: #374151;\n    border-color: #4b5563;\n    color: #f9fafb;\n  }\n\n  .uicm-form-input:focus,\n  .uicm-form-select:focus {\n    border-color: #60a5fa;\n    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);\n  }\n\n  .uicm-form-help {\n    color: #9ca3af;\n  }\n\n  .uicm-profile-modal-footer {\n    background: #374151;\n    border-color: #4b5563;\n  }\n\n  .uicm-btn-secondary {\n    background: #4b5563;\n    color: #f9fafb;\n    border-color: #6b7280;\n  }\n\n  .uicm-btn-secondary:hover:not(:disabled) {\n    background: #6b7280;\n    border-color: #9ca3af;\n  }\n}\n\n/* Mobile responsiveness */\n@media (max-width: 640px) {\n  .uicm-profile-modal-content {\n    width: 95%;\n    margin: 20px;\n  }\n\n  .uicm-profile-modal-header,\n  .uicm-profile-modal-body,\n  .uicm-profile-modal-footer {\n    padding: 16px;\n  }\n\n  .uicm-profile-avatar-section {\n    flex-direction: column;\n    text-align: center;\n    gap: 12px;\n  }\n\n  .uicm-profile-modal-footer {\n    flex-direction: column-reverse;\n    gap: 8px;\n  }\n\n  .uicm-btn {\n    width: 100%;\n  }\n}\n";
+var css_248z$2 = "/* Sidebar Button */\n.uicm-sidebar-button {\n  position: fixed;\n  bottom: 80px;\n  right: 20px;\n  width: 48px;\n  height: 48px;\n  border-radius: 50%;\n  background: white;\n  border: 2px solid #e5e7eb;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #6b7280;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),\n    0 2px 4px -1px rgba(0, 0, 0, 0.06);\n  z-index: 9999999999999;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto,\n    \"Helvetica Neue\", Arial, sans-serif;\n  opacity: 1;\n  transform: scale(1) translateY(0);\n}\n\n.uicm-sidebar-button[style*=\"display: none\"] {\n  opacity: 0;\n  transform: scale(0.8) translateY(20px);\n  pointer-events: none;\n}\n\n.uicm-sidebar-button:hover {\n  background: #f9fafb;\n  border-color: #d1d5db;\n  color: #374151;\n  transform: scale(1.05);\n  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),\n    0 4px 6px -2px rgba(0, 0, 0, 0.05);\n}\n\n.uicm-sidebar-button:active {\n  transform: scale(0.95);\n}\n\n.uicm-sidebar-button:focus {\n  outline: none;\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n}\n\n/* Sidebar Icon */\n.uicm-sidebar-icon {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 100%;\n  height: 100%;\n}\n\n.uicm-list-icon {\n  font-size: 20px;\n  line-height: 1;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 20px;\n  height: 20px;\n  color: inherit;\n  transition: transform 0.3s ease;\n}\n\n.uicm-sidebar-button:hover .uicm-list-icon {\n  transform: scale(1.1);\n}\n\n/* Dark theme support */\n@media (prefers-color-scheme: dark) {\n  .uicm-sidebar-button {\n    background: #374151;\n    border-color: #4b5563;\n    color: #d1d5db;\n  }\n\n  .uicm-sidebar-button:hover {\n    background: #4b5563;\n    border-color: #6b7280;\n    color: #f9fafb;\n  }\n\n  .uicm-sidebar-button:focus {\n    border-color: #60a5fa;\n    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);\n  }\n}\n\n/* Mobile responsiveness */\n@media (max-width: 640px) {\n  .uicm-sidebar-button {\n    bottom: 76px;\n    right: 16px;\n    width: 44px;\n    height: 44px;\n  }\n\n  .uicm-list-icon {\n    font-size: 18px;\n    width: 18px;\n    height: 18px;\n  }\n}\n";
 styleInject(css_248z$2);
 
-var css_248z$1 = "/* Settings Button */\n.uicm-settings-button {\n  position: fixed;\n  bottom: 20px;\n  right: 20px;\n  width: 48px;\n  height: 48px;\n  border-radius: 50%;\n  background: white;\n  border: 2px solid #e5e7eb;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #6b7280;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),\n    0 2px 4px -1px rgba(0, 0, 0, 0.06);\n  z-index: 9999999999;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto,\n    \"Helvetica Neue\", Arial, sans-serif;\n  opacity: 1;\n  transform: scale(1) translateY(0);\n}\n\n.uicm-settings-button[style*=\"display: none\"] {\n  opacity: 0;\n  transform: scale(0.8) translateY(20px);\n  pointer-events: none;\n}\n\n.uicm-settings-button:hover {\n  background: #f9fafb;\n  border-color: #d1d5db;\n  color: #374151;\n  transform: scale(1.05);\n  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),\n    0 4px 6px -2px rgba(0, 0, 0, 0.05);\n}\n\n.uicm-settings-button:active {\n  transform: scale(0.95);\n}\n\n.uicm-settings-button:focus {\n  outline: none;\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n}\n\n/* Settings Icon */\n.uicm-settings-icon {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 100%;\n  height: 100%;\n}\n\n.uicm-gear-icon {\n  font-size: 30px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 20px;\n  height: 20px;\n  color: inherit;\n  transition: transform 0.3s ease;\n}\n\n/* Dark theme support */\n@media (prefers-color-scheme: dark) {\n  .uicm-settings-button {\n    background: #374151;\n    border-color: #4b5563;\n    color: #d1d5db;\n  }\n\n  .uicm-settings-button:hover {\n    background: #4b5563;\n    border-color: #6b7280;\n    color: #f9fafb;\n  }\n\n  .uicm-settings-button:focus {\n    border-color: #60a5fa;\n    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);\n  }\n}\n\n/* Mobile responsiveness */\n@media (max-width: 640px) {\n  .uicm-settings-button {\n    bottom: 16px;\n    right: 16px;\n    width: 44px;\n    height: 44px;\n  }\n\n  .uicm-gear-icon {\n    font-size: 18px;\n    width: 18px;\n    height: 18px;\n  }\n}\n";
+var css_248z$1 = "/* Comments Table Modal */\n.uicm-comments-table-modal {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100vw;\n  height: 100vh;\n  z-index: 10000000;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif;\n  color: #222;\n}\n\n.uicm-comments-table-overlay {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background-color: rgba(0, 0, 0, 0.5);\n  backdrop-filter: blur(4px);\n}\n\n.uicm-comments-table-container {\n  position: relative;\n  width: 95vw;\n  max-width: 1400px;\n  height: 90vh;\n  background: #fff;\n  border-radius: 12px;\n  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),\n    0 10px 10px -5px rgba(0, 0, 0, 0.04);\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n}\n\n/* Header */\n.uicm-comments-table-header {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 20px 24px;\n  border-bottom: 1px solid #e5e7eb;\n  background: #f9fafb;\n}\n\n.uicm-comments-table-header h2 {\n  margin: 0;\n  font-size: 1.5rem;\n  font-weight: 600;\n  color: #111827;\n}\n\n.uicm-comments-table-close {\n  background: none;\n  border: none;\n  font-size: 24px;\n  cursor: pointer;\n  padding: 8px;\n  border-radius: 6px;\n  color: #6b7280;\n  transition: all 0.2s;\n}\n\n.uicm-comments-table-close:hover {\n  background-color: #f3f4f6;\n  color: #374151;\n}\n\n/* Toolbar */\n.uicm-comments-table-toolbar {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 16px 24px;\n  border-bottom: 1px solid #e5e7eb;\n  background: white;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n\n.uicm-comments-table-filters {\n  display: flex;\n  align-items: center;\n  gap: 18px;\n  flex-wrap: wrap;\n  padding: 4px 0;\n}\n\n.uicm-comments-table-actions {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n}\n\n/* Filter Controls */\n.uicm-search-input,\n.uicm-status-filter,\n.uicm-date-start,\n.uicm-date-end {\n  height: 40px;\n  min-width: 140px;\n  padding: 0 14px;\n  border: 1.5px solid #d1d5db;\n  border-radius: 999px;\n  font-size: 15px;\n  background: #f9fafb;\n  color: #374151;\n  transition: border-color 0.2s, box-shadow 0.2s;\n  box-shadow: 0 1px 2px rgba(59, 130, 246, 0.03);\n  outline: none;\n  appearance: none;\n  margin: 0;\n  box-sizing: border-box;\n}\n\n.uicm-search-input {\n  min-width: 220px;\n  padding-left: 38px;\n  background-image: url('data:image/svg+xml;utf8,<svg fill=\"none\" stroke=\"%239ca3af\" stroke-width=\"2\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"M21 21l-4.35-4.35\"/></svg>');\n  background-repeat: no-repeat;\n  background-position: 12px center;\n  background-size: 18px 18px;\n}\n\n.uicm-status-filter {\n  min-width: 140px;\n  padding-right: 32px;\n  background-image: url('data:image/svg+xml;utf8,<svg fill=\"none\" stroke=\"%239ca3af\" stroke-width=\"2\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M19 9l-7 7-7-7\"/></svg>');\n  background-repeat: no-repeat;\n  background-position: right 12px center;\n  background-size: 18px 18px;\n}\n\n.uicm-search-input:focus,\n.uicm-status-filter:focus,\n.uicm-date-start:focus,\n.uicm-date-end:focus {\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n  background: #fff;\n}\n\n.uicm-search-input:hover,\n.uicm-status-filter:hover,\n.uicm-date-start:hover,\n.uicm-date-end:hover {\n  border-color: #a5b4fc;\n}\n\n.uicm-date-start,\n.uicm-date-end {\n  min-width: 120px;\n}\n\n/* Remove default arrow for select (for Chrome) */\n.uicm-status-filter::-ms-expand {\n  display: none;\n}\n.uicm-status-filter {\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n}\n\n.uicm-clear-filters,\n.uicm-delete-selected,\n.uicm-export-excel,\n.uicm-edit-comment,\n.uicm-delete-comment {\n  font-weight: 600;\n  border-radius: 8px;\n  min-width: 90px;\n  height: 38px;\n  letter-spacing: 0.01em;\n  padding: 0 18px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  box-sizing: border-box;\n  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);\n  outline: none;\n  border-width: 1.5px;\n}\n\n.uicm-clear-filters {\n  background: #f3f4f6;\n  color: #374151;\n  border: 1.5px solid #d1d5db;\n}\n.uicm-clear-filters:hover {\n  background: #e5e7eb;\n  color: #111827;\n  border-color: #9ca3af;\n  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.07);\n}\n.uicm-clear-filters:active {\n  background: #d1d5db;\n  color: #111827;\n}\n\n.uicm-delete-selected {\n  background: #ef4444;\n  color: #fff;\n  border: 1.5px solid #ef4444;\n  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);\n}\n.uicm-delete-selected:hover:not(:disabled) {\n  background: #dc2626;\n  border-color: #dc2626;\n  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.13);\n}\n.uicm-delete-selected:active {\n  background: #b91c1c;\n  border-color: #b91c1c;\n}\n.uicm-delete-selected:disabled {\n  opacity: 0.7;\n  cursor: not-allowed;\n  box-shadow: none;\n}\n\n.uicm-export-excel {\n  background: #10b981;\n  color: #fff;\n  border: 1.5px solid #10b981;\n  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);\n}\n.uicm-export-excel:hover {\n  background: #059669;\n  border-color: #059669;\n  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.13);\n}\n.uicm-export-excel:active {\n  background: #047857;\n  border-color: #047857;\n}\n\n.uicm-edit-comment {\n  background: #f3f4f6;\n  color: #2563eb;\n  border: 1.5px solid #d1d5db;\n  margin-right: 6px;\n}\n.uicm-edit-comment:hover {\n  background: #dbeafe;\n  color: #1d4ed8;\n  border-color: #60a5fa;\n  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.07);\n}\n.uicm-edit-comment:active {\n  background: #bfdbfe;\n  color: #1e40af;\n}\n\n.uicm-delete-comment {\n  background: #fee2e2;\n  color: #dc2626;\n  border: 1.5px solid #fecaca;\n}\n.uicm-delete-comment:hover {\n  background: #fecaca;\n  color: #b91c1c;\n  border-color: #f87171;\n  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.07);\n}\n.uicm-delete-comment:active {\n  background: #fca5a5;\n  color: #991b1b;\n}\n\n/* Table Container */\n.uicm-comments-table-wrapper {\n  flex: 1;\n  overflow: auto;\n  padding: 0 24px;\n}\n\n/* Table */\n.uicm-comments-table {\n  width: 100%;\n  border-collapse: collapse;\n  margin: 0;\n}\n\n.uicm-comments-table th,\n.uicm-comments-table td {\n  padding: 12px 8px;\n  text-align: left;\n  border-bottom: 1px solid #e5e7eb;\n  vertical-align: top;\n}\n\n.uicm-comments-table th {\n  background-color: #f9fafb;\n  font-weight: 600;\n  color: #222;\n  position: sticky;\n  top: 0;\n  z-index: 10;\n}\n\n.uicm-comments-table th.sortable {\n  cursor: pointer;\n  user-select: none;\n  transition: background-color 0.2s;\n}\n\n.uicm-comments-table th.sortable:hover {\n  background-color: #f3f4f6;\n}\n\n.sort-indicator {\n  margin-left: 4px;\n  color: #3b82f6;\n  font-weight: bold;\n}\n\n/* Table Rows */\n.uicm-comment-row {\n  transition: background-color 0.2s;\n}\n\n.uicm-comment-row:hover {\n  background-color: #f9fafb;\n}\n\n/* Table Cells */\n.date-cell {\n  min-width: 140px;\n  font-size: 13px;\n  color: #6b7280;\n}\n\n.author-cell {\n  min-width: 120px;\n}\n\n.author-name {\n  display: block;\n  font-weight: 500;\n  font-size: 14px;\n}\n\n.author-role {\n  display: block;\n  font-size: 12px;\n  color: #6b7280;\n  margin-top: 2px;\n}\n\n.status-cell {\n  min-width: 120px;\n}\n\n.status-badge {\n  display: inline-block;\n  padding: 4px 8px;\n  border-radius: 12px;\n  font-size: 12px;\n  font-weight: 500;\n  color: white;\n  text-transform: capitalize;\n}\n\n.content-cell {\n  max-width: 300px;\n  min-width: 200px;\n}\n\n.comment-content {\n  font-size: 14px;\n  line-height: 1.4;\n  margin-bottom: 4px;\n  word-break: break-word;\n}\n\n.attachment-count {\n  font-size: 12px;\n  color: #6b7280;\n  background: #f3f4f6;\n  padding: 2px 6px;\n  border-radius: 4px;\n  display: inline-block;\n}\n\n.url-cell {\n  max-width: 200px;\n  min-width: 150px;\n}\n\n.url-text {\n  font-size: 13px;\n  color: #6b7280;\n  word-break: break-all;\n}\n\n.replies-cell {\n  text-align: center;\n  width: 60px;\n}\n\n.replies-count {\n  display: inline-block;\n  background: #e5e7eb;\n  color: #374151;\n  padding: 2px 6px;\n  border-radius: 12px;\n  font-size: 12px;\n  font-weight: 500;\n  min-width: 20px;\n}\n\n.actions-cell {\n  min-width: 120px;\n  white-space: nowrap;\n}\n\n/* Checkboxes */\n.uicm-select-all,\n.uicm-comment-select {\n  width: 16px;\n  height: 16px;\n  cursor: pointer;\n}\n\n/* Footer */\n.uicm-comments-table-footer {\n  padding: 16px 24px;\n  border-top: 1px solid #e5e7eb;\n  background: #f9fafb;\n}\n\n.uicm-comments-count {\n  font-size: 14px;\n  color: #6b7280;\n}\n\n.total-count,\n.selected-count {\n  font-weight: 600;\n  color: #374151;\n}\n\n.uicm-status-badge {\n  display: inline-block;\n  min-width: 70px;\n  padding: 4px 12px;\n  border-radius: 999px;\n  font-size: 13px;\n  font-weight: 700;\n  color: #fff !important;\n  text-align: center;\n  background: #6b7280;\n}\n.uicm-status-badge[data-status=\"bug\"] {\n  background: #ef4444;\n}\n.uicm-status-badge[data-status=\"feature_request\"] {\n  background: #f59e0b;\n}\n.uicm-status-badge[data-status=\"dev_completed\"] {\n  background: #3b82f6;\n}\n.uicm-status-badge[data-status=\"done\"] {\n  background: #10b981;\n}\n.uicm-status-badge[data-status=\"archived\"] {\n  background: #6b7280;\n}\n\n/* Responsive */\n@media (max-width: 1200px) {\n  .uicm-comments-table-container {\n    width: 98vw;\n    height: 95vh;\n  }\n\n  .uicm-comments-table-toolbar {\n    flex-direction: column;\n    align-items: stretch;\n  }\n\n  .uicm-comments-table-filters,\n  .uicm-comments-table-actions {\n    justify-content: center;\n  }\n}\n\n@media (max-width: 768px) {\n  .uicm-comments-table-header {\n    padding: 16px;\n  }\n\n  .uicm-comments-table-toolbar {\n    padding: 12px 16px;\n  }\n\n  .uicm-comments-table-wrapper {\n    padding: 0 16px;\n  }\n\n  .uicm-comments-table th,\n  .uicm-comments-table td {\n    padding: 8px 4px;\n    font-size: 13px;\n  }\n\n  .content-cell {\n    max-width: 200px;\n    min-width: 150px;\n  }\n\n  .url-cell {\n    max-width: 120px;\n    min-width: 100px;\n  }\n\n  /* Responsive: stack filters on mobile */\n  .uicm-comments-table-filters {\n    flex-direction: column;\n    align-items: stretch;\n    gap: 10px;\n    padding: 0;\n  }\n  .uicm-search-input,\n  .uicm-status-filter,\n  .uicm-date-start,\n  .uicm-date-end {\n    min-width: 0;\n    width: 100%;\n    font-size: 15px;\n  }\n}\n\n/* Responsive button spacing */\n@media (max-width: 600px) {\n  .uicm-clear-filters,\n  .uicm-delete-selected,\n  .uicm-export-excel,\n  .uicm-edit-comment,\n  .uicm-delete-comment {\n    min-width: 70px;\n    font-size: 13px;\n    padding: 0 10px;\n    height: 34px;\n  }\n}\n";
 styleInject(css_248z$1);
 
-var css_248z = "/* Sidebar Button */\n.uicm-sidebar-button {\n  position: fixed;\n  bottom: 80px;\n  right: 20px;\n  width: 48px;\n  height: 48px;\n  border-radius: 50%;\n  background: white;\n  border: 2px solid #e5e7eb;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #6b7280;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),\n    0 2px 4px -1px rgba(0, 0, 0, 0.06);\n  z-index: 9999999999999;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto,\n    \"Helvetica Neue\", Arial, sans-serif;\n  opacity: 1;\n  transform: scale(1) translateY(0);\n}\n\n.uicm-sidebar-button[style*=\"display: none\"] {\n  opacity: 0;\n  transform: scale(0.8) translateY(20px);\n  pointer-events: none;\n}\n\n.uicm-sidebar-button:hover {\n  background: #f9fafb;\n  border-color: #d1d5db;\n  color: #374151;\n  transform: scale(1.05);\n  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),\n    0 4px 6px -2px rgba(0, 0, 0, 0.05);\n}\n\n.uicm-sidebar-button:active {\n  transform: scale(0.95);\n}\n\n.uicm-sidebar-button:focus {\n  outline: none;\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n}\n\n/* Sidebar Icon */\n.uicm-sidebar-icon {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 100%;\n  height: 100%;\n}\n\n.uicm-list-icon {\n  font-size: 20px;\n  line-height: 1;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 20px;\n  height: 20px;\n  color: inherit;\n  transition: transform 0.3s ease;\n}\n\n.uicm-sidebar-button:hover .uicm-list-icon {\n  transform: scale(1.1);\n}\n\n/* Dark theme support */\n@media (prefers-color-scheme: dark) {\n  .uicm-sidebar-button {\n    background: #374151;\n    border-color: #4b5563;\n    color: #d1d5db;\n  }\n\n  .uicm-sidebar-button:hover {\n    background: #4b5563;\n    border-color: #6b7280;\n    color: #f9fafb;\n  }\n\n  .uicm-sidebar-button:focus {\n    border-color: #60a5fa;\n    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);\n  }\n}\n\n/* Mobile responsiveness */\n@media (max-width: 640px) {\n  .uicm-sidebar-button {\n    bottom: 76px;\n    right: 16px;\n    width: 44px;\n    height: 44px;\n  }\n\n  .uicm-list-icon {\n    font-size: 18px;\n    width: 18px;\n    height: 18px;\n  }\n}\n";
+var css_248z = "/* Comments Table Button - Floating Icon Only */\n.uicm-comments-table-btn {\n  position: fixed;\n  bottom: 140px;\n  right: 20px;\n  width: 48px;\n  height: 48px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  padding: 0;\n  border-radius: 50%;\n  background: white;\n  border: 2px solid #e5e7eb;\n  cursor: pointer;\n  color: #6b7280;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),\n    0 2px 4px -1px rgba(0, 0, 0, 0.06);\n  z-index: 9999999999;\n  font-family: inherit;\n  opacity: 1;\n  transform: scale(1) translateY(0);\n  outline: none;\n  user-select: none;\n}\n\n.uicm-comments-table-btn[style*=\"display: none\"] {\n  opacity: 0;\n  transform: scale(0.8) translateY(20px);\n  pointer-events: none;\n}\n\n.uicm-comments-table-btn:hover {\n  background: #f9fafb;\n  border-color: #d1d5db;\n  color: #374151;\n  transform: scale(1.05);\n  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),\n    0 4px 6px -2px rgba(0, 0, 0, 0.05);\n}\n\n.uicm-comments-table-btn:active {\n  transform: scale(0.95);\n}\n\n.uicm-comments-table-btn:focus {\n  outline: none;\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n}\n\n.uicm-comments-table-btn svg {\n  width: 26px;\n  height: 26px;\n  display: block;\n  pointer-events: none;\n}\n\n.uicm-comments-table-btn-text {\n  display: none !important;\n}\n\n@media (prefers-color-scheme: dark) {\n  .uicm-comments-table-btn {\n    background: #374151;\n    border-color: #4b5563;\n    color: #d1d5db;\n  }\n  .uicm-comments-table-btn:hover {\n    background: #4b5563;\n    border-color: #6b7280;\n    color: #f9fafb;\n  }\n  .uicm-comments-table-btn:focus {\n    border-color: #60a5fa;\n    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);\n  }\n}\n\n@media (max-width: 768px) {\n  .uicm-comments-table-btn {\n    bottom: 24px;\n    right: 12px;\n    width: 44px;\n    height: 44px;\n  }\n  .uicm-comments-table-btn svg {\n    width: 22px;\n    height: 22px;\n  }\n}\n";
 styleInject(css_248z);
 
 class CommentStorage {
@@ -6135,6 +7010,8 @@ var index = { initCommentSDK };
 exports.AdvancedImageCompressor = AdvancedImageCompressor;
 exports.CommentSDK = CommentSDK;
 exports.CommentStorage = CommentStorage;
+exports.CommentsTable = CommentsTable;
+exports.CommentsTableButton = CommentsTableButton;
 exports.GitHubGistStorage = GitHubGistStorage;
 exports.HybridCommentStorage = HybridCommentStorage;
 exports.ImageCompressor = ImageCompressor;

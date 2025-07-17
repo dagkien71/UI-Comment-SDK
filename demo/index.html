@@ -110,43 +110,8 @@
         letter-spacing: 0.5px;
       }
 
-      button {
-        padding: 12px 24px;
-        border: none;
-        border-radius: 6px;
-        background: linear-gradient(
-          135deg,
-          rgba(0, 255, 255, 0.1) 0%,
-          rgba(139, 92, 246, 0.1) 100%
-        );
-        color: #00ffff;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-        font-family: inherit;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(0, 255, 255, 0.3);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
       li {
         list-style: none;
-      }
-      button:hover {
-        background: linear-gradient(
-          135deg,
-          rgba(0, 255, 255, 0.2) 0%,
-          rgba(139, 92, 246, 0.2) 100%
-        );
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
-          0 0 20px rgba(0, 255, 255, 0.2);
-        border-color: rgba(0, 255, 255, 0.6);
-      }
-
-      button:active {
-        transform: translateY(0);
       }
 
       .info {
@@ -308,33 +273,21 @@
       }
 
       .code-block {
-        background: rgba(15, 23, 42, 0.9);
-        padding: 20px;
-        border-radius: 6px;
-        border: 1px solid rgba(0, 255, 255, 0.2);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3),
-          inset 0 1px 0 rgba(0, 255, 255, 0.1);
-        overflow-x: auto;
-        font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono",
-          monospace;
+        border-radius: 10px;
+        background: #161b22;
+        border: 1px solid #30363d;
+        margin: 24px 0;
+        overflow: auto;
         position: relative;
+        box-shadow: 0 2px 8px #0002;
       }
-
-      .code-block::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, #00ffff, transparent);
-      }
-
       .code-block pre {
         margin: 0;
-        font-size: 14px;
-        line-height: 1.5;
-        overflow-x: auto;
+        padding: 20px 24px;
+        font-size: 15px;
+        line-height: 1.7;
+        background: transparent;
+        color: inherit;
       }
 
       /* VSCode-like syntax highlighting for tech theme */
@@ -583,8 +536,11 @@
         font-weight: 500;
       }
     </style>
-    <script src="https://unpkg.com/ui-comment-sdk@latest/dist/ui-comment-sdk.min.js"></script>
+<!-- highlight.js for syntax highlight giống ReactJS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   
+    <script>hljs.highlightAll();</script>
   </head>
 
   <body>
@@ -601,6 +557,7 @@ This SDK enables teams to add visual comments and feedback directly on any web p
   <li><strong>Visual feedback:</strong> Pin comments to specific UI elements for clear context.</li>
   <li><strong>Collaboration:</strong> Streamline design reviews, bug reporting, and team discussions.</li>
   <li><strong>Flexible:</strong> Works with static sites, React, and more.</li>
+  <li><strong>Export CSV:</strong> Easily export all comments as a CSV file for reporting or analysis.</li>
 </ul>
       </div>
 
@@ -648,31 +605,30 @@ This SDK enables teams to add visual comments and feedback directly on any web p
       </div>
     </div>
 
-
-
     <div class="container">
       <h2>📦 CDN Setup</h2>
       <div class="code-block">
-        <pre>
-<script src="https://unpkg.com/ui-comment-sdk@latest/dist/ui-comment-sdk.min.js"></script>
-<script>
-const sdkDemo = UICommentSDK.initCommentSDK({
-  projectId: "my-project",
-  theme: "light", // optional
-  onFetchJsonFile: async () => {
-    return await fetch("/api/comments.json").then(r => r.json());
+        <pre><span class="comment">// CDN Script</span>
+<span class="keyword">&lt;script</span> <span class="property">src</span>=<span class="string">"https://unpkg.com/ui-comment-sdk@latest/dist/ui-comment-sdk.min.js"</span><span class="keyword">&gt;&lt;/script&gt;</span>
+
+<span class="comment">// Init SDK</span>
+<span class="keyword">&lt;script&gt;</span>
+<span class="keyword">const</span> <span class="variable">sdkDemo</span> = <span class="function">UICommentSDK.initCommentSDK</span>({
+  <span class="property">projectId</span>: <span class="string">"my-project"</span>,
+  <span class="property">theme</span>: <span class="string">"light"</span>, <span class="comment">// optional</span>
+  <span class="property">onFetchJsonFile</span>: <span class="keyword">async</span> () =&gt; {
+    <span class="keyword">return</span> <span class="keyword">await</span> <span class="function">fetch</span>(<span class="string">"/api/comments.json"</span>).<span class="property">then</span>(<span class="variable">r</span> =&gt; <span class="variable">r</span>.<span class="property">json</span>());
   },
-  onUpdate: async (comments) => {
-    await fetch("/api/comments.json", {
-      method: "PUT",
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(comments)
+  <span class="property">onUpdate</span>: <span class="keyword">async</span> (<span class="variable">comments</span>) =&gt; {
+    <span class="keyword">await</span> <span class="function">fetch</span>(<span class="string">"/api/comments.json"</span>, {
+      <span class="property">method</span>: <span class="string">"PUT"</span>,
+      <span class="property">headers</span>: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
+      <span class="property">body</span>: <span class="function">JSON.stringify</span>(<span class="variable">comments</span>)
     });
   }
 });
-await sdkDemo.init();
-</script>
-</pre>
+<span class="keyword">await</span> <span class="variable">sdkDemo</span>.<span class="property">init</span>();
+<span class="keyword">&lt;/script&gt;</span></pre>
       </div>
     </div>
 
@@ -826,7 +782,7 @@ await sdkDemo.init();
             <h4>🎯 CDN Setup (Recommended)</h4>
             <p>Perfect for static websites and quick prototypes</p>
             <div class="code-block">
-              <pre><span class="keyword">&lt;script</span> <span class="property">src</span>=<span class="string">"https://cdn.jsdelivr.net/npm/ui-comment-sdk@latest/dist/ui-comment-sdk.min.js"</span><span class="keyword">&gt;&lt;/script&gt;</span></pre>
+              <pre><span class="keyword">&lt;script</span> <span class="property">src</span>=<span class="string">"https://unpkg.com/ui-comment-sdk@latest/dist/ui-comment-sdk.min.js"</span><span class="keyword">&gt;&lt;/script&gt;</span></pre>
             </div>
           </div>
 
@@ -849,265 +805,10 @@ await sdkDemo.init();
         shortcut (Ctrl+E).
       </div>
 
-    <!-- SDK script -->
+    <!-- SDK script - Use development build for debugging -->
+    <script src="../dist/index.umd.js"></script>
 
-    <script>
-      // JSONBin.io Configuration for Online Demo
-      const BIN_ID = "68724f7c520a0b7959385cb9";
-      const MASTER_KEY = "$2a$10$spXPIbtHsz.rbZrMYwrEMeTym8i4DzcmiBsiyyB.esXTvFPp0l3kq";
-  
-      // JSONBin.io API functions
-      async function fetchFromBin() {
-        try {
-          console.log("🔄 Fetching from JSONBin.io...");
-          const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-            headers: {
-              "X-Master-Key": MASTER_KEY,
-            },
-          });
-          console.log("📡 JSONBin response status:", response.status);
-  
-          if (!response.ok) {
-            if (response.status === 404) {
-              console.log("📭 Bin not found, returning empty data");
-              return { comments: [] };
-            }
-            throw new Error(
-              `JSONBin API error: ${response.status} ${response.statusText}`
-            );
-          }
-  
-          const data = await response.json();
-          const comments = data.record?.comments || [];
-          console.log("✅ Successfully fetched from JSONBin:", {
-            hasComments: !!comments,
-            commentCount: comments.length,
-            dataSize: JSON.stringify(data).length,
-          });
-          return { comments };
-        } catch (error) {
-          console.error("❌ Error fetching from JSONBin:", error);
-          // Return empty data on error
-          return { comments: [] };
-        }
-      }
-  
-      async function saveToBin(data) {
-        try {
-          console.log("💾 Saving to JSONBin.io...");
-          console.log("📊 Data to save:", {
-            commentCount: data.comments ? data.comments.length : 0,
-            dataSize: JSON.stringify(data).length,
-            hasAttachments: data.comments
-              ? data.comments.some(
-                  (c) => c.attachments && c.attachments.length > 0
-                )
-              : false,
-          });
-  
-          const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-            method: "PUT",
-            headers: {
-              "X-Master-Key": MASTER_KEY,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-          });
-  
-          console.log("📡 Save response status:", response.status);
-  
-          if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(
-              `JSONBin API error: ${response.status} ${response.statusText} - ${errorText}`
-            );
-          }
-  
-          const result = await response.json();
-          console.log("✅ Successfully saved to JSONBin");
-          return result;
-        } catch (error) {
-          console.error("❌ Error saving to JSONBin:", error);
-          throw error;
-        }
-      }
-  
-      // Initialize SDK with JSONBin.io
-      const sdk = UICommentSDK.initCommentSDK({
-        projectId: "online-demo",
-        theme: "light",
-  
-        onFetchJsonFile: async () => {
-          return await fetchFromBin();
-        },
-  
-        onUpdate: async (comments) => {
-          console.log("🔄 SDK onUpdate called with comments:", {
-            count: comments.length,
-            hasAttachments: comments.some(
-              (c) => c.attachments && c.attachments.length > 0
-            ),
-            attachmentsCount: comments.reduce(
-              (total, c) => total + (c.attachments ? c.attachments.length : 0),
-              0
-            ),
-            totalDataSize: JSON.stringify(comments).length,
-          });
-  
-          await saveToBin({ comments });
-        },
-      });
-  
-      sdk.init();
-    </script>
-    <script>
-      // Add event handlers
-      document
-        .getElementById("loadAllComments")
-        .addEventListener("click", utils.loadAll);
-      document
-        .getElementById("syncToFile")
-        .addEventListener("click", utils.syncToFile);
-      document
-        .getElementById("clearComments")
-        .addEventListener("click", utils.clearAll);
-
-      // Add localStorage utils event handlers
-      document
-        .getElementById("showLocalStorageData")
-        .addEventListener("click", () => {
-          localStorageUtils.displayAllData();
-        });
-
-      document
-        .getElementById("exportCommentsData")
-        .addEventListener("click", () => {
-          const exportData = localStorageUtils.exportCommentsData();
-          if (exportData) {
-            // Create download link
-            const blob = new Blob([exportData], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `uicm-comments-${
-              new Date().toISOString().split("T")[0]
-            }.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            console.log("📤 Comments data exported and downloaded");
-          } else {
-            console.log("📭 No comments data to export");
-          }
-        });
-
-      document
-        .getElementById("getCommentsData")
-        .addEventListener("click", () => {
-          const commentsData = localStorageUtils.getCommentsData();
-          if (commentsData) {
-            console.log("📂 Comments data from localStorage:", commentsData);
-            console.log("📊 Data structure:", {
-              type: typeof commentsData,
-              isArray: Array.isArray(commentsData),
-              length: Array.isArray(commentsData) ? commentsData.length : "N/A",
-              keys:
-                typeof commentsData === "object"
-                  ? Object.keys(commentsData)
-                  : "N/A",
-            });
-          } else {
-            console.log("📭 No comments data found in localStorage");
-          }
-        });
-
-      utils.showInstructions();
-
-      // Add a test comment with attachments for testing
-      setTimeout(() => {
-        const testComment = {
-          id: "test-comment-with-attachments",
-          content:
-            "This is a test comment with attachments and URLs: https://example.com",
-          xpath: "/html/body/div[1]/div[1]/h1",
-          url: window.location.href,
-          position: { x: 100, y: 100 },
-          relativePosition: { x: 0.5, y: 0.5 },
-          createdAt: new Date().toISOString(),
-          createdBy: { id: "test-user", name: "Test User", role: "developer" },
-          replies: [
-            {
-              id: "test-reply-with-attachments",
-              content: "This is a reply with attachments",
-              xpath: "/html/body/div[1]/div[1]/h1",
-              url: window.location.href,
-              position: { x: 100, y: 100 },
-              relativePosition: { x: 0.5, y: 0.5 },
-              createdAt: new Date().toISOString(),
-              createdBy: {
-                id: "test-user",
-                name: "Test User",
-                role: "developer",
-              },
-              replies: [],
-              status: "bug",
-              attachments: [
-                {
-                  id: "test-image-1",
-                  filename: "test-image.jpg",
-                  url: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzNiODJmNiIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlRlc3QgSW1hZ2U8L3RleHQ+PC9zdmc+",
-                  type: "image",
-                  size: 1024,
-                  uploadedAt: new Date().toISOString(),
-                },
-                {
-                  id: "test-file-1",
-                  filename: "test-document.pdf",
-                  url: "data:application/pdf;base64,JVBERi0xLjQKJcOkw7zDtsO8DQoxIDAgb2JqDQo8PA0KL1R5cGUgL0NhdGFsb2cNCi9QYWdlcyAyIDAgUg0KPj4NCmVuZG9iag0KMiAwIG9iag0KPDwNCi9UeXBlIC9QYWdlcw0KL0NvdW50IDENCi9LaWRzIFszIDAgUl0NCj4+DQplbmRvYmoNCjMgMCBvYmoNCjw8DQovVHlwZSAvUGFnZQ0KL1BhcmVudCAyIDAgUg0KL1Jlc291cmNlcyA8PA0KL0ZvbnQgPDwNCi9GMSA0IDAgUg0KPj4NCi9FeHRHU3RhdGUgPDwNCi9BdXRoIDUgMCBSDQo+Pg0KPj4NCi9NZWRpYUJveCBbMCAwIDU5NSA4NDJdDQovQ29udGVudHMgNiAwIFINCj4+DQplbmRvYmoNCjQgMCBvYmoNCjw8DQovVHlwZSAvRm9udA0KL1N1YnR5cGUgL1R5cGUxDQovQmFzZUZvbnQgL0hlbHZldGljYS1Cb2xkDQo+Pg0KZW5kb2JqDQo1IDAgb2JqDQo8PA0KL1R5cGUgL0V4dEdTdGF0ZQ0KL0NBIDENCi9jYSAxDQo+Pg0KZW5kb2JqDQo2IDAgb2JqDQo8PA0KL0xlbmd0aCAxNQ0KPj4NCnN0cmVhbQ0KQlQNCjEwMCA3MDAgVEQNCi9GMSAxMiBUZg0KVGVzdCBQREYgRmlsZQ0KRVQNCmVuZG9iag0KeHJlZg0KMCA3DQowMDAwMDAwMDAwIDY1NTM1IGYNCjAwMDAwMDAwMTAgMDAwMDAgbg0KMDAwMDAwMDA3OSAwMDAwMCBuDQowMDAwMDAwMTczIDAwMDAwIG4NCjAwMDAwMDAzMDIgMDAwMDAgbg0KMDAwMDAwMDM4MSAwMDAwMCBuDQowMDAwMDAwNDYwIDAwMDAwIG4NCnRyYWlsZXINCjw8DQovU2l6ZSA3DQovUm9vdCAxIDAgUg0KPj4NCnN0YXJ0eHJlZg0KNTI4DQolJUVPRg==",
-                  type: "file",
-                  size: 2048,
-                  uploadedAt: new Date().toISOString(),
-                },
-              ],
-              status: "bug",
-            },
-          ],
-          status: "bug",
-          attachments: [
-            {
-              id: "test-image-1",
-              filename: "test-image.jpg",
-              url: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzNiODJmNiIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlRlc3QgSW1hZ2U8L3RleHQ+PC9zdmc+",
-              type: "image",
-              size: 1024,
-              uploadedAt: new Date().toISOString(),
-            },
-            {
-              id: "test-file-1",
-              filename: "test-document.pdf",
-              url: "data:application/pdf;base64,JVBERi0xLjQKJcOkw7zDtsO8DQoxIDAgb2JqDQo8PA0KL1R5cGUgL0NhdGFsb2cNCi9QYWdlcyAyIDAgUg0KPj4NCmVuZG9iag0KMiAwIG9iag0KPDwNCi9UeXBlIC9QYWdlcw0KL0NvdW50IDENCi9LaWRzIFszIDAgUl0NCj4+DQplbmRvYmoNCjMgMCBvYmoNCjw8DQovVHlwZSAvUGFnZQ0KL1BhcmVudCAyIDAgUg0KL1Jlc291cmNlcyA8PA0KL0ZvbnQgPDwNCi9GMSA0IDAgUg0KPj4NCi9FeHRHU3RhdGUgPDwNCi9BdXRoIDUgMCBSDQo+Pg0KPj4NCi9NZWRpYUJveCBbMCAwIDU5NSA4NDJdDQovQ29udGVudHMgNiAwIFINCj4+DQplbmRvYmoNCjQgMCBvYmoNCjw8DQovVHlwZSAvRm9udA0KL1N1YnR5cGUgL1R5cGUxDQovQmFzZUZvbnQgL0hlbHZldGljYS1Cb2xkDQo+Pg0KZW5kb2JqDQo1IDAgb2JqDQo8PA0KL1R5cGUgL0V4dEdTdGF0ZQ0KL0NBIDENCi9jYSAxDQo+Pg0KZW5kb2JqDQo2IDAgb2JqDQo8PA0KL0xlbmd0aCAxNQ0KPj4NCnN0cmVhbQ0KQlQNCjEwMCA3MDAgVEQNCi9GMSAxMiBUZg0KVGVzdCBQREYgRmlsZQ0KRVQNCmVuZG9iag0KeHJlZg0KMCA3DQowMDAwMDAwMDAwIDY1NTM1IGYNCjAwMDAwMDAwMTAgMDAwMDAgbg0KMDAwMDAwMDA3OSAwMDAwMCBuDQowMDAwMDAwMTczIDAwMDAwIG4NCjAwMDAwMDAzMDIgMDAwMDAgbg0KMDAwMDAwMDM4MSAwMDAwMCBuDQowMDAwMDAwNDYwIDAwMDAwIG4NCnRyYWlsZXINCjw8DQovU2l6ZSA3DQovUm9vdCAxIDAgUg0KPj4NCnN0YXJ0eHJlZg0KNTI4DQolJUVPRg==",
-              type: "file",
-              size: 2048,
-              uploadedAt: new Date().toISOString(),
-            },
-          ],
-        };
-
-        // Add to local storage for testing
-        const existingComments = JSON.parse(
-          localStorage.getItem("uicm-demo-project") || "[]"
-        );
-        existingComments.push(testComment);
-        localStorage.setItem(
-          "uicm-demo-project",
-          JSON.stringify(existingComments)
-        );
-
-        console.log("🧪 Test comment with attachments added to storage");
-        console.log("📎 Test comment attachments:", testComment.attachments);
-      }, 1000);
-    </script>
+    <script>hljs.highlightAll();</script>
   </body>
  
 </html>

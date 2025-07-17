@@ -1,5 +1,7 @@
-import { CommentSidebar } from "../components/CommentSidebar";
 import { CommentModal } from "../components/CommentModal";
+import { CommentSidebar } from "../components/CommentSidebar";
+import { CommentsTable } from "../components/CommentsTable";
+import { CommentsTableButton } from "../components/CommentsTableButton";
 import { DebugIcon } from "../components/DebugIcon";
 import { SettingsButton } from "../components/SettingsButton";
 import { SidebarButton } from "../components/SidebarButton";
@@ -7,9 +9,8 @@ import {
   Comment,
   CommentManagerConfig,
   CommentSDKConfig,
-  User,
   CommentStatus,
-  CommentAttachment,
+  User,
 } from "../types";
 import { ensureSDKRoot } from "../utils/dom";
 import { userProfileStorage } from "../utils/userProfileStorage";
@@ -21,8 +22,10 @@ export class CommentSDK {
   private debugIcon!: DebugIcon;
   private settingsButton!: SettingsButton;
   private sidebarButton!: SidebarButton;
+  private commentsTableButton!: CommentsTableButton;
   private sidebar: CommentSidebar | null = null;
   private commentModal: CommentModal | null = null; // Add modal reference
+  private commentsTable: CommentsTable | null = null;
   private root!: HTMLElement;
   private isInitialized: boolean = false;
   private comments: Comment[] = [];
@@ -47,6 +50,41 @@ export class CommentSDK {
     }
 
     this.validateConfig();
+  }
+
+  private createCustomCursor(): string {
+    // SVG chỉ có icon 💬, không background
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+        <text x="20" y="28" font-size="24" text-anchor="middle" fill="#00bcd4" font-family="Arial" font-weight="bold">💬</text>
+      </svg>
+    `;
+    // Encode SVG cho data URL
+    const encodedSvg = encodeURIComponent(svg);
+    const dataUrl = `data:image/svg+xml,${encodedSvg}`;
+    return `url('${dataUrl}') 20 20, auto`;
+  }
+
+  private setCustomCursor(enable: boolean): void {
+    const cursor = enable ? this.createCustomCursor() : "";
+    document.body.style.cursor = cursor;
+    // Apply to all SDK layers that may override cursor
+    const layers = [
+      ".uicm-overlay",
+      ".uicm-comment-modal",
+      ".uicm-comment-form",
+      ".uicm-comment-bubble",
+      "#uicm-root",
+      "#uicm-highlight-layer",
+      "#uicm-interaction-layer",
+    ];
+    layers.forEach((sel) => {
+      document.querySelectorAll(sel).forEach((el) => {
+        if (el instanceof HTMLElement) {
+          el.style.cursor = cursor;
+        }
+      });
+    });
   }
 
   private validateConfig(): void {
@@ -76,10 +114,6 @@ export class CommentSDK {
         currentUser: this.currentUser,
         theme: this.config.theme,
         onLoadComments: async () => {
-          console.log(
-            "🔄 onLoadComments called - returning SDK comments:",
-            this.comments.length
-          );
           // Return SDK comments and sync to CommentManager
           return this.comments;
         },
@@ -91,18 +125,7 @@ export class CommentSDK {
             id: this.generateId(),
             createdAt: new Date().toISOString(),
           };
-          console.log("onSaveComment - SDK comments before push:", {
-            count: this.comments.length,
-            comments: this.comments.map((c) => ({
-              id: c.id,
-              content: c.content.substring(0, 30),
-            })),
-          });
           this.comments.push(newComment);
-          console.log(
-            "onSaveComment - SDK comments after push:",
-            this.comments.length
-          );
 
           await this.config.onUpdate(this.comments);
           return newComment;
@@ -152,16 +175,7 @@ export class CommentSDK {
   public syncCommentsFromManager(): void {
     if (this.commentManager) {
       const managerComments = this.commentManager.getComments();
-      console.log("🔄 Syncing comments from manager:", {
-        managerCommentsCount: managerComments.length,
-        sdkCommentsCount: this.comments.length,
-        managerComments: managerComments.map((c) => ({
-          id: c.id,
-          content: c.content.substring(0, 30),
-        })),
-      });
       this.comments = [...managerComments];
-      console.log("✅ Synced comments from manager:", this.comments.length);
     } else {
       console.warn("⚠️ CommentManager not available for sync");
     }
@@ -170,7 +184,6 @@ export class CommentSDK {
   // Load comments from API directly into SDK
   private async loadCommentsFromAPI(): Promise<void> {
     try {
-      console.log("🔄 Loading comments from API into SDK...");
       const data = await this.config.onFetchJsonFile();
       const allComments = data?.comments || [];
       const currentUrl = window.location.href;
@@ -180,15 +193,10 @@ export class CommentSDK {
         (comment) => comment.url === currentUrl
       );
 
-      console.log("📂 Loaded comments into SDK:", {
-        totalFromAPI: allComments.length,
-        filteredForCurrentURL: this.comments.length,
-        currentURL: currentUrl,
-        sdkComments: this.comments.map((c) => ({
-          id: c.id,
-          content: c.content.substring(0, 30) + "...",
-        })),
-      });
+      // Update comments count in table button
+      if (this.commentsTableButton) {
+        this.commentsTableButton.updateCommentsCount(this.comments.length);
+      }
     } catch (error) {
       console.error("Failed to load comments from API into SDK:", error);
     }
@@ -233,10 +241,19 @@ export class CommentSDK {
       isVisible: false,
     });
 
+    // Comments table button
+    this.commentsTableButton = new CommentsTableButton({
+      onClick: () => this.toggleCommentsTable(),
+      theme: this.config.theme!,
+      commentsCount: this.comments.length,
+      isVisible: false,
+    });
+
     // Add to DOM
     document.body.appendChild(this.debugIcon.getElement());
     document.body.appendChild(this.settingsButton.getElement());
     document.body.appendChild(this.sidebarButton.getElement());
+    document.body.appendChild(this.commentsTableButton.getElement());
   }
 
   private async toggleMode(): Promise<void> {
@@ -256,16 +273,12 @@ export class CommentSDK {
 
     await this.commentManager.setMode(newMode);
     this.debugIcon.updateState(newMode === "comment");
-
-    // Show sidebar and settings icons for keyboard shortcut too
     this.settingsButton.setVisible(newMode === "comment");
     this.sidebarButton.setVisible(newMode === "comment");
+    this.commentsTableButton.setVisible(newMode === "comment");
 
-    if (newMode === "comment") {
-      document.body.style.cursor = "crosshair";
-    } else {
-      document.body.style.cursor = "";
-    }
+    // Apply custom cursor
+    this.setCustomCursor(newMode === "comment");
   }
 
   public async setMode(mode: "normal" | "comment"): Promise<void> {
@@ -277,12 +290,10 @@ export class CommentSDK {
     this.debugIcon.updateState(mode === "comment");
     this.settingsButton.setVisible(mode === "comment");
     this.sidebarButton.setVisible(mode === "comment");
+    this.commentsTableButton.setVisible(mode === "comment");
 
-    if (mode === "comment") {
-      document.body.style.cursor = "crosshair";
-    } else {
-      document.body.style.cursor = "";
-    }
+    // Apply custom cursor
+    this.setCustomCursor(mode === "comment");
   }
 
   private openSidebar(): void {
@@ -316,15 +327,8 @@ export class CommentSDK {
   }
 
   private navigateToComment(comment: Comment): void {
-    console.log("🔧 SDK: Navigating to comment:", {
-      id: comment.id,
-      url: comment.url,
-      currentUrl: window.location.href,
-    });
-
     // Check if comment is from a different URL
     if (comment.url !== window.location.href) {
-      console.log("🔄 Comment is from different URL, navigating...");
       // Set a flag to indicate we're navigating from sidebar
       (window as any).uicmIsNavigatingFromSidebar = true;
 
@@ -354,7 +358,6 @@ export class CommentSDK {
       // Open comment modal
       this.openCommentModal(comment, element);
     } else {
-      console.warn("⚠️ Could not find element for comment:", comment.id);
       // Still try to open modal even if element not found
       this.openCommentModal(comment, null);
     }
@@ -440,6 +443,112 @@ export class CommentSDK {
     return `comment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
+  private toggleCommentsTable(): void {
+    console.log("🔄 Toggling CommentsTable...");
+
+    // If modal is already open, close it
+    if (this.commentsTable) {
+      console.log("📋 CommentsTable is open, closing...");
+      this.commentsTable.destroy();
+      this.commentsTable = null;
+
+      // Restore SDK cursor if in comment mode
+      if (this.commentManager.getMode() === "comment") {
+        this.setCustomCursor(true);
+        console.log("🖱️ Custom cursor restored");
+      }
+      return;
+    }
+
+    // Otherwise open the modal
+    this.openCommentsTable();
+  }
+
+  private openCommentsTable(): void {
+    console.log("🔄 Opening CommentsTable...");
+    console.log("📊 Total comments available:", this.comments.length);
+
+    // Close sidebar and comment modal if open
+    if (this.sidebar) {
+      this.sidebar.destroy();
+      this.sidebar = null;
+    }
+    if (this.commentModal) {
+      this.commentModal.destroy();
+      this.commentModal = null;
+    }
+
+    // Create and show comments table
+    this.commentsTable = new CommentsTable({
+      comments: this.comments,
+      currentUser: this.currentUser,
+      onClose: () => {
+        console.log("🔄 CommentsTable onClose callback triggered");
+
+        // Always remove modal from DOM if exists
+        if (this.commentsTable) {
+          const modalEl = this.commentsTable.getElement();
+          if (modalEl.parentNode) {
+            modalEl.parentNode.removeChild(modalEl);
+            console.log("✅ Modal removed from DOM by SDK");
+          }
+        }
+
+        // Restore SDK cursor if in comment mode
+        if (this.commentManager.getMode() === "comment") {
+          this.setCustomCursor(true);
+          console.log("🖱️ Custom cursor restored");
+        }
+
+        // Always set commentsTable = null
+        this.commentsTable = null;
+        console.log("✅ CommentsTable reference cleared");
+      },
+      onDeleteComments: async (commentIds: string[]) => {
+        // Remove comments from array
+        this.comments = this.comments.filter(
+          (comment) => !commentIds.includes(comment.id)
+        );
+
+        // Update via API
+        await this.config.onUpdate(this.comments);
+
+        // Update comments count in button
+        this.commentsTableButton.updateCommentsCount(this.comments.length);
+
+        // Update comment manager
+        if (this.commentManager) {
+          await this.commentManager.loadComments();
+        }
+      },
+      onUpdateComment: async (updatedComment: Comment) => {
+        // Update local array
+        const index = this.comments.findIndex(
+          (c) => c.id === updatedComment.id
+        );
+        if (index !== -1) {
+          this.comments[index] = updatedComment;
+          await this.config.onUpdate(this.comments);
+
+          // Update comment manager
+          if (this.commentManager) {
+            await this.commentManager.loadComments();
+          }
+        }
+      },
+    });
+
+    document.body.appendChild(this.commentsTable.getElement());
+    // Set cursor: auto for modal and all children
+    const modal = this.commentsTable.getElement();
+    modal.style.cursor = "auto";
+    modal.querySelectorAll("*").forEach((el) => {
+      (el as HTMLElement).style.cursor = "auto";
+    });
+    // Also set body cursor to auto while modal is open
+    document.body.style.cursor = "auto";
+  }
+
   public destroy(): void {
     if (this.sidebar) {
       this.sidebar.destroy();
@@ -450,6 +559,10 @@ export class CommentSDK {
     if (this.commentModal) {
       this.commentModal.destroy();
       this.commentModal = null;
+    }
+    if (this.commentsTable) {
+      this.commentsTable.destroy();
+      this.commentsTable = null;
     }
     this.isInitialized = false;
   }
@@ -467,12 +580,10 @@ export class CommentSDK {
     const hash = window.location.hash;
     if (hash && hash.startsWith("#comment-")) {
       const commentId = hash.substring(9); // Remove '#comment-' prefix
-      console.log("🔧 SDK: Found comment ID in hash:", commentId);
 
       // Find the comment
       const comment = this.comments.find((c) => c.id === commentId);
       if (comment) {
-        console.log("🔧 SDK: Found comment, opening modal...");
         // Clear the hash
         window.location.hash = "";
 
