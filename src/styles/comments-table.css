@@ -289,10 +289,10 @@
 
 .uicm-comments-table th,
 .uicm-comments-table td {
-  padding: 12px 8px;
-  text-align: left;
+  padding: 14px 8px;
+  text-align: center;
   border-bottom: 1px solid #e5e7eb;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 .uicm-comments-table th {

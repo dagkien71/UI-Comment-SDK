@@ -2268,8 +2268,12 @@ class CommentsTable {
                   Date Created
                   <span class="sort-indicator">↓</span>
                 </th>
+                <th class="sortable" data-key="role">
+                  Role
+                  <span class="sort-indicator"></span>
+                </th>
                 <th class="sortable" data-key="author">
-                  Author
+                  Name
                   <span class="sort-indicator"></span>
                 </th>
                 <th class="sortable" data-key="status">
@@ -2345,6 +2349,10 @@ class CommentsTable {
                 case "author":
                     aValue = a.createdBy.name;
                     bValue = b.createdBy.name;
+                    break;
+                case "role":
+                    aValue = a.createdBy.role || "other";
+                    bValue = b.createdBy.role || "other";
                     break;
                 case "statusText":
                     aValue = this.getStatusDisplayName(a.status);
@@ -2456,9 +2464,11 @@ class CommentsTable {
         <input type="checkbox" class="uicm-comment-select" ${isSelected ? "checked" : ""}>
       </td>
       <td class="date-cell">${formattedDate}</td>
+      <td class="role-cell">
+        <span class="author-role" style="color: ${roleColor}">${getRoleDisplayName(comment.createdBy.role || "other")}</span>
+      </td>
       <td class="author-cell">
-        <span class="author-name" style="color: ${roleColor}">${comment.createdBy.name}</span>
-        <small class="author-role">${getRoleDisplayName(comment.createdBy.role || "other")}</small>
+        <span class="author-name">${comment.createdBy.name}</span>
       </td>
       <td class="status-cell">
         <span class="status-badge" style="background-color: ${statusColor}">${statusName}</span>
@@ -2470,14 +2480,16 @@ class CommentsTable {
         row.appendChild(attachmentsCell);
         row.innerHTML += `
       <td class="url-cell">
-        <span class="url-text" title="${comment.url}">${this.truncateText(comment.url, 50)}</span>
+        <span class="url-text" title="${comment.url}" style="display:inline-block; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle;">${comment.url}</span>
       </td>
       <td class="replies-cell">
         <span class="replies-count">${comment.replies.length}</span>
       </td>
       <td class="actions-cell">
         <button class="uicm-edit-comment" data-comment-id="${comment.id}" style="display: none;" disabled>Edit</button>
-        <button class="uicm-delete-comment uicm-allow-bubble" data-comment-id="${comment.id}">Delete</button>
+        <button class="uicm-delete-comment uicm-allow-bubble" data-comment-id="${comment.id}" title="Delete">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;"><path d="M6 8V15M10 8V15M14 8V15M3 5H17M8 5V3.5C8 2.67157 8.67157 2 9.5 2H10.5C11.3284 2 12 2.67157 12 3.5V5M4 5V16.5C4 17.3284 4.67157 18 5.5 18H14.5C15.3284 18 16 17.3284 16 16.5V5" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </td>
     `;
         return row;
@@ -2818,27 +2830,31 @@ class CommentsTable {
 }
 function exportCommentsToCSV(comments, filename = "comments_export.csv", options = { separator: "," }, onError) {
     try {
-        // Validate input
         if (!comments || !Array.isArray(comments) || comments.length === 0) {
             const msg = "Không có dữ liệu hợp lệ để xuất!";
             onError?.(msg);
             alert(msg);
             return;
         }
-        // Normalize data
+        // Only export the required fields in the specified order
         const data = comments.map((c) => ({
-            ID: c?.id ?? "",
+            "Created Date": c?.createdAt
+                ? (() => {
+                    const d = new Date(c.createdAt);
+                    const pad = (n) => n.toString().padStart(2, "0");
+                    return `${pad(d.getHours())}:${pad(d.getMinutes())}, ${pad(d.getDate())} ${pad(d.getMonth() + 1)} ${d.getFullYear()}`;
+                })()
+                : "",
             Content: c?.content ?? "",
-            Author: c?.createdBy?.name ?? "",
-            Role: c?.createdBy?.role ?? "",
+            Name: c?.createdBy?.name ?? "",
+            Role: typeof getRoleDisplayName === "function"
+                ? getRoleDisplayName(c?.createdBy?.role || "other")
+                : c?.createdBy?.role || "",
             Status: c?.status ?? "",
-            "Created Date": c?.createdAt ? new Date(c.createdAt).toISOString() : "",
-            URL: c?.url ?? "",
-            "Replies Count": Array.isArray(c?.replies) ? c.replies.length : 0,
             Attachments: Array.isArray(c?.attachments)
                 ? c.attachments.map((a) => a.filename).join("; ")
                 : "",
-            XPath: c?.xpath ?? "",
+            URL: c?.url ?? "",
         }));
         if (!data.length) {
             const msg = "Không có dữ liệu hợp lệ để xuất!";
@@ -2846,31 +2862,35 @@ function exportCommentsToCSV(comments, filename = "comments_export.csv", options
             alert(msg);
             return;
         }
-        // Escape CSV values
         const escapeCsvValue = (value) => {
             if (value == null)
                 return "";
             const str = String(value)
-                .replace(/"/g, '""') // Thoát dấu ngoặc kép
-                .replace(/^([=+\-@])/g, "'$1"); // Ngăn CSV injection
+                .replace(/"/g, '""')
+                .replace(/^([=+\-@])/g, "'$1");
             return `"${str.replace(/\n/g, " ")}"`;
         };
-        // Create CSV
         const separator = options.separator || ",";
-        const headers = Object.keys(data[0]);
+        const headers = [
+            "Created Date",
+            "Content",
+            "Name",
+            "Role",
+            "Status",
+            "Attachments",
+            "URL",
+        ];
         const csvRows = [headers.join(separator)];
         for (const row of data) {
             const values = headers.map((h) => escapeCsvValue(row[h]));
             csvRows.push(values.join(separator));
         }
-        // Add UTF-8 BOM for Excel compatibility
         const BOM = "\uFEFF";
         const csvString = BOM + csvRows.join("\n");
-        console.log("Nội dung CSV:", csvString); // Debug nội dung
-        // Create and download file
+        console.log("Nội dung CSV:", csvString);
         const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
         const blobUrl = URL.createObjectURL(blob);
-        console.log("URL Blob:", blobUrl); // Debug URL
+        console.log("URL Blob:", blobUrl);
         const safeFilename = filename.endsWith(".csv")
             ? filename
             : `${filename}.csv`;
@@ -2879,7 +2899,7 @@ function exportCommentsToCSV(comments, filename = "comments_export.csv", options
         a.download = safeFilename;
         document.body.appendChild(a);
         a.addEventListener("click", (e) => {
-            e.stopPropagation(); // Ngăn sự kiện nhấp chuột lan đến globalClickHandler
+            e.stopPropagation();
         });
         a.click();
         document.body.removeChild(a);
@@ -4985,6 +5005,19 @@ function isElementValid(element) {
         getComputedStyle(element).visibility !== "hidden");
 }
 
+function normalizeUrl$1(url) {
+    try {
+        const u = new URL(url);
+        u.hash = "";
+        let norm = u.origin + u.pathname;
+        if (norm.endsWith("/"))
+            norm = norm.slice(0, -1);
+        return norm;
+    }
+    catch {
+        return url;
+    }
+}
 class CommentManager {
     constructor(config, root) {
         this.comments = [];
@@ -5343,10 +5376,6 @@ class CommentManager {
         const globalClickHandler = (e) => {
             // Check if click is outside modal/form
             const target = e.target;
-            // Ignore if click is on an element with 'uicm-allow-bubble' class (for export/download, etc.)
-            if (target && target.closest(".uicm-allow-bubble")) {
-                return;
-            }
             const isInsideModal = target &&
                 this.activeModal &&
                 this.activeModal.getElement &&
@@ -5684,9 +5713,9 @@ class CommentManager {
             // Try to load from API first
             const data = await this.config.onFetchJsonFile?.();
             const allComments = data?.comments || [];
-            const currentUrl = this.getCurrentUrl();
+            const currentUrl = normalizeUrl$1(this.getCurrentUrl());
             // Filter comments to only show those from the current URL
-            this.comments = allComments.filter((comment) => comment.url === currentUrl);
+            this.comments = allComments.filter((comment) => normalizeUrl$1(comment.url) === currentUrl);
             console.log("📂 Loaded comments from API:", {
                 totalFromAPI: allComments.length,
                 filteredForCurrentURL: this.comments.length,
@@ -5696,8 +5725,8 @@ class CommentManager {
                     content: c.content.substring(0, 30) + "...",
                 })),
             });
-            // Save to localStorage as backup (only once when loading)
-            this.saveCommentsToLocalStorage(this.comments);
+            // Luôn cập nhật lại localStorage với toàn bộ comment mới nhất từ API
+            this.saveCommentsToLocalStorage(allComments);
             // Clear existing bubbles before creating new ones
             this.clearAllBubbles();
             // Create bubbles for all comments
@@ -5728,9 +5757,9 @@ class CommentManager {
             // Fallback to localStorage when API fails
             try {
                 const localComments = this.loadCommentsFromLocalStorage();
-                const currentUrl = this.getCurrentUrl();
+                const currentUrl = normalizeUrl$1(this.getCurrentUrl());
                 // Filter comments to only show those from the current URL
-                this.comments = localComments.filter((comment) => comment.url === currentUrl);
+                this.comments = localComments.filter((comment) => normalizeUrl$1(comment.url) === currentUrl);
                 // Clear existing bubbles before creating new ones
                 this.clearAllBubbles();
                 // Create bubbles for all comments
@@ -5934,6 +5963,19 @@ class CommentManager {
     }
 }
 
+function normalizeUrl(url) {
+    try {
+        const u = new URL(url);
+        u.hash = "";
+        let norm = u.origin + u.pathname;
+        if (norm.endsWith("/"))
+            norm = norm.slice(0, -1);
+        return norm;
+    }
+    catch {
+        return url;
+    }
+}
 class CommentSDK {
     constructor(config) {
         this.sidebar = null;
@@ -6015,31 +6057,51 @@ class CommentSDK {
                 theme: this.config.theme,
                 onLoadComments: async () => {
                     // Return SDK comments and sync to CommentManager
+                    console.log("🔄 onLoadComments callback triggered");
+                    console.log("📊 Total comments available:", this.comments.length);
                     return this.comments;
                 },
                 onSaveComment: async (commentData) => {
+                    // Luôn fetch lại comment mới nhất từ API
+                    const data = await this.config.onFetchJsonFile();
+                    const allComments = data?.comments || [];
+                    const currentUrl = normalizeUrl(window.location.href);
+                    // Lọc comment cho đúng URL
+                    const filteredComments = allComments.filter((c) => normalizeUrl(c.url) === currentUrl);
+                    // Tạo comment mới
                     const newComment = {
                         ...commentData,
                         id: this.generateId(),
                         createdAt: new Date().toISOString(),
                     };
-                    this.comments.push(newComment);
-                    await this.config.onUpdate(this.comments);
+                    // Gộp vào danh sách
+                    const updatedComments = [...filteredComments, newComment];
+                    this.comments = updatedComments;
+                    await this.config.onUpdate(updatedComments);
                     return newComment;
                 },
                 onUpdateComment: async (updatedComment) => {
-                    // Update local array
-                    const index = this.comments.findIndex((c) => c.id === updatedComment.id);
-                    if (index !== -1) {
-                        this.comments[index] = updatedComment;
-                        // Always use onUpdate to send complete JSON
-                        await this.config.onUpdate(this.comments);
-                    }
+                    // Luôn fetch lại comment mới nhất từ API
+                    const data = await this.config.onFetchJsonFile();
+                    const allComments = data?.comments || [];
+                    const currentUrl = normalizeUrl(window.location.href);
+                    const filteredComments = allComments.filter((c) => normalizeUrl(c.url) === currentUrl);
+                    // Update comment trong danh sách
+                    const updatedComments = filteredComments.map((c) => c.id === updatedComment.id ? updatedComment : c);
+                    this.comments = updatedComments;
+                    await this.config.onUpdate(updatedComments);
                     return updatedComment;
                 },
                 onDeleteComment: async (commentId) => {
-                    this.comments = this.comments.filter((c) => c.id !== commentId);
-                    await this.config.onUpdate(this.comments);
+                    // Luôn fetch lại comment mới nhất từ API
+                    const data = await this.config.onFetchJsonFile();
+                    const allComments = data?.comments || [];
+                    const currentUrl = normalizeUrl(window.location.href);
+                    const filteredComments = allComments.filter((c) => normalizeUrl(c.url) === currentUrl);
+                    // Xóa comment khỏi danh sách
+                    const updatedComments = filteredComments.filter((c) => c.id !== commentId);
+                    this.comments = updatedComments;
+                    await this.config.onUpdate(updatedComments);
                 },
                 onFetchJsonFile: this.config.onFetchJsonFile,
                 onToggleModeSilent: async () => {
@@ -6076,9 +6138,7 @@ class CommentSDK {
         try {
             const data = await this.config.onFetchJsonFile();
             const allComments = data?.comments || [];
-            const currentUrl = window.location.href;
-            // Filter comments to only show those from the current URL
-            this.comments = allComments.filter((comment) => comment.url === currentUrl);
+            this.comments = allComments; // Lưu tất cả comments
             // Update comments count in table button
             if (this.commentsTableButton) {
                 this.commentsTableButton.updateCommentsCount(this.comments.length);
@@ -6195,7 +6255,7 @@ class CommentSDK {
     }
     navigateToComment(comment) {
         // Check if comment is from a different URL
-        if (comment.url !== window.location.href) {
+        if (normalizeUrl(comment.url) !== normalizeUrl(window.location.href)) {
             // Set a flag to indicate we're navigating from sidebar
             window.uicmIsNavigatingFromSidebar = true;
             // Navigate to the comment's URL with hash for comment ID
@@ -6449,7 +6509,7 @@ styleInject(css_248z$3);
 var css_248z$2 = "/* Sidebar Button */\n.uicm-sidebar-button {\n  position: fixed;\n  bottom: 80px;\n  right: 20px;\n  width: 48px;\n  height: 48px;\n  border-radius: 50%;\n  background: white;\n  border: 2px solid #e5e7eb;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #6b7280;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),\n    0 2px 4px -1px rgba(0, 0, 0, 0.06);\n  z-index: 9999999999999;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto,\n    \"Helvetica Neue\", Arial, sans-serif;\n  opacity: 1;\n  transform: scale(1) translateY(0);\n}\n\n.uicm-sidebar-button[style*=\"display: none\"] {\n  opacity: 0;\n  transform: scale(0.8) translateY(20px);\n  pointer-events: none;\n}\n\n.uicm-sidebar-button:hover {\n  background: #f9fafb;\n  border-color: #d1d5db;\n  color: #374151;\n  transform: scale(1.05);\n  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),\n    0 4px 6px -2px rgba(0, 0, 0, 0.05);\n}\n\n.uicm-sidebar-button:active {\n  transform: scale(0.95);\n}\n\n.uicm-sidebar-button:focus {\n  outline: none;\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n}\n\n/* Sidebar Icon */\n.uicm-sidebar-icon {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 100%;\n  height: 100%;\n}\n\n.uicm-list-icon {\n  font-size: 20px;\n  line-height: 1;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 20px;\n  height: 20px;\n  color: inherit;\n  transition: transform 0.3s ease;\n}\n\n.uicm-sidebar-button:hover .uicm-list-icon {\n  transform: scale(1.1);\n}\n\n/* Dark theme support */\n@media (prefers-color-scheme: dark) {\n  .uicm-sidebar-button {\n    background: #374151;\n    border-color: #4b5563;\n    color: #d1d5db;\n  }\n\n  .uicm-sidebar-button:hover {\n    background: #4b5563;\n    border-color: #6b7280;\n    color: #f9fafb;\n  }\n\n  .uicm-sidebar-button:focus {\n    border-color: #60a5fa;\n    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);\n  }\n}\n\n/* Mobile responsiveness */\n@media (max-width: 640px) {\n  .uicm-sidebar-button {\n    bottom: 76px;\n    right: 16px;\n    width: 44px;\n    height: 44px;\n  }\n\n  .uicm-list-icon {\n    font-size: 18px;\n    width: 18px;\n    height: 18px;\n  }\n}\n";
 styleInject(css_248z$2);
 
-var css_248z$1 = "/* Comments Table Modal */\n.uicm-comments-table-modal {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100vw;\n  height: 100vh;\n  z-index: 10000000;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif;\n  color: #222;\n}\n\n.uicm-comments-table-overlay {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background-color: rgba(0, 0, 0, 0.5);\n  backdrop-filter: blur(4px);\n}\n\n.uicm-comments-table-container {\n  position: relative;\n  width: 95vw;\n  max-width: 1400px;\n  height: 90vh;\n  background: #fff;\n  border-radius: 12px;\n  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),\n    0 10px 10px -5px rgba(0, 0, 0, 0.04);\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n}\n\n/* Header */\n.uicm-comments-table-header {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 20px 24px;\n  border-bottom: 1px solid #e5e7eb;\n  background: #f9fafb;\n}\n\n.uicm-comments-table-header h2 {\n  margin: 0;\n  font-size: 1.5rem;\n  font-weight: 600;\n  color: #111827;\n}\n\n.uicm-comments-table-close {\n  background: none;\n  border: none;\n  font-size: 24px;\n  cursor: pointer;\n  padding: 8px;\n  border-radius: 6px;\n  color: #6b7280;\n  transition: all 0.2s;\n}\n\n.uicm-comments-table-close:hover {\n  background-color: #f3f4f6;\n  color: #374151;\n}\n\n/* Toolbar */\n.uicm-comments-table-toolbar {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 16px 24px;\n  border-bottom: 1px solid #e5e7eb;\n  background: white;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n\n.uicm-comments-table-filters {\n  display: flex;\n  align-items: center;\n  gap: 18px;\n  flex-wrap: wrap;\n  padding: 4px 0;\n}\n\n.uicm-comments-table-actions {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n}\n\n/* Filter Controls */\n.uicm-search-input,\n.uicm-status-filter,\n.uicm-date-start,\n.uicm-date-end {\n  height: 40px;\n  min-width: 140px;\n  padding: 0 14px;\n  border: 1.5px solid #d1d5db;\n  border-radius: 999px;\n  font-size: 15px;\n  background: #f9fafb;\n  color: #374151;\n  transition: border-color 0.2s, box-shadow 0.2s;\n  box-shadow: 0 1px 2px rgba(59, 130, 246, 0.03);\n  outline: none;\n  appearance: none;\n  margin: 0;\n  box-sizing: border-box;\n}\n\n.uicm-search-input {\n  min-width: 220px;\n  padding-left: 38px;\n  background-image: url('data:image/svg+xml;utf8,<svg fill=\"none\" stroke=\"%239ca3af\" stroke-width=\"2\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"M21 21l-4.35-4.35\"/></svg>');\n  background-repeat: no-repeat;\n  background-position: 12px center;\n  background-size: 18px 18px;\n}\n\n.uicm-status-filter {\n  min-width: 140px;\n  padding-right: 32px;\n  background-image: url('data:image/svg+xml;utf8,<svg fill=\"none\" stroke=\"%239ca3af\" stroke-width=\"2\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M19 9l-7 7-7-7\"/></svg>');\n  background-repeat: no-repeat;\n  background-position: right 12px center;\n  background-size: 18px 18px;\n}\n\n.uicm-search-input:focus,\n.uicm-status-filter:focus,\n.uicm-date-start:focus,\n.uicm-date-end:focus {\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n  background: #fff;\n}\n\n.uicm-search-input:hover,\n.uicm-status-filter:hover,\n.uicm-date-start:hover,\n.uicm-date-end:hover {\n  border-color: #a5b4fc;\n}\n\n.uicm-date-start,\n.uicm-date-end {\n  min-width: 120px;\n}\n\n/* Remove default arrow for select (for Chrome) */\n.uicm-status-filter::-ms-expand {\n  display: none;\n}\n.uicm-status-filter {\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n}\n\n.uicm-clear-filters,\n.uicm-delete-selected,\n.uicm-export-excel,\n.uicm-edit-comment,\n.uicm-delete-comment {\n  font-weight: 600;\n  border-radius: 8px;\n  min-width: 90px;\n  height: 38px;\n  letter-spacing: 0.01em;\n  padding: 0 18px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  box-sizing: border-box;\n  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);\n  outline: none;\n  border-width: 1.5px;\n}\n\n.uicm-clear-filters {\n  background: #f3f4f6;\n  color: #374151;\n  border: 1.5px solid #d1d5db;\n}\n.uicm-clear-filters:hover {\n  background: #e5e7eb;\n  color: #111827;\n  border-color: #9ca3af;\n  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.07);\n}\n.uicm-clear-filters:active {\n  background: #d1d5db;\n  color: #111827;\n}\n\n.uicm-delete-selected {\n  background: #ef4444;\n  color: #fff;\n  border: 1.5px solid #ef4444;\n  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);\n}\n.uicm-delete-selected:hover:not(:disabled) {\n  background: #dc2626;\n  border-color: #dc2626;\n  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.13);\n}\n.uicm-delete-selected:active {\n  background: #b91c1c;\n  border-color: #b91c1c;\n}\n.uicm-delete-selected:disabled {\n  opacity: 0.7;\n  cursor: not-allowed;\n  box-shadow: none;\n}\n\n.uicm-export-excel {\n  background: #10b981;\n  color: #fff;\n  border: 1.5px solid #10b981;\n  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);\n}\n.uicm-export-excel:hover {\n  background: #059669;\n  border-color: #059669;\n  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.13);\n}\n.uicm-export-excel:active {\n  background: #047857;\n  border-color: #047857;\n}\n\n.uicm-edit-comment {\n  background: #f3f4f6;\n  color: #2563eb;\n  border: 1.5px solid #d1d5db;\n  margin-right: 6px;\n}\n.uicm-edit-comment:hover {\n  background: #dbeafe;\n  color: #1d4ed8;\n  border-color: #60a5fa;\n  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.07);\n}\n.uicm-edit-comment:active {\n  background: #bfdbfe;\n  color: #1e40af;\n}\n\n.uicm-delete-comment {\n  background: #fee2e2;\n  color: #dc2626;\n  border: 1.5px solid #fecaca;\n}\n.uicm-delete-comment:hover {\n  background: #fecaca;\n  color: #b91c1c;\n  border-color: #f87171;\n  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.07);\n}\n.uicm-delete-comment:active {\n  background: #fca5a5;\n  color: #991b1b;\n}\n\n/* Table Container */\n.uicm-comments-table-wrapper {\n  flex: 1;\n  overflow: auto;\n  padding: 0 24px;\n}\n\n/* Table */\n.uicm-comments-table {\n  width: 100%;\n  border-collapse: collapse;\n  margin: 0;\n}\n\n.uicm-comments-table th,\n.uicm-comments-table td {\n  padding: 12px 8px;\n  text-align: left;\n  border-bottom: 1px solid #e5e7eb;\n  vertical-align: top;\n}\n\n.uicm-comments-table th {\n  background-color: #f9fafb;\n  font-weight: 600;\n  color: #222;\n  position: sticky;\n  top: 0;\n  z-index: 10;\n}\n\n.uicm-comments-table th.sortable {\n  cursor: pointer;\n  user-select: none;\n  transition: background-color 0.2s;\n}\n\n.uicm-comments-table th.sortable:hover {\n  background-color: #f3f4f6;\n}\n\n.sort-indicator {\n  margin-left: 4px;\n  color: #3b82f6;\n  font-weight: bold;\n}\n\n/* Table Rows */\n.uicm-comment-row {\n  transition: background-color 0.2s;\n}\n\n.uicm-comment-row:hover {\n  background-color: #f9fafb;\n}\n\n/* Table Cells */\n.date-cell {\n  min-width: 140px;\n  font-size: 13px;\n  color: #6b7280;\n}\n\n.author-cell {\n  min-width: 120px;\n}\n\n.author-name {\n  display: block;\n  font-weight: 500;\n  font-size: 14px;\n}\n\n.author-role {\n  display: block;\n  font-size: 12px;\n  color: #6b7280;\n  margin-top: 2px;\n}\n\n.status-cell {\n  min-width: 120px;\n}\n\n.status-badge {\n  display: inline-block;\n  padding: 4px 8px;\n  border-radius: 12px;\n  font-size: 12px;\n  font-weight: 500;\n  color: white;\n  text-transform: capitalize;\n}\n\n.content-cell {\n  max-width: 300px;\n  min-width: 200px;\n}\n\n.comment-content {\n  font-size: 14px;\n  line-height: 1.4;\n  margin-bottom: 4px;\n  word-break: break-word;\n}\n\n.attachment-count {\n  font-size: 12px;\n  color: #6b7280;\n  background: #f3f4f6;\n  padding: 2px 6px;\n  border-radius: 4px;\n  display: inline-block;\n}\n\n.url-cell {\n  max-width: 200px;\n  min-width: 150px;\n}\n\n.url-text {\n  font-size: 13px;\n  color: #6b7280;\n  word-break: break-all;\n}\n\n.replies-cell {\n  text-align: center;\n  width: 60px;\n}\n\n.replies-count {\n  display: inline-block;\n  background: #e5e7eb;\n  color: #374151;\n  padding: 2px 6px;\n  border-radius: 12px;\n  font-size: 12px;\n  font-weight: 500;\n  min-width: 20px;\n}\n\n.actions-cell {\n  min-width: 120px;\n  white-space: nowrap;\n}\n\n/* Checkboxes */\n.uicm-select-all,\n.uicm-comment-select {\n  width: 16px;\n  height: 16px;\n  cursor: pointer;\n}\n\n/* Footer */\n.uicm-comments-table-footer {\n  padding: 16px 24px;\n  border-top: 1px solid #e5e7eb;\n  background: #f9fafb;\n}\n\n.uicm-comments-count {\n  font-size: 14px;\n  color: #6b7280;\n}\n\n.total-count,\n.selected-count {\n  font-weight: 600;\n  color: #374151;\n}\n\n.uicm-status-badge {\n  display: inline-block;\n  min-width: 70px;\n  padding: 4px 12px;\n  border-radius: 999px;\n  font-size: 13px;\n  font-weight: 700;\n  color: #fff !important;\n  text-align: center;\n  background: #6b7280;\n}\n.uicm-status-badge[data-status=\"bug\"] {\n  background: #ef4444;\n}\n.uicm-status-badge[data-status=\"feature_request\"] {\n  background: #f59e0b;\n}\n.uicm-status-badge[data-status=\"dev_completed\"] {\n  background: #3b82f6;\n}\n.uicm-status-badge[data-status=\"done\"] {\n  background: #10b981;\n}\n.uicm-status-badge[data-status=\"archived\"] {\n  background: #6b7280;\n}\n\n/* Responsive */\n@media (max-width: 1200px) {\n  .uicm-comments-table-container {\n    width: 98vw;\n    height: 95vh;\n  }\n\n  .uicm-comments-table-toolbar {\n    flex-direction: column;\n    align-items: stretch;\n  }\n\n  .uicm-comments-table-filters,\n  .uicm-comments-table-actions {\n    justify-content: center;\n  }\n}\n\n@media (max-width: 768px) {\n  .uicm-comments-table-header {\n    padding: 16px;\n  }\n\n  .uicm-comments-table-toolbar {\n    padding: 12px 16px;\n  }\n\n  .uicm-comments-table-wrapper {\n    padding: 0 16px;\n  }\n\n  .uicm-comments-table th,\n  .uicm-comments-table td {\n    padding: 8px 4px;\n    font-size: 13px;\n  }\n\n  .content-cell {\n    max-width: 200px;\n    min-width: 150px;\n  }\n\n  .url-cell {\n    max-width: 120px;\n    min-width: 100px;\n  }\n\n  /* Responsive: stack filters on mobile */\n  .uicm-comments-table-filters {\n    flex-direction: column;\n    align-items: stretch;\n    gap: 10px;\n    padding: 0;\n  }\n  .uicm-search-input,\n  .uicm-status-filter,\n  .uicm-date-start,\n  .uicm-date-end {\n    min-width: 0;\n    width: 100%;\n    font-size: 15px;\n  }\n}\n\n/* Responsive button spacing */\n@media (max-width: 600px) {\n  .uicm-clear-filters,\n  .uicm-delete-selected,\n  .uicm-export-excel,\n  .uicm-edit-comment,\n  .uicm-delete-comment {\n    min-width: 70px;\n    font-size: 13px;\n    padding: 0 10px;\n    height: 34px;\n  }\n}\n";
+var css_248z$1 = "/* Comments Table Modal */\n.uicm-comments-table-modal {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100vw;\n  height: 100vh;\n  z-index: 10000000;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif;\n  color: #222;\n}\n\n.uicm-comments-table-overlay {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background-color: rgba(0, 0, 0, 0.5);\n  backdrop-filter: blur(4px);\n}\n\n.uicm-comments-table-container {\n  position: relative;\n  width: 95vw;\n  max-width: 1400px;\n  height: 90vh;\n  background: #fff;\n  border-radius: 12px;\n  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),\n    0 10px 10px -5px rgba(0, 0, 0, 0.04);\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n}\n\n/* Header */\n.uicm-comments-table-header {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 20px 24px;\n  border-bottom: 1px solid #e5e7eb;\n  background: #f9fafb;\n}\n\n.uicm-comments-table-header h2 {\n  margin: 0;\n  font-size: 1.5rem;\n  font-weight: 600;\n  color: #111827;\n}\n\n.uicm-comments-table-close {\n  background: none;\n  border: none;\n  font-size: 24px;\n  cursor: pointer;\n  padding: 8px;\n  border-radius: 6px;\n  color: #6b7280;\n  transition: all 0.2s;\n}\n\n.uicm-comments-table-close:hover {\n  background-color: #f3f4f6;\n  color: #374151;\n}\n\n/* Toolbar */\n.uicm-comments-table-toolbar {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 16px 24px;\n  border-bottom: 1px solid #e5e7eb;\n  background: white;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n\n.uicm-comments-table-filters {\n  display: flex;\n  align-items: center;\n  gap: 18px;\n  flex-wrap: wrap;\n  padding: 4px 0;\n}\n\n.uicm-comments-table-actions {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n}\n\n/* Filter Controls */\n.uicm-search-input,\n.uicm-status-filter,\n.uicm-date-start,\n.uicm-date-end {\n  height: 40px;\n  min-width: 140px;\n  padding: 0 14px;\n  border: 1.5px solid #d1d5db;\n  border-radius: 999px;\n  font-size: 15px;\n  background: #f9fafb;\n  color: #374151;\n  transition: border-color 0.2s, box-shadow 0.2s;\n  box-shadow: 0 1px 2px rgba(59, 130, 246, 0.03);\n  outline: none;\n  appearance: none;\n  margin: 0;\n  box-sizing: border-box;\n}\n\n.uicm-search-input {\n  min-width: 220px;\n  padding-left: 38px;\n  background-image: url('data:image/svg+xml;utf8,<svg fill=\"none\" stroke=\"%239ca3af\" stroke-width=\"2\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"M21 21l-4.35-4.35\"/></svg>');\n  background-repeat: no-repeat;\n  background-position: 12px center;\n  background-size: 18px 18px;\n}\n\n.uicm-status-filter {\n  min-width: 140px;\n  padding-right: 32px;\n  background-image: url('data:image/svg+xml;utf8,<svg fill=\"none\" stroke=\"%239ca3af\" stroke-width=\"2\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M19 9l-7 7-7-7\"/></svg>');\n  background-repeat: no-repeat;\n  background-position: right 12px center;\n  background-size: 18px 18px;\n}\n\n.uicm-search-input:focus,\n.uicm-status-filter:focus,\n.uicm-date-start:focus,\n.uicm-date-end:focus {\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n  background: #fff;\n}\n\n.uicm-search-input:hover,\n.uicm-status-filter:hover,\n.uicm-date-start:hover,\n.uicm-date-end:hover {\n  border-color: #a5b4fc;\n}\n\n.uicm-date-start,\n.uicm-date-end {\n  min-width: 120px;\n}\n\n/* Remove default arrow for select (for Chrome) */\n.uicm-status-filter::-ms-expand {\n  display: none;\n}\n.uicm-status-filter {\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n}\n\n.uicm-clear-filters,\n.uicm-delete-selected,\n.uicm-export-excel,\n.uicm-edit-comment,\n.uicm-delete-comment {\n  font-weight: 600;\n  border-radius: 8px;\n  min-width: 90px;\n  height: 38px;\n  letter-spacing: 0.01em;\n  padding: 0 18px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  box-sizing: border-box;\n  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);\n  outline: none;\n  border-width: 1.5px;\n}\n\n.uicm-clear-filters {\n  background: #f3f4f6;\n  color: #374151;\n  border: 1.5px solid #d1d5db;\n}\n.uicm-clear-filters:hover {\n  background: #e5e7eb;\n  color: #111827;\n  border-color: #9ca3af;\n  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.07);\n}\n.uicm-clear-filters:active {\n  background: #d1d5db;\n  color: #111827;\n}\n\n.uicm-delete-selected {\n  background: #ef4444;\n  color: #fff;\n  border: 1.5px solid #ef4444;\n  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);\n}\n.uicm-delete-selected:hover:not(:disabled) {\n  background: #dc2626;\n  border-color: #dc2626;\n  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.13);\n}\n.uicm-delete-selected:active {\n  background: #b91c1c;\n  border-color: #b91c1c;\n}\n.uicm-delete-selected:disabled {\n  opacity: 0.7;\n  cursor: not-allowed;\n  box-shadow: none;\n}\n\n.uicm-export-excel {\n  background: #10b981;\n  color: #fff;\n  border: 1.5px solid #10b981;\n  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);\n}\n.uicm-export-excel:hover {\n  background: #059669;\n  border-color: #059669;\n  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.13);\n}\n.uicm-export-excel:active {\n  background: #047857;\n  border-color: #047857;\n}\n\n.uicm-edit-comment {\n  background: #f3f4f6;\n  color: #2563eb;\n  border: 1.5px solid #d1d5db;\n  margin-right: 6px;\n}\n.uicm-edit-comment:hover {\n  background: #dbeafe;\n  color: #1d4ed8;\n  border-color: #60a5fa;\n  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.07);\n}\n.uicm-edit-comment:active {\n  background: #bfdbfe;\n  color: #1e40af;\n}\n\n.uicm-delete-comment {\n  background: #fee2e2;\n  color: #dc2626;\n  border: 1.5px solid #fecaca;\n}\n.uicm-delete-comment:hover {\n  background: #fecaca;\n  color: #b91c1c;\n  border-color: #f87171;\n  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.07);\n}\n.uicm-delete-comment:active {\n  background: #fca5a5;\n  color: #991b1b;\n}\n\n/* Table Container */\n.uicm-comments-table-wrapper {\n  flex: 1;\n  overflow: auto;\n  padding: 0 24px;\n}\n\n/* Table */\n.uicm-comments-table {\n  width: 100%;\n  border-collapse: collapse;\n  margin: 0;\n}\n\n.uicm-comments-table th,\n.uicm-comments-table td {\n  padding: 14px 8px;\n  text-align: center;\n  border-bottom: 1px solid #e5e7eb;\n  vertical-align: middle;\n}\n\n.uicm-comments-table th {\n  background-color: #f9fafb;\n  font-weight: 600;\n  color: #222;\n  position: sticky;\n  top: 0;\n  z-index: 10;\n}\n\n.uicm-comments-table th.sortable {\n  cursor: pointer;\n  user-select: none;\n  transition: background-color 0.2s;\n}\n\n.uicm-comments-table th.sortable:hover {\n  background-color: #f3f4f6;\n}\n\n.sort-indicator {\n  margin-left: 4px;\n  color: #3b82f6;\n  font-weight: bold;\n}\n\n/* Table Rows */\n.uicm-comment-row {\n  transition: background-color 0.2s;\n}\n\n.uicm-comment-row:hover {\n  background-color: #f9fafb;\n}\n\n/* Table Cells */\n.date-cell {\n  min-width: 140px;\n  font-size: 13px;\n  color: #6b7280;\n}\n\n.author-cell {\n  min-width: 120px;\n}\n\n.author-name {\n  display: block;\n  font-weight: 500;\n  font-size: 14px;\n}\n\n.author-role {\n  display: block;\n  font-size: 12px;\n  color: #6b7280;\n  margin-top: 2px;\n}\n\n.status-cell {\n  min-width: 120px;\n}\n\n.status-badge {\n  display: inline-block;\n  padding: 4px 8px;\n  border-radius: 12px;\n  font-size: 12px;\n  font-weight: 500;\n  color: white;\n  text-transform: capitalize;\n}\n\n.content-cell {\n  max-width: 300px;\n  min-width: 200px;\n}\n\n.comment-content {\n  font-size: 14px;\n  line-height: 1.4;\n  margin-bottom: 4px;\n  word-break: break-word;\n}\n\n.attachment-count {\n  font-size: 12px;\n  color: #6b7280;\n  background: #f3f4f6;\n  padding: 2px 6px;\n  border-radius: 4px;\n  display: inline-block;\n}\n\n.url-cell {\n  max-width: 200px;\n  min-width: 150px;\n}\n\n.url-text {\n  font-size: 13px;\n  color: #6b7280;\n  word-break: break-all;\n}\n\n.replies-cell {\n  text-align: center;\n  width: 60px;\n}\n\n.replies-count {\n  display: inline-block;\n  background: #e5e7eb;\n  color: #374151;\n  padding: 2px 6px;\n  border-radius: 12px;\n  font-size: 12px;\n  font-weight: 500;\n  min-width: 20px;\n}\n\n.actions-cell {\n  min-width: 120px;\n  white-space: nowrap;\n}\n\n/* Checkboxes */\n.uicm-select-all,\n.uicm-comment-select {\n  width: 16px;\n  height: 16px;\n  cursor: pointer;\n}\n\n/* Footer */\n.uicm-comments-table-footer {\n  padding: 16px 24px;\n  border-top: 1px solid #e5e7eb;\n  background: #f9fafb;\n}\n\n.uicm-comments-count {\n  font-size: 14px;\n  color: #6b7280;\n}\n\n.total-count,\n.selected-count {\n  font-weight: 600;\n  color: #374151;\n}\n\n.uicm-status-badge {\n  display: inline-block;\n  min-width: 70px;\n  padding: 4px 12px;\n  border-radius: 999px;\n  font-size: 13px;\n  font-weight: 700;\n  color: #fff !important;\n  text-align: center;\n  background: #6b7280;\n}\n.uicm-status-badge[data-status=\"bug\"] {\n  background: #ef4444;\n}\n.uicm-status-badge[data-status=\"feature_request\"] {\n  background: #f59e0b;\n}\n.uicm-status-badge[data-status=\"dev_completed\"] {\n  background: #3b82f6;\n}\n.uicm-status-badge[data-status=\"done\"] {\n  background: #10b981;\n}\n.uicm-status-badge[data-status=\"archived\"] {\n  background: #6b7280;\n}\n\n/* Responsive */\n@media (max-width: 1200px) {\n  .uicm-comments-table-container {\n    width: 98vw;\n    height: 95vh;\n  }\n\n  .uicm-comments-table-toolbar {\n    flex-direction: column;\n    align-items: stretch;\n  }\n\n  .uicm-comments-table-filters,\n  .uicm-comments-table-actions {\n    justify-content: center;\n  }\n}\n\n@media (max-width: 768px) {\n  .uicm-comments-table-header {\n    padding: 16px;\n  }\n\n  .uicm-comments-table-toolbar {\n    padding: 12px 16px;\n  }\n\n  .uicm-comments-table-wrapper {\n    padding: 0 16px;\n  }\n\n  .uicm-comments-table th,\n  .uicm-comments-table td {\n    padding: 8px 4px;\n    font-size: 13px;\n  }\n\n  .content-cell {\n    max-width: 200px;\n    min-width: 150px;\n  }\n\n  .url-cell {\n    max-width: 120px;\n    min-width: 100px;\n  }\n\n  /* Responsive: stack filters on mobile */\n  .uicm-comments-table-filters {\n    flex-direction: column;\n    align-items: stretch;\n    gap: 10px;\n    padding: 0;\n  }\n  .uicm-search-input,\n  .uicm-status-filter,\n  .uicm-date-start,\n  .uicm-date-end {\n    min-width: 0;\n    width: 100%;\n    font-size: 15px;\n  }\n}\n\n/* Responsive button spacing */\n@media (max-width: 600px) {\n  .uicm-clear-filters,\n  .uicm-delete-selected,\n  .uicm-export-excel,\n  .uicm-edit-comment,\n  .uicm-delete-comment {\n    min-width: 70px;\n    font-size: 13px;\n    padding: 0 10px;\n    height: 34px;\n  }\n}\n";
 styleInject(css_248z$1);
 
 var css_248z = "/* Comments Table Button - Floating Icon Only */\n.uicm-comments-table-btn {\n  position: fixed;\n  bottom: 140px;\n  right: 20px;\n  width: 48px;\n  height: 48px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  padding: 0;\n  border-radius: 50%;\n  background: white;\n  border: 2px solid #e5e7eb;\n  cursor: pointer;\n  color: #6b7280;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),\n    0 2px 4px -1px rgba(0, 0, 0, 0.06);\n  z-index: 9999999999;\n  font-family: inherit;\n  opacity: 1;\n  transform: scale(1) translateY(0);\n  outline: none;\n  user-select: none;\n}\n\n.uicm-comments-table-btn[style*=\"display: none\"] {\n  opacity: 0;\n  transform: scale(0.8) translateY(20px);\n  pointer-events: none;\n}\n\n.uicm-comments-table-btn:hover {\n  background: #f9fafb;\n  border-color: #d1d5db;\n  color: #374151;\n  transform: scale(1.05);\n  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),\n    0 4px 6px -2px rgba(0, 0, 0, 0.05);\n}\n\n.uicm-comments-table-btn:active {\n  transform: scale(0.95);\n}\n\n.uicm-comments-table-btn:focus {\n  outline: none;\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n}\n\n.uicm-comments-table-btn svg {\n  width: 26px;\n  height: 26px;\n  display: block;\n  pointer-events: none;\n}\n\n.uicm-comments-table-btn-text {\n  display: none !important;\n}\n\n@media (prefers-color-scheme: dark) {\n  .uicm-comments-table-btn {\n    background: #374151;\n    border-color: #4b5563;\n    color: #d1d5db;\n  }\n  .uicm-comments-table-btn:hover {\n    background: #4b5563;\n    border-color: #6b7280;\n    color: #f9fafb;\n  }\n  .uicm-comments-table-btn:focus {\n    border-color: #60a5fa;\n    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);\n  }\n}\n\n@media (max-width: 768px) {\n  .uicm-comments-table-btn {\n    bottom: 24px;\n    right: 12px;\n    width: 44px;\n    height: 44px;\n  }\n  .uicm-comments-table-btn svg {\n    width: 22px;\n    height: 22px;\n  }\n}\n";

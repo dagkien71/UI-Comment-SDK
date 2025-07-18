@@ -90,8 +90,12 @@ export class CommentsTable {
                   Date Created
                   <span class="sort-indicator">↓</span>
                 </th>
+                <th class="sortable" data-key="role">
+                  Role
+                  <span class="sort-indicator"></span>
+                </th>
                 <th class="sortable" data-key="author">
-                  Author
+                  Name
                   <span class="sort-indicator"></span>
                 </th>
                 <th class="sortable" data-key="status">
@@ -183,6 +187,10 @@ export class CommentsTable {
         case "author":
           aValue = a.createdBy.name;
           bValue = b.createdBy.name;
+          break;
+        case "role":
+          aValue = a.createdBy.role || "other";
+          bValue = b.createdBy.role || "other";
           break;
         case "statusText":
           aValue = this.getStatusDisplayName(a.status);
@@ -311,13 +319,13 @@ export class CommentsTable {
         }>
       </td>
       <td class="date-cell">${formattedDate}</td>
+      <td class="role-cell">
+        <span class="author-role" style="color: ${roleColor}">${getRoleDisplayName(
+      comment.createdBy.role || "other"
+    )}</span>
+      </td>
       <td class="author-cell">
-        <span class="author-name" style="color: ${roleColor}">${
-      comment.createdBy.name
-    }</span>
-        <small class="author-role">${getRoleDisplayName(
-          comment.createdBy.role || "other"
-        )}</small>
+        <span class="author-name">${comment.createdBy.name}</span>
       </td>
       <td class="status-cell">
         <span class="status-badge" style="background-color: ${statusColor}">${statusName}</span>
@@ -332,21 +340,16 @@ export class CommentsTable {
     row.appendChild(attachmentsCell);
     row.innerHTML += `
       <td class="url-cell">
-        <span class="url-text" title="${comment.url}">${this.truncateText(
-      comment.url,
-      50
-    )}</span>
+        <span class="url-text" title="${comment.url}" style="display:inline-block; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle;">${comment.url}</span>
       </td>
       <td class="replies-cell">
         <span class="replies-count">${comment.replies.length}</span>
       </td>
       <td class="actions-cell">
-        <button class="uicm-edit-comment" data-comment-id="${
-          comment.id
-        }" style="display: none;" disabled>Edit</button>
-        <button class="uicm-delete-comment uicm-allow-bubble" data-comment-id="${
-          comment.id
-        }">Delete</button>
+        <button class="uicm-edit-comment" data-comment-id="${comment.id}" style="display: none;" disabled>Edit</button>
+        <button class="uicm-delete-comment uicm-allow-bubble" data-comment-id="${comment.id}" title="Delete">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;"><path d="M6 8V15M10 8V15M14 8V15M3 5H17M8 5V3.5C8 2.67157 8.67157 2 9.5 2H10.5C11.3284 2 12 2.67157 12 3.5V5M4 5V16.5C4 17.3284 4.67157 18 5.5 18H14.5C15.3284 18 16 17.3284 16 16.5V5" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </td>
     `;
 
@@ -807,12 +810,11 @@ function exportCommentsToCSV(
   comments: any[],
   filename: string = "comments_export.csv",
   options: {
-    separator?: string; // Dấu phân tách, mặc định là dấu phẩy
+    separator?: string;
   } = { separator: "," },
   onError?: (message: string) => void
 ): void {
   try {
-    // Validate input
     if (!comments || !Array.isArray(comments) || comments.length === 0) {
       const msg = "Không có dữ liệu hợp lệ để xuất!";
       onError?.(msg);
@@ -820,20 +822,28 @@ function exportCommentsToCSV(
       return;
     }
 
-    // Normalize data
+    // Only export the required fields in the specified order
     const data = comments.map((c) => ({
-      ID: c?.id ?? "",
+      "Created Date": c?.createdAt
+        ? (() => {
+            const d = new Date(c.createdAt);
+            const pad = (n: number) => n.toString().padStart(2, "0");
+            return `${pad(d.getHours())}:${pad(d.getMinutes())}, ${pad(
+              d.getDate()
+            )} ${pad(d.getMonth() + 1)} ${d.getFullYear()}`;
+          })()
+        : "",
       Content: c?.content ?? "",
-      Author: c?.createdBy?.name ?? "",
-      Role: c?.createdBy?.role ?? "",
+      Name: c?.createdBy?.name ?? "",
+      Role:
+        typeof getRoleDisplayName === "function"
+          ? getRoleDisplayName(c?.createdBy?.role || "other")
+          : c?.createdBy?.role || "",
       Status: c?.status ?? "",
-      "Created Date": c?.createdAt ? new Date(c.createdAt).toISOString() : "",
-      URL: c?.url ?? "",
-      "Replies Count": Array.isArray(c?.replies) ? c.replies.length : 0,
       Attachments: Array.isArray(c?.attachments)
         ? c.attachments.map((a: any) => a.filename).join("; ")
         : "",
-      XPath: c?.xpath ?? "",
+      URL: c?.url ?? "",
     }));
 
     if (!data.length) {
@@ -843,33 +853,37 @@ function exportCommentsToCSV(
       return;
     }
 
-    // Escape CSV values
     const escapeCsvValue = (value: any): string => {
       if (value == null) return "";
       const str = String(value)
-        .replace(/"/g, '""') // Thoát dấu ngoặc kép
-        .replace(/^([=+\-@])/g, "'$1"); // Ngăn CSV injection
+        .replace(/"/g, '""')
+        .replace(/^([=+\-@])/g, "'$1");
       return `"${str.replace(/\n/g, " ")}"`;
     };
 
-    // Create CSV
     const separator = options.separator || ",";
-    const headers = Object.keys(data[0]);
+    const headers = [
+      "Created Date",
+      "Content",
+      "Name",
+      "Role",
+      "Status",
+      "Attachments",
+      "URL",
+    ];
     const csvRows = [headers.join(separator)];
     for (const row of data as Record<string, any>[]) {
       const values = headers.map((h) => escapeCsvValue(row[h]));
       csvRows.push(values.join(separator));
     }
 
-    // Add UTF-8 BOM for Excel compatibility
     const BOM = "\uFEFF";
     const csvString = BOM + csvRows.join("\n");
-    console.log("Nội dung CSV:", csvString); // Debug nội dung
+    console.log("Nội dung CSV:", csvString);
 
-    // Create and download file
     const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
     const blobUrl = URL.createObjectURL(blob);
-    console.log("URL Blob:", blobUrl); // Debug URL
+    console.log("URL Blob:", blobUrl);
 
     const safeFilename = filename.endsWith(".csv")
       ? filename
@@ -880,7 +894,7 @@ function exportCommentsToCSV(
     a.download = safeFilename;
     document.body.appendChild(a);
     a.addEventListener("click", (e) => {
-      e.stopPropagation(); // Ngăn sự kiện nhấp chuột lan đến globalClickHandler
+      e.stopPropagation();
     });
     a.click();
     document.body.removeChild(a);

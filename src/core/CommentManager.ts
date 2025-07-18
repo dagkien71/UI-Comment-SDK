@@ -35,6 +35,18 @@ import {
   isElementValid,
 } from "../utils/xpath";
 
+function normalizeUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    u.hash = "";
+    let norm = u.origin + u.pathname;
+    if (norm.endsWith("/")) norm = norm.slice(0, -1);
+    return norm;
+  } catch {
+    return url;
+  }
+}
+
 export class CommentManager {
   private config: CommentManagerConfig;
   private comments: Comment[] = [];
@@ -467,11 +479,7 @@ export class CommentManager {
     // Add global document click listener for outside clicks
     const globalClickHandler = (e: Event) => {
       // Check if click is outside modal/form
-      const target = e.target as HTMLElement | null;
-      // Ignore if click is on an element with 'uicm-allow-bubble' class (for export/download, etc.)
-      if (target && target.closest(".uicm-allow-bubble")) {
-        return;
-      }
+      const target = e.target as Node;
       const isInsideModal =
         target &&
         this.activeModal &&
@@ -917,11 +925,11 @@ export class CommentManager {
       // Try to load from API first
       const data = await this.config.onFetchJsonFile?.();
       const allComments = data?.comments || [];
-      const currentUrl = this.getCurrentUrl();
+      const currentUrl = normalizeUrl(this.getCurrentUrl());
 
       // Filter comments to only show those from the current URL
       this.comments = allComments.filter(
-        (comment) => comment.url === currentUrl
+        (comment) => normalizeUrl(comment.url) === currentUrl
       );
 
       console.log("📂 Loaded comments from API:", {
@@ -934,8 +942,8 @@ export class CommentManager {
         })),
       });
 
-      // Save to localStorage as backup (only once when loading)
-      this.saveCommentsToLocalStorage(this.comments);
+      // Luôn cập nhật lại localStorage với toàn bộ comment mới nhất từ API
+      this.saveCommentsToLocalStorage(allComments);
 
       // Clear existing bubbles before creating new ones
       this.clearAllBubbles();
@@ -972,11 +980,11 @@ export class CommentManager {
       // Fallback to localStorage when API fails
       try {
         const localComments = this.loadCommentsFromLocalStorage();
-        const currentUrl = this.getCurrentUrl();
+        const currentUrl = normalizeUrl(this.getCurrentUrl());
 
         // Filter comments to only show those from the current URL
         this.comments = localComments.filter(
-          (comment) => comment.url === currentUrl
+          (comment) => normalizeUrl(comment.url) === currentUrl
         );
 
         // Clear existing bubbles before creating new ones

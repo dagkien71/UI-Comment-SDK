@@ -16,6 +16,18 @@ import { ensureSDKRoot } from "../utils/dom";
 import { userProfileStorage } from "../utils/userProfileStorage";
 import { CommentManager } from "./CommentManager";
 
+function normalizeUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    u.hash = "";
+    let norm = u.origin + u.pathname;
+    if (norm.endsWith("/")) norm = norm.slice(0, -1);
+    return norm;
+  } catch {
+    return url;
+  }
+}
+
 export class CommentSDK {
   private config: CommentSDKConfig;
   private commentManager!: CommentManager;
@@ -115,36 +127,63 @@ export class CommentSDK {
         theme: this.config.theme,
         onLoadComments: async () => {
           // Return SDK comments and sync to CommentManager
+          console.log("🔄 onLoadComments callback triggered");
+          console.log("📊 Total comments available:", this.comments.length);
           return this.comments;
         },
         onSaveComment: async (
           commentData: Omit<Comment, "id" | "createdAt">
         ) => {
+          // Luôn fetch lại comment mới nhất từ API
+          const data = await this.config.onFetchJsonFile();
+          const allComments = data?.comments || [];
+          const currentUrl = normalizeUrl(window.location.href);
+          // Lọc comment cho đúng URL
+          const filteredComments = allComments.filter(
+            (c) => normalizeUrl(c.url) === currentUrl
+          );
+          // Tạo comment mới
           const newComment: Comment = {
             ...commentData,
             id: this.generateId(),
             createdAt: new Date().toISOString(),
           };
-          this.comments.push(newComment);
-
-          await this.config.onUpdate(this.comments);
+          // Gộp vào danh sách
+          const updatedComments = [...filteredComments, newComment];
+          this.comments = updatedComments;
+          await this.config.onUpdate(updatedComments);
           return newComment;
         },
         onUpdateComment: async (updatedComment: Comment) => {
-          // Update local array
-          const index = this.comments.findIndex(
-            (c) => c.id === updatedComment.id
+          // Luôn fetch lại comment mới nhất từ API
+          const data = await this.config.onFetchJsonFile();
+          const allComments = data?.comments || [];
+          const currentUrl = normalizeUrl(window.location.href);
+          const filteredComments = allComments.filter(
+            (c) => normalizeUrl(c.url) === currentUrl
           );
-          if (index !== -1) {
-            this.comments[index] = updatedComment;
-            // Always use onUpdate to send complete JSON
-            await this.config.onUpdate(this.comments);
-          }
+          // Update comment trong danh sách
+          const updatedComments = filteredComments.map((c) =>
+            c.id === updatedComment.id ? updatedComment : c
+          );
+          this.comments = updatedComments;
+          await this.config.onUpdate(updatedComments);
           return updatedComment;
         },
         onDeleteComment: async (commentId: string) => {
-          this.comments = this.comments.filter((c) => c.id !== commentId);
-          await this.config.onUpdate(this.comments);
+          // Luôn fetch lại comment mới nhất từ API
+          const data = await this.config.onFetchJsonFile();
+          const allComments = data?.comments || [];
+          const currentUrl = normalizeUrl(window.location.href);
+          const filteredComments = allComments.filter(
+            (c) => normalizeUrl(c.url) === currentUrl
+          );
+          // Xóa comment khỏi danh sách
+          const updatedComments = filteredComments.filter(
+            (c) => c.id !== commentId
+          );
+          this.comments = updatedComments;
+          await this.config.onUpdate(updatedComments);
         },
         onFetchJsonFile: this.config.onFetchJsonFile,
         onToggleModeSilent: async () => {
@@ -186,13 +225,7 @@ export class CommentSDK {
     try {
       const data = await this.config.onFetchJsonFile();
       const allComments = data?.comments || [];
-      const currentUrl = window.location.href;
-
-      // Filter comments to only show those from the current URL
-      this.comments = allComments.filter(
-        (comment) => comment.url === currentUrl
-      );
-
+      this.comments = allComments; // Lưu tất cả comments
       // Update comments count in table button
       if (this.commentsTableButton) {
         this.commentsTableButton.updateCommentsCount(this.comments.length);
@@ -328,7 +361,7 @@ export class CommentSDK {
 
   private navigateToComment(comment: Comment): void {
     // Check if comment is from a different URL
-    if (comment.url !== window.location.href) {
+    if (normalizeUrl(comment.url) !== normalizeUrl(window.location.href)) {
       // Set a flag to indicate we're navigating from sidebar
       (window as any).uicmIsNavigatingFromSidebar = true;
 
