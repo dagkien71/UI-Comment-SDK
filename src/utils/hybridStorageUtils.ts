@@ -40,7 +40,6 @@ export const hybridStorageUtils = {
    */
   loadAll: () => {
     HybridCommentStorage.loadComments().then((comments) => {
-      console.log("Loaded comments:", comments);
       alert(`Loaded ${comments.length} comments from storage`);
     });
   },

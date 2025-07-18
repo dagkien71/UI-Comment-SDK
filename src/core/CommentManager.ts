@@ -932,16 +932,6 @@ export class CommentManager {
         (comment) => normalizeUrl(comment.url) === currentUrl
       );
 
-      console.log("📂 Loaded comments from API:", {
-        totalFromAPI: allComments.length,
-        filteredForCurrentURL: this.comments.length,
-        currentURL: currentUrl,
-        comments: this.comments.map((c) => ({
-          id: c.id,
-          content: c.content.substring(0, 30) + "...",
-        })),
-      });
-
       // Luôn cập nhật lại localStorage với toàn bộ comment mới nhất từ API
       this.saveCommentsToLocalStorage(allComments);
 
@@ -956,10 +946,8 @@ export class CommentManager {
       // Sync comments back to SDK if it has onLoadComments configured
       if (this.config.onLoadComments) {
         try {
-          console.log("🔄 Calling onLoadComments to sync with SDK...");
           // This will update the SDK's comments array
           await this.config.onLoadComments();
-          console.log("✅ onLoadComments completed");
         } catch (error) {
           console.warn("Failed to sync comments to SDK:", error);
         }
@@ -1083,12 +1071,10 @@ export class CommentManager {
       // Get comments from SDK instead of loading from API
       if (this.config.onLoadComments) {
         try {
-          console.log("🔄 Getting comments from SDK...");
           const sdkComments = await this.config.onLoadComments();
 
           // Update CommentManager's comments array
           this.comments = [...sdkComments];
-          console.log("✅ Got comments from SDK:", this.comments.length);
 
           // Clear existing bubbles before creating new ones
           this.clearAllBubbles();

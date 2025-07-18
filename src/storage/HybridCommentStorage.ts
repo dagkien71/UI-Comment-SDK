@@ -18,7 +18,6 @@ export class HybridCommentStorage {
 
       return mergedComments;
     } catch (error) {
-      console.error("Failed to load comments:", error);
       return [];
     }
   }
@@ -31,9 +30,7 @@ export class HybridCommentStorage {
         const data = JSON.parse(stored);
         return data.comments || [];
       }
-    } catch (error) {
-      console.error("Failed to load from localStorage:", error);
-    }
+    } catch (error) {}
     return [];
   }
 
@@ -51,12 +48,7 @@ export class HybridCommentStorage {
           return data.comments || [];
         }
       }
-    } catch (error: any) {
-      console.log(
-        "Could not load from JSON file (this is normal in production):",
-        error.message
-      );
-    }
+    } catch (error: any) {}
     return [];
   }
 
@@ -88,9 +80,7 @@ export class HybridCommentStorage {
 
       // Save vào file JSON (development only)
       await this.saveToJsonFile(comments);
-    } catch (error) {
-      console.error("Failed to save comments:", error);
-    }
+    } catch (error) {}
   }
 
   // Save vào localStorage
@@ -102,9 +92,7 @@ export class HybridCommentStorage {
         source: "hybrid-storage",
       };
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
-    } catch (error) {
-      console.error("Failed to save to localStorage:", error);
-    }
+    } catch (error) {}
   }
 
   // Save vào file JSON (development only)
@@ -125,15 +113,10 @@ export class HybridCommentStorage {
         const jsonString = JSON.stringify(data, null, 2);
 
         // Log để copy vào file manually
-        console.log("📝 Copy this JSON to src/storage/comments.json:");
-        console.log(jsonString);
-
         // Tự động download file
         this.downloadJsonFile(jsonString);
       }
-    } catch (error) {
-      console.error("Failed to save to JSON file:", error);
-    }
+    } catch (error) {}
   }
 
   // Download JSON file
@@ -149,13 +132,7 @@ export class HybridCommentStorage {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-
-      console.log(
-        "💾 Downloaded comments.json - Please replace src/storage/comments.json with this file"
-      );
-    } catch (error) {
-      console.error("Failed to download JSON file:", error);
-    }
+    } catch (error) {}
   }
 
   // Add new comment
@@ -223,11 +200,7 @@ export class HybridCommentStorage {
     // Save only if there were changes
     if (hasChanges) {
       await this.saveComments(comments);
-      console.log(
-        `✅ Updated user name from ${userId} to "${newName}" in all comments`
-      );
     } else {
-      console.log(`ℹ️ No comments found for user ${userId}`);
     }
   }
 
@@ -254,13 +227,11 @@ export class HybridCommentStorage {
   public static async syncToFile(): Promise<void> {
     const localComments = this.loadFromLocalStorage();
     await this.saveToJsonFile(localComments);
-    console.log("✅ Synced localStorage comments to JSON file");
   }
 
   // Import từ file JSON vào localStorage
   public static async importFromFile(): Promise<void> {
     const fileComments = await this.loadFromJsonFile();
     this.saveToLocalStorage(fileComments);
-    console.log("✅ Imported file comments to localStorage");
   }
 }

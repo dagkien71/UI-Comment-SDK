@@ -20,9 +20,8 @@ export class LocalUserProfileStorage implements UserProfileStorage {
     try {
       const userData = JSON.stringify(user);
       localStorage.setItem(this.storageKey, userData);
-      console.log("✅ User profile saved to localStorage:", user);
     } catch (error) {
-      console.error("Failed to save user profile to localStorage:", error);
+      // console.error("Failed to save user profile to localStorage:", error);
     }
   }
 
@@ -34,10 +33,9 @@ export class LocalUserProfileStorage implements UserProfileStorage {
       }
 
       const user = JSON.parse(userData) as User;
-      console.log("📂 User profile loaded from localStorage:", user);
       return user;
     } catch (error) {
-      console.error("Failed to load user profile from localStorage:", error);
+      // console.error("Failed to load user profile from localStorage:", error);
       return null;
     }
   }
@@ -45,9 +43,8 @@ export class LocalUserProfileStorage implements UserProfileStorage {
   public clearUserProfile(): void {
     try {
       localStorage.removeItem(this.storageKey);
-      console.log("🗑️ User profile cleared from localStorage");
     } catch (error) {
-      console.error("Failed to clear user profile from localStorage:", error);
+      // console.error("Failed to clear user profile from localStorage:", error);
     }
   }
 
@@ -64,10 +61,9 @@ export class LocalUserProfileStorage implements UserProfileStorage {
       };
 
       this.saveUserProfile(updatedUser);
-      console.log("🔄 User profile updated in localStorage:", updatedUser);
       return updatedUser;
     } catch (error) {
-      console.error("Failed to update user profile in localStorage:", error);
+      // console.error("Failed to update user profile in localStorage:", error);
       return null;
     }
   }

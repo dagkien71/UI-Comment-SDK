@@ -1223,9 +1223,7 @@
             content.appendChild(commentHeader);
             content.appendChild(commentText);
             // Add attachments if any
-            console.log("🔍 Checking attachments for comment:", comment.id, comment.attachments);
             if (comment.attachments && comment.attachments.length > 0) {
-                console.log("📎 Found attachments:", comment.attachments.length);
                 const attachmentsContainer = document.createElement("div");
                 attachmentsContainer.className = "uicm-comment-attachments";
                 // Add class for multiple images layout
@@ -1234,7 +1232,6 @@
                     attachmentsContainer.classList.add("has-multiple-images");
                 }
                 comment.attachments.forEach((attachment, index) => {
-                    console.log(`📎 Processing attachment ${index}:`, attachment);
                     const attachmentItem = document.createElement("div");
                     attachmentItem.className = "uicm-attachment-item";
                     if (attachment.type === "image") {
@@ -1275,10 +1272,8 @@
                         });
                     }
                     attachmentsContainer.appendChild(attachmentItem);
-                    console.log(`✅ Attachment ${index} added to container`);
                 });
                 content.appendChild(attachmentsContainer);
-                console.log("✅ Attachments container added to comment item");
             }
             item.appendChild(avatar);
             item.appendChild(content);
@@ -1571,19 +1566,6 @@
             return form;
         }
         updateComments(comments) {
-            console.log("🔄 Updating modal comments:", comments.length);
-            comments.forEach((comment, index) => {
-                console.log(`📝 Comment ${index}:`, {
-                    id: comment.id,
-                    content: comment.content.substring(0, 50) + "...",
-                    attachments: comment.attachments?.length || 0,
-                    attachmentDetails: comment.attachments?.map((a) => ({
-                        type: a.type,
-                        filename: a.filename,
-                        size: a.size,
-                    })) || [],
-                });
-            });
             const previousCount = this.props.comments.length;
             this.props.comments = comments;
             this.refreshCommentsList();
@@ -1610,25 +1592,20 @@
                     }
                 }
             }
-            console.log("✅ Modal updated with new comments:", comments.length);
         }
         updateUser(user) {
             this.props.currentUser = user;
-            console.log("🔄 CommentModal: User updated:", user.name);
             // Refresh the modal to show updated user info
             this.refreshCommentsList();
         }
         refreshCommentsList() {
-            console.log("🔄 Refreshing comments list");
             const commentsList = this.element.querySelector(".uicm-comments-list");
             if (commentsList) {
                 commentsList.innerHTML = "";
                 this.props.comments.forEach((comment) => {
-                    console.log("📝 Creating comment item for:", comment.id);
                     const commentItem = this.createCommentItem(comment);
                     commentsList.appendChild(commentItem);
                 });
-                console.log("✅ Comments list refreshed");
             }
         }
         formatTimeAgo(dateString) {
@@ -1647,7 +1624,6 @@
             // Prevent modal from closing when clicking inside modal
             this.element.addEventListener("click", (e) => {
                 e.stopPropagation();
-                console.log("🔒 Modal internal click - prevented propagation");
             });
             // Prevent modal from closing when interacting with form elements
             this.element.addEventListener("mousedown", (e) => {
@@ -1729,10 +1705,8 @@
             this.statsContent = null;
             this.filterContainer = null;
             this.filterToggleBtn = null;
-            console.log("🔧 CommentSidebar: Constructor called with", props.comments.length, "comments");
             this.props = props;
             this.element = this.createElement();
-            console.log("🔧 CommentSidebar: Element created:", this.element);
             this.attachEventListeners();
         }
         formatTimeAgo(dateString) {
@@ -1878,7 +1852,6 @@
             item.addEventListener("click", (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log("🔧 Sidebar: Comment item clicked:", comment.id);
                 this.props.onNavigateToComment(comment);
             });
             // Header with avatar, name, role, and time
@@ -1893,9 +1866,6 @@
                 typeof comment.createdBy.name === "string" &&
                 comment.createdBy.name.length > 0) {
                 avatarChar = comment.createdBy.name.charAt(0).toUpperCase();
-            }
-            else {
-                console.warn("Sidebar: Comment missing createdBy or name", comment);
             }
             avatar.textContent = avatarChar;
             // User info container
@@ -2150,7 +2120,6 @@
             this.element.classList.add("show");
         }
         hide() {
-            console.log("🔧 CommentSidebar: hide() called");
             this.isVisible = false;
             // Remove show class to trigger slide out animation
             this.element.classList.remove("show");
@@ -2158,7 +2127,6 @@
             setTimeout(() => {
                 if (this.element.parentNode) {
                     this.element.parentNode.removeChild(this.element);
-                    console.log("🔧 CommentSidebar: Element removed from DOM");
                 }
             }, 300);
         }
@@ -2308,9 +2276,6 @@
             return modal;
         }
         updateFilteredComments() {
-            console.log("🔄 Updating filtered comments...");
-            console.log("📊 Total source comments:", this.props.comments.length);
-            console.log("🔍 Current filter config:", this.filterConfig);
             let filtered = [...this.props.comments];
             // Apply search filter
             if (this.filterConfig.searchText?.trim()) {
@@ -2371,7 +2336,6 @@
                 return 0;
             });
             this.filteredComments = filtered;
-            console.log("✅ Filtered comments updated:", this.filteredComments.length);
         }
         render() {
             const tbody = this.element.querySelector(".uicm-comments-table-body");
@@ -2500,7 +2464,6 @@
             // Close button
             const closeButton = this.element.querySelector(".uicm-comments-table-close");
             closeButton.addEventListener("click", (e) => {
-                console.log("❌ Close button clicked");
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation();
@@ -2509,7 +2472,6 @@
             // Overlay click to close
             const overlay = this.element.querySelector(".uicm-comments-table-overlay");
             overlay.addEventListener("click", (e) => {
-                console.log("🖱️ Overlay clicked, target:", e.target);
                 // Only close if clicking directly on overlay, not on child elements
                 if (e.target === overlay) {
                     e.preventDefault();
@@ -2558,9 +2520,6 @@
             // Clear filters
             const clearFilters = this.element.querySelector(".uicm-clear-filters");
             clearFilters.addEventListener("click", () => {
-                console.log("🔄 Clearing all filters...");
-                console.log("📊 Before clear - filtered comments:", this.filteredComments.length);
-                console.log("📊 Before clear - total comments:", this.props.comments.length);
                 // Clear any pending debounce
                 if (searchDebounce) {
                     clearTimeout(searchDebounce);
@@ -2581,8 +2540,6 @@
                 // Force re-filter and render immediately
                 this.updateFilteredComments();
                 this.render();
-                console.log("📊 After clear - filtered comments:", this.filteredComments.length);
-                console.log("✅ All filters cleared and UI updated");
                 // Optional: Force trigger events for any external listeners
                 setTimeout(() => {
                     const inputEvent = new Event("input", { bubbles: true });
@@ -2653,23 +2610,16 @@
             // Export CSV
             const exportExcel = this.element.querySelector(".uicm-export-excel");
             exportExcel.addEventListener("click", (e) => {
-                console.log("🔄 Export button clicked");
                 e.preventDefault();
                 e.stopPropagation();
-                console.log("📊 Filtered comments count:", this.filteredComments.length);
-                console.log("📊 Sample comment:", this.filteredComments[0]);
                 exportCommentsToCSV(this.filteredComments, "comments_export.csv", { separator: ";" }, (error) => {
-                    console.error("❌ Export error:", error);
                     alert("Export failed: " + error);
                 });
             });
             // ESC key to close
             this.escHandler = (e) => {
                 if (e.key === "Escape") {
-                    console.log("🔑 ESC key pressed, closing modal...");
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.closeModal();
+                    this.props.onClose();
                 }
             };
             document.addEventListener("keydown", this.escHandler, true);
@@ -2779,13 +2729,10 @@
             return text.substring(0, maxLength) + "...";
         }
         closeModal() {
-            console.log("🔄 CommentsTable closeModal called, destroyed:", this.destroyed);
             if (this.destroyed) {
-                console.log("⚠️ Modal already destroyed, ignoring close request");
                 return;
             }
             this.destroyed = true;
-            console.log("✅ Destroying CommentsTable modal...");
             // Clean up event listeners first
             if (this.escHandler) {
                 document.removeEventListener("keydown", this.escHandler);
@@ -2794,12 +2741,10 @@
             // Remove from DOM
             if (this.element.parentNode) {
                 this.element.parentNode.removeChild(this.element);
-                console.log("✅ Modal removed from DOM");
             }
             // Call onClose callback
             try {
                 this.props.onClose();
-                console.log("✅ onClose callback executed");
             }
             catch (error) {
                 console.error("❌ Error in onClose callback:", error);
@@ -2809,20 +2754,16 @@
             return this.element;
         }
         destroy() {
-            console.log("🔄 CommentsTable destroy() called");
             if (this.destroyed) {
-                console.log("⚠️ Already destroyed, skipping");
                 return;
             }
             this.destroyed = true;
             if (this.escHandler) {
                 document.removeEventListener("keydown", this.escHandler);
                 this.escHandler = null;
-                console.log("✅ Event listeners removed");
             }
             if (this.element.parentNode) {
                 this.element.parentNode.removeChild(this.element);
-                console.log("✅ Element removed from DOM");
             }
             if (this.imageModal) {
                 this.imageModal.destroy();
@@ -2889,10 +2830,8 @@
             }
             const BOM = "\uFEFF";
             const csvString = BOM + csvRows.join("\n");
-            console.log("Nội dung CSV:", csvString);
             const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
             const blobUrl = URL.createObjectURL(blob);
-            console.log("URL Blob:", blobUrl);
             const safeFilename = filename.endsWith(".csv")
                 ? filename
                 : `${filename}.csv`;
@@ -2908,7 +2847,6 @@
             setTimeout(() => {
                 URL.revokeObjectURL(blobUrl);
             }, 5000);
-            console.log("✅ Tải file CSV thành công");
         }
         catch (error) {
             const msg = "Lỗi khi xuất CSV: " +
@@ -3115,7 +3053,6 @@
                 return mergedComments;
             }
             catch (error) {
-                console.error("Failed to load comments:", error);
                 return [];
             }
         }
@@ -3128,9 +3065,7 @@
                     return data.comments || [];
                 }
             }
-            catch (error) {
-                console.error("Failed to load from localStorage:", error);
-            }
+            catch (error) { }
             return [];
         }
         // Load từ file JSON
@@ -3147,9 +3082,7 @@
                     }
                 }
             }
-            catch (error) {
-                console.log("Could not load from JSON file (this is normal in production):", error.message);
-            }
+            catch (error) { }
             return [];
         }
         // Merge comments từ hai nguồn
@@ -3173,9 +3106,7 @@
                 // Save vào file JSON (development only)
                 await this.saveToJsonFile(comments);
             }
-            catch (error) {
-                console.error("Failed to save comments:", error);
-            }
+            catch (error) { }
         }
         // Save vào localStorage
         static saveToLocalStorage(comments) {
@@ -3187,9 +3118,7 @@
                 };
                 localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
             }
-            catch (error) {
-                console.error("Failed to save to localStorage:", error);
-            }
+            catch (error) { }
         }
         // Save vào file JSON (development only)
         static async saveToJsonFile(comments) {
@@ -3206,15 +3135,11 @@
                     // Tạo JSON string
                     const jsonString = JSON.stringify(data, null, 2);
                     // Log để copy vào file manually
-                    console.log("📝 Copy this JSON to src/storage/comments.json:");
-                    console.log(jsonString);
                     // Tự động download file
                     this.downloadJsonFile(jsonString);
                 }
             }
-            catch (error) {
-                console.error("Failed to save to JSON file:", error);
-            }
+            catch (error) { }
         }
         // Download JSON file
         static downloadJsonFile(jsonString) {
@@ -3229,11 +3154,8 @@
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                console.log("💾 Downloaded comments.json - Please replace src/storage/comments.json with this file");
             }
-            catch (error) {
-                console.error("Failed to download JSON file:", error);
-            }
+            catch (error) { }
         }
         // Add new comment
         static async addComment(comment) {
@@ -3284,10 +3206,6 @@
             // Save only if there were changes
             if (hasChanges) {
                 await this.saveComments(comments);
-                console.log(`✅ Updated user name from ${userId} to "${newName}" in all comments`);
-            }
-            else {
-                console.log(`ℹ️ No comments found for user ${userId}`);
             }
         }
         // Get comments for URL
@@ -3308,13 +3226,11 @@
         static async syncToFile() {
             const localComments = this.loadFromLocalStorage();
             await this.saveToJsonFile(localComments);
-            console.log("✅ Synced localStorage comments to JSON file");
         }
         // Import từ file JSON vào localStorage
         static async importFromFile() {
             const fileComments = await this.loadFromJsonFile();
             this.saveToLocalStorage(fileComments);
-            console.log("✅ Imported file comments to localStorage");
         }
     }
     HybridCommentStorage.STORAGE_KEY = "uicm-comments";
@@ -3511,15 +3427,11 @@
                 await this.props.onSave(updatedUser);
                 // If name changed, update all comments
                 if (nameChanged) {
-                    console.log(`🔄 Updating user name from "${this.props.currentUser.name}" to "${name}" in all comments...`);
                     await HybridCommentStorage.updateUserNameInAllComments(this.props.currentUser.id, name);
                 }
-                console.log("✅ Profile updated successfully");
                 this.props.onClose();
             }
             catch (error) {
-                console.error("Failed to update profile:", error);
-                // Re-enable save button
                 saveBtn.disabled = false;
                 saveBtn.textContent = "Save Changes";
             }
@@ -3548,10 +3460,9 @@
             try {
                 const userData = JSON.stringify(user);
                 localStorage.setItem(this.storageKey, userData);
-                console.log("✅ User profile saved to localStorage:", user);
             }
             catch (error) {
-                console.error("Failed to save user profile to localStorage:", error);
+                // console.error("Failed to save user profile to localStorage:", error);
             }
         }
         loadUserProfile() {
@@ -3561,21 +3472,19 @@
                     return null;
                 }
                 const user = JSON.parse(userData);
-                console.log("📂 User profile loaded from localStorage:", user);
                 return user;
             }
             catch (error) {
-                console.error("Failed to load user profile from localStorage:", error);
+                // console.error("Failed to load user profile from localStorage:", error);
                 return null;
             }
         }
         clearUserProfile() {
             try {
                 localStorage.removeItem(this.storageKey);
-                console.log("🗑️ User profile cleared from localStorage");
             }
             catch (error) {
-                console.error("Failed to clear user profile from localStorage:", error);
+                // console.error("Failed to clear user profile from localStorage:", error);
             }
         }
         updateUserProfile(updates) {
@@ -3589,11 +3498,10 @@
                     ...updates,
                 };
                 this.saveUserProfile(updatedUser);
-                console.log("🔄 User profile updated in localStorage:", updatedUser);
                 return updatedUser;
             }
             catch (error) {
-                console.error("Failed to update user profile in localStorage:", error);
+                // console.error("Failed to update user profile in localStorage:", error);
                 return null;
             }
         }
@@ -3716,7 +3624,6 @@
         }
         attachEventListeners() {
             this.element.addEventListener("click", (e) => {
-                console.log("🔧 SidebarButton: Clicked!");
                 e.preventDefault();
                 e.stopPropagation();
                 this.props.onClick();
@@ -3745,7 +3652,6 @@
         updateUser(user) {
             this.props.currentUser = user;
             // Sidebar button doesn't display user info, so no UI update needed
-            console.log("🔄 SidebarButton: User updated:", user.name);
         }
         destroy() {
             this.element.remove();
@@ -4024,7 +3930,6 @@
             }
         }
         testClickability() {
-            console.log("🧪 TESTING BUBBLE CLICKABILITY for:", this.props.comment.id);
             this.testBubbleClickability();
         }
     }
@@ -5718,15 +5623,6 @@
                 const currentUrl = normalizeUrl$1(this.getCurrentUrl());
                 // Filter comments to only show those from the current URL
                 this.comments = allComments.filter((comment) => normalizeUrl$1(comment.url) === currentUrl);
-                console.log("📂 Loaded comments from API:", {
-                    totalFromAPI: allComments.length,
-                    filteredForCurrentURL: this.comments.length,
-                    currentURL: currentUrl,
-                    comments: this.comments.map((c) => ({
-                        id: c.id,
-                        content: c.content.substring(0, 30) + "...",
-                    })),
-                });
                 // Luôn cập nhật lại localStorage với toàn bộ comment mới nhất từ API
                 this.saveCommentsToLocalStorage(allComments);
                 // Clear existing bubbles before creating new ones
@@ -5738,10 +5634,8 @@
                 // Sync comments back to SDK if it has onLoadComments configured
                 if (this.config.onLoadComments) {
                     try {
-                        console.log("🔄 Calling onLoadComments to sync with SDK...");
                         // This will update the SDK's comments array
                         await this.config.onLoadComments();
-                        console.log("✅ onLoadComments completed");
                     }
                     catch (error) {
                         console.warn("Failed to sync comments to SDK:", error);
@@ -5850,11 +5744,9 @@
                 // Get comments from SDK instead of loading from API
                 if (this.config.onLoadComments) {
                     try {
-                        console.log("🔄 Getting comments from SDK...");
                         const sdkComments = await this.config.onLoadComments();
                         // Update CommentManager's comments array
                         this.comments = [...sdkComments];
-                        console.log("✅ Got comments from SDK:", this.comments.length);
                         // Clear existing bubbles before creating new ones
                         this.clearAllBubbles();
                         // Create bubbles for all comments
@@ -6059,49 +5951,37 @@
                     theme: this.config.theme,
                     onLoadComments: async () => {
                         // Return SDK comments and sync to CommentManager
-                        console.log("🔄 onLoadComments callback triggered");
-                        console.log("📊 Total comments available:", this.comments.length);
                         return this.comments;
                     },
                     onSaveComment: async (commentData) => {
                         // Luôn fetch lại comment mới nhất từ API
                         const data = await this.config.onFetchJsonFile();
                         const allComments = data?.comments || [];
-                        const currentUrl = normalizeUrl(window.location.href);
-                        // Lọc comment cho đúng URL
-                        const filteredComments = allComments.filter((c) => normalizeUrl(c.url) === currentUrl);
-                        // Tạo comment mới
+                        // Không filter theo URL nữa
                         const newComment = {
                             ...commentData,
                             id: this.generateId(),
                             createdAt: new Date().toISOString(),
                         };
-                        // Gộp vào danh sách
-                        const updatedComments = [...filteredComments, newComment];
+                        const updatedComments = [...allComments, newComment];
                         this.comments = updatedComments;
                         await this.config.onUpdate(updatedComments);
                         return newComment;
                     },
                     onUpdateComment: async (updatedComment) => {
-                        // Luôn fetch lại comment mới nhất từ API
                         const data = await this.config.onFetchJsonFile();
                         const allComments = data?.comments || [];
-                        const currentUrl = normalizeUrl(window.location.href);
-                        const filteredComments = allComments.filter((c) => normalizeUrl(c.url) === currentUrl);
-                        // Update comment trong danh sách
-                        const updatedComments = filteredComments.map((c) => c.id === updatedComment.id ? updatedComment : c);
+                        // Không filter theo URL nữa
+                        const updatedComments = allComments.map((c) => c.id === updatedComment.id ? updatedComment : c);
                         this.comments = updatedComments;
                         await this.config.onUpdate(updatedComments);
                         return updatedComment;
                     },
                     onDeleteComment: async (commentId) => {
-                        // Luôn fetch lại comment mới nhất từ API
                         const data = await this.config.onFetchJsonFile();
                         const allComments = data?.comments || [];
-                        const currentUrl = normalizeUrl(window.location.href);
-                        const filteredComments = allComments.filter((c) => normalizeUrl(c.url) === currentUrl);
-                        // Xóa comment khỏi danh sách
-                        const updatedComments = filteredComments.filter((c) => c.id !== commentId);
+                        // Không filter theo URL nữa
+                        const updatedComments = allComments.filter((c) => c.id !== commentId);
                         this.comments = updatedComments;
                         await this.config.onUpdate(updatedComments);
                     },
@@ -6121,7 +6001,6 @@
                 this.isInitialized = true;
             }
             catch (error) {
-                console.error("CommentSDK: Failed to initialize", error);
                 throw error;
             }
         }
@@ -6130,9 +6009,6 @@
             if (this.commentManager) {
                 const managerComments = this.commentManager.getComments();
                 this.comments = [...managerComments];
-            }
-            else {
-                console.warn("⚠️ CommentManager not available for sync");
             }
         }
         // Load comments from API directly into SDK
@@ -6147,7 +6023,7 @@
                 }
             }
             catch (error) {
-                console.error("Failed to load comments from API into SDK:", error);
+                // console.error("Failed to load comments from API into SDK:", error);
             }
         }
         setupDOM() {
@@ -6356,16 +6232,13 @@
             return `comment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         }
         toggleCommentsTable() {
-            console.log("🔄 Toggling CommentsTable...");
             // If modal is already open, close it
             if (this.commentsTable) {
-                console.log("📋 CommentsTable is open, closing...");
                 this.commentsTable.destroy();
                 this.commentsTable = null;
                 // Restore SDK cursor if in comment mode
                 if (this.commentManager.getMode() === "comment") {
                     this.setCustomCursor(true);
-                    console.log("🖱️ Custom cursor restored");
                 }
                 return;
             }
@@ -6373,8 +6246,6 @@
             this.openCommentsTable();
         }
         openCommentsTable() {
-            console.log("🔄 Opening CommentsTable...");
-            console.log("📊 Total comments available:", this.comments.length);
             // Close sidebar and comment modal if open
             if (this.sidebar) {
                 this.sidebar.destroy();
@@ -6389,23 +6260,19 @@
                 comments: this.comments,
                 currentUser: this.currentUser,
                 onClose: () => {
-                    console.log("🔄 CommentsTable onClose callback triggered");
                     // Always remove modal from DOM if exists
                     if (this.commentsTable) {
                         const modalEl = this.commentsTable.getElement();
                         if (modalEl.parentNode) {
                             modalEl.parentNode.removeChild(modalEl);
-                            console.log("✅ Modal removed from DOM by SDK");
                         }
                     }
                     // Restore SDK cursor if in comment mode
                     if (this.commentManager.getMode() === "comment") {
                         this.setCustomCursor(true);
-                        console.log("🖱️ Custom cursor restored");
                     }
                     // Always set commentsTable = null
                     this.commentsTable = null;
-                    console.log("✅ CommentsTable reference cleared");
                 },
                 onDeleteComments: async (commentIds) => {
                     // Remove comments from array
@@ -6670,7 +6537,6 @@
          */
         loadAll: () => {
             HybridCommentStorage.loadComments().then((comments) => {
-                console.log("Loaded comments:", comments);
                 alert(`Loaded ${comments.length} comments from storage`);
             });
         },
@@ -6711,15 +6577,12 @@
             try {
                 const data = localStorage.getItem(this.commentsKey);
                 if (!data) {
-                    console.log("📭 No comments data found in localStorage");
                     return null;
                 }
                 const parsedData = JSON.parse(data);
-                console.log("📂 Comments data loaded from localStorage:", parsedData);
                 return parsedData;
             }
             catch (error) {
-                console.error("❌ Failed to load comments data from localStorage:", error);
                 return null;
             }
         }
@@ -6737,27 +6600,21 @@
                             }
                         }
                         catch (error) {
-                            console.warn(`⚠️ Failed to parse localStorage key: ${key}`, error);
                             allData[key] = localStorage.getItem(key); // Store as string if JSON parse fails
                         }
                     }
                 }
-                console.log("📊 All UICM data from localStorage:", allData);
                 return allData;
             }
             catch (error) {
-                console.error("❌ Failed to get all UICM data:", error);
                 return {};
             }
         }
         clearCommentsData() {
             try {
                 localStorage.removeItem(this.commentsKey);
-                console.log("🗑️ Comments data cleared from localStorage");
             }
-            catch (error) {
-                console.error("❌ Failed to clear comments data:", error);
-            }
+            catch (error) { }
         }
         exportCommentsData() {
             try {
@@ -6771,11 +6628,9 @@
                     version: "1.0.0",
                 };
                 const jsonString = JSON.stringify(exportData, null, 2);
-                console.log("📤 Comments data exported:", exportData);
                 return jsonString;
             }
             catch (error) {
-                console.error("❌ Failed to export comments data:", error);
                 return "";
             }
         }
@@ -6785,11 +6640,9 @@
                 // Handle both direct data and wrapped export format
                 const commentsData = parsedData.data || parsedData;
                 localStorage.setItem(this.commentsKey, JSON.stringify(commentsData));
-                console.log("📥 Comments data imported to localStorage:", commentsData);
                 return true;
             }
             catch (error) {
-                console.error("❌ Failed to import comments data:", error);
                 return false;
             }
         }
@@ -6798,15 +6651,12 @@
                 const key = `uicm-${projectId}`;
                 const data = localStorage.getItem(key);
                 if (!data) {
-                    console.log(`📭 No project data found for: ${projectId}`);
                     return null;
                 }
                 const parsedData = JSON.parse(data);
-                console.log(`📂 Project data loaded for ${projectId}:`, parsedData);
                 return parsedData;
             }
             catch (error) {
-                console.error(`❌ Failed to load project data for ${projectId}:`, error);
                 return null;
             }
         }
@@ -6814,15 +6664,12 @@
             try {
                 const data = localStorage.getItem(this.userProfileKey);
                 if (!data) {
-                    console.log("📭 No user profile data found in localStorage");
                     return null;
                 }
                 const parsedData = JSON.parse(data);
-                console.log("📂 User profile data loaded from localStorage:", parsedData);
                 return parsedData;
             }
             catch (error) {
-                console.error("❌ Failed to load user profile data from localStorage:", error);
                 return null;
             }
         }

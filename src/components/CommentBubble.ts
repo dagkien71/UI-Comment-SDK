@@ -353,7 +353,6 @@ export class CommentBubble {
   }
 
   public testClickability(): void {
-    console.log("🧪 TESTING BUBBLE CLICKABILITY for:", this.props.comment.id);
     this.testBubbleClickability();
   }
 }

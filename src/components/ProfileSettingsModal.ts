@@ -247,20 +247,14 @@ export class ProfileSettingsModal {
 
       // If name changed, update all comments
       if (nameChanged) {
-        console.log(
-          `🔄 Updating user name from "${this.props.currentUser.name}" to "${name}" in all comments...`
-        );
         await HybridCommentStorage.updateUserNameInAllComments(
           this.props.currentUser.id,
           name
         );
       }
 
-      console.log("✅ Profile updated successfully");
       this.props.onClose();
     } catch (error) {
-      console.error("Failed to update profile:", error);
-      // Re-enable save button
       saveBtn.disabled = false;
       saveBtn.textContent = "Save Changes";
     }

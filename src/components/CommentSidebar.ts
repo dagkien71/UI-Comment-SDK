@@ -25,14 +25,8 @@ export class CommentSidebar {
   private filterToggleBtn: HTMLElement | null = null;
 
   constructor(props: CommentSidebarProps) {
-    console.log(
-      "🔧 CommentSidebar: Constructor called with",
-      props.comments.length,
-      "comments"
-    );
     this.props = props;
     this.element = this.createElement();
-    console.log("🔧 CommentSidebar: Element created:", this.element);
     this.attachEventListeners();
   }
 
@@ -213,7 +207,6 @@ export class CommentSidebar {
     item.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      console.log("🔧 Sidebar: Comment item clicked:", comment.id);
       this.props.onNavigateToComment(comment);
     });
 
@@ -233,7 +226,6 @@ export class CommentSidebar {
     ) {
       avatarChar = comment.createdBy.name.charAt(0).toUpperCase();
     } else {
-      console.warn("Sidebar: Comment missing createdBy or name", comment);
     }
     avatar.textContent = avatarChar;
 
@@ -560,7 +552,6 @@ export class CommentSidebar {
   }
 
   public hide(): void {
-    console.log("🔧 CommentSidebar: hide() called");
     this.isVisible = false;
 
     // Remove show class to trigger slide out animation
@@ -570,7 +561,6 @@ export class CommentSidebar {
     setTimeout(() => {
       if (this.element.parentNode) {
         this.element.parentNode.removeChild(this.element);
-        console.log("🔧 CommentSidebar: Element removed from DOM");
       }
     }, 300);
   }

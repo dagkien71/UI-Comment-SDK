@@ -15,18 +15,12 @@ export class LocalStorageManager implements LocalStorageUtils {
     try {
       const data = localStorage.getItem(this.commentsKey);
       if (!data) {
-        console.log("📭 No comments data found in localStorage");
         return null;
       }
 
       const parsedData = JSON.parse(data);
-      console.log("📂 Comments data loaded from localStorage:", parsedData);
       return parsedData;
     } catch (error) {
-      console.error(
-        "❌ Failed to load comments data from localStorage:",
-        error
-      );
       return null;
     }
   }
@@ -45,16 +39,13 @@ export class LocalStorageManager implements LocalStorageUtils {
               allData[key] = JSON.parse(value);
             }
           } catch (error) {
-            console.warn(`⚠️ Failed to parse localStorage key: ${key}`, error);
             allData[key] = localStorage.getItem(key); // Store as string if JSON parse fails
           }
         }
       }
 
-      console.log("📊 All UICM data from localStorage:", allData);
       return allData;
     } catch (error) {
-      console.error("❌ Failed to get all UICM data:", error);
       return {};
     }
   }
@@ -62,10 +53,7 @@ export class LocalStorageManager implements LocalStorageUtils {
   public clearCommentsData(): void {
     try {
       localStorage.removeItem(this.commentsKey);
-      console.log("🗑️ Comments data cleared from localStorage");
-    } catch (error) {
-      console.error("❌ Failed to clear comments data:", error);
-    }
+    } catch (error) {}
   }
 
   public exportCommentsData(): string {
@@ -82,10 +70,8 @@ export class LocalStorageManager implements LocalStorageUtils {
       };
 
       const jsonString = JSON.stringify(exportData, null, 2);
-      console.log("📤 Comments data exported:", exportData);
       return jsonString;
     } catch (error) {
-      console.error("❌ Failed to export comments data:", error);
       return "";
     }
   }
@@ -98,10 +84,8 @@ export class LocalStorageManager implements LocalStorageUtils {
       const commentsData = parsedData.data || parsedData;
 
       localStorage.setItem(this.commentsKey, JSON.stringify(commentsData));
-      console.log("📥 Comments data imported to localStorage:", commentsData);
       return true;
     } catch (error) {
-      console.error("❌ Failed to import comments data:", error);
       return false;
     }
   }
@@ -111,15 +95,12 @@ export class LocalStorageManager implements LocalStorageUtils {
       const key = `uicm-${projectId}`;
       const data = localStorage.getItem(key);
       if (!data) {
-        console.log(`📭 No project data found for: ${projectId}`);
         return null;
       }
 
       const parsedData = JSON.parse(data);
-      console.log(`📂 Project data loaded for ${projectId}:`, parsedData);
       return parsedData;
     } catch (error) {
-      console.error(`❌ Failed to load project data for ${projectId}:`, error);
       return null;
     }
   }
@@ -128,18 +109,12 @@ export class LocalStorageManager implements LocalStorageUtils {
     try {
       const data = localStorage.getItem(this.userProfileKey);
       if (!data) {
-        console.log("📭 No user profile data found in localStorage");
         return null;
       }
 
       const parsedData = JSON.parse(data);
-      console.log("📂 User profile data loaded from localStorage:", parsedData);
       return parsedData;
     } catch (error) {
-      console.error(
-        "❌ Failed to load user profile data from localStorage:",
-        error
-      );
       return null;
     }
   }

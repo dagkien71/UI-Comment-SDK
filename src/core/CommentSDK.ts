@@ -127,8 +127,6 @@ export class CommentSDK {
         theme: this.config.theme,
         onLoadComments: async () => {
           // Return SDK comments and sync to CommentManager
-          console.log("🔄 onLoadComments callback triggered");
-          console.log("📊 Total comments available:", this.comments.length);
           return this.comments;
         },
         onSaveComment: async (
@@ -137,33 +135,22 @@ export class CommentSDK {
           // Luôn fetch lại comment mới nhất từ API
           const data = await this.config.onFetchJsonFile();
           const allComments = data?.comments || [];
-          const currentUrl = normalizeUrl(window.location.href);
-          // Lọc comment cho đúng URL
-          const filteredComments = allComments.filter(
-            (c) => normalizeUrl(c.url) === currentUrl
-          );
-          // Tạo comment mới
+          // Không filter theo URL nữa
           const newComment: Comment = {
             ...commentData,
             id: this.generateId(),
             createdAt: new Date().toISOString(),
           };
-          // Gộp vào danh sách
-          const updatedComments = [...filteredComments, newComment];
+          const updatedComments = [...allComments, newComment];
           this.comments = updatedComments;
           await this.config.onUpdate(updatedComments);
           return newComment;
         },
         onUpdateComment: async (updatedComment: Comment) => {
-          // Luôn fetch lại comment mới nhất từ API
           const data = await this.config.onFetchJsonFile();
           const allComments = data?.comments || [];
-          const currentUrl = normalizeUrl(window.location.href);
-          const filteredComments = allComments.filter(
-            (c) => normalizeUrl(c.url) === currentUrl
-          );
-          // Update comment trong danh sách
-          const updatedComments = filteredComments.map((c) =>
+          // Không filter theo URL nữa
+          const updatedComments = allComments.map((c) =>
             c.id === updatedComment.id ? updatedComment : c
           );
           this.comments = updatedComments;
@@ -171,17 +158,10 @@ export class CommentSDK {
           return updatedComment;
         },
         onDeleteComment: async (commentId: string) => {
-          // Luôn fetch lại comment mới nhất từ API
           const data = await this.config.onFetchJsonFile();
           const allComments = data?.comments || [];
-          const currentUrl = normalizeUrl(window.location.href);
-          const filteredComments = allComments.filter(
-            (c) => normalizeUrl(c.url) === currentUrl
-          );
-          // Xóa comment khỏi danh sách
-          const updatedComments = filteredComments.filter(
-            (c) => c.id !== commentId
-          );
+          // Không filter theo URL nữa
+          const updatedComments = allComments.filter((c) => c.id !== commentId);
           this.comments = updatedComments;
           await this.config.onUpdate(updatedComments);
         },
@@ -205,7 +185,6 @@ export class CommentSDK {
 
       this.isInitialized = true;
     } catch (error) {
-      console.error("CommentSDK: Failed to initialize", error);
       throw error;
     }
   }
@@ -216,7 +195,7 @@ export class CommentSDK {
       const managerComments = this.commentManager.getComments();
       this.comments = [...managerComments];
     } else {
-      console.warn("⚠️ CommentManager not available for sync");
+      // console.warn("⚠️ CommentManager not available for sync");
     }
   }
 
@@ -231,7 +210,7 @@ export class CommentSDK {
         this.commentsTableButton.updateCommentsCount(this.comments.length);
       }
     } catch (error) {
-      console.error("Failed to load comments from API into SDK:", error);
+      // console.error("Failed to load comments from API into SDK:", error);
     }
   }
 
@@ -477,18 +456,14 @@ export class CommentSDK {
   }
 
   private toggleCommentsTable(): void {
-    console.log("🔄 Toggling CommentsTable...");
-
     // If modal is already open, close it
     if (this.commentsTable) {
-      console.log("📋 CommentsTable is open, closing...");
       this.commentsTable.destroy();
       this.commentsTable = null;
 
       // Restore SDK cursor if in comment mode
       if (this.commentManager.getMode() === "comment") {
         this.setCustomCursor(true);
-        console.log("🖱️ Custom cursor restored");
       }
       return;
     }
@@ -498,9 +473,6 @@ export class CommentSDK {
   }
 
   private openCommentsTable(): void {
-    console.log("🔄 Opening CommentsTable...");
-    console.log("📊 Total comments available:", this.comments.length);
-
     // Close sidebar and comment modal if open
     if (this.sidebar) {
       this.sidebar.destroy();
@@ -516,26 +488,21 @@ export class CommentSDK {
       comments: this.comments,
       currentUser: this.currentUser,
       onClose: () => {
-        console.log("🔄 CommentsTable onClose callback triggered");
-
         // Always remove modal from DOM if exists
         if (this.commentsTable) {
           const modalEl = this.commentsTable.getElement();
           if (modalEl.parentNode) {
             modalEl.parentNode.removeChild(modalEl);
-            console.log("✅ Modal removed from DOM by SDK");
           }
         }
 
         // Restore SDK cursor if in comment mode
         if (this.commentManager.getMode() === "comment") {
           this.setCustomCursor(true);
-          console.log("🖱️ Custom cursor restored");
         }
 
         // Always set commentsTable = null
         this.commentsTable = null;
-        console.log("✅ CommentsTable reference cleared");
       },
       onDeleteComments: async (commentIds: string[]) => {
         // Remove comments from array

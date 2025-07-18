@@ -39,7 +39,6 @@ export class SidebarButton {
 
   private attachEventListeners(): void {
     this.element.addEventListener("click", (e) => {
-      console.log("🔧 SidebarButton: Clicked!");
       e.preventDefault();
       e.stopPropagation();
       this.props.onClick();
@@ -70,7 +69,6 @@ export class SidebarButton {
   public updateUser(user: User): void {
     this.props.currentUser = user;
     // Sidebar button doesn't display user info, so no UI update needed
-    console.log("🔄 SidebarButton: User updated:", user.name);
   }
 
   public destroy(): void {

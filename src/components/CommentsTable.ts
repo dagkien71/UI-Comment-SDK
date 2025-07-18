@@ -129,10 +129,6 @@ export class CommentsTable {
   }
 
   private updateFilteredComments(): void {
-    console.log("🔄 Updating filtered comments...");
-    console.log("📊 Total source comments:", this.props.comments.length);
-    console.log("🔍 Current filter config:", this.filterConfig);
-
     let filtered = [...this.props.comments];
 
     // Apply search filter
@@ -207,7 +203,6 @@ export class CommentsTable {
     });
 
     this.filteredComments = filtered;
-    console.log("✅ Filtered comments updated:", this.filteredComments.length);
   }
 
   private render(): void {
@@ -364,7 +359,6 @@ export class CommentsTable {
     closeButton.addEventListener(
       "click",
       (e) => {
-        console.log("❌ Close button clicked");
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
@@ -380,7 +374,6 @@ export class CommentsTable {
     overlay.addEventListener(
       "click",
       (e) => {
-        console.log("🖱️ Overlay clicked, target:", e.target);
         // Only close if clicking directly on overlay, not on child elements
         if (e.target === overlay) {
           e.preventDefault();
@@ -444,16 +437,6 @@ export class CommentsTable {
       ".uicm-clear-filters"
     ) as HTMLElement;
     clearFilters.addEventListener("click", () => {
-      console.log("🔄 Clearing all filters...");
-      console.log(
-        "📊 Before clear - filtered comments:",
-        this.filteredComments.length
-      );
-      console.log(
-        "📊 Before clear - total comments:",
-        this.props.comments.length
-      );
-
       // Clear any pending debounce
       if (searchDebounce) {
         clearTimeout(searchDebounce);
@@ -477,12 +460,6 @@ export class CommentsTable {
       // Force re-filter and render immediately
       this.updateFilteredComments();
       this.render();
-
-      console.log(
-        "📊 After clear - filtered comments:",
-        this.filteredComments.length
-      );
-      console.log("✅ All filters cleared and UI updated");
 
       // Optional: Force trigger events for any external listeners
       setTimeout(() => {
@@ -570,19 +547,14 @@ export class CommentsTable {
       ".uicm-export-excel"
     ) as HTMLElement;
     exportExcel.addEventListener("click", (e) => {
-      console.log("🔄 Export button clicked");
       e.preventDefault();
       e.stopPropagation();
-
-      console.log("📊 Filtered comments count:", this.filteredComments.length);
-      console.log("📊 Sample comment:", this.filteredComments[0]);
 
       exportCommentsToCSV(
         this.filteredComments,
         "comments_export.csv",
         { separator: ";" },
         (error) => {
-          console.error("❌ Export error:", error);
           alert("Export failed: " + error);
         }
       );
@@ -591,10 +563,7 @@ export class CommentsTable {
     // ESC key to close
     this.escHandler = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        console.log("🔑 ESC key pressed, closing modal...");
-        e.preventDefault();
-        e.stopPropagation();
-        this.closeModal();
+        this.props.onClose();
       }
     };
     document.addEventListener("keydown", this.escHandler, true);
@@ -740,17 +709,11 @@ export class CommentsTable {
   }
 
   private closeModal(): void {
-    console.log(
-      "🔄 CommentsTable closeModal called, destroyed:",
-      this.destroyed
-    );
     if (this.destroyed) {
-      console.log("⚠️ Modal already destroyed, ignoring close request");
       return;
     }
 
     this.destroyed = true;
-    console.log("✅ Destroying CommentsTable modal...");
 
     // Clean up event listeners first
     if (this.escHandler) {
@@ -761,13 +724,11 @@ export class CommentsTable {
     // Remove from DOM
     if (this.element.parentNode) {
       this.element.parentNode.removeChild(this.element);
-      console.log("✅ Modal removed from DOM");
     }
 
     // Call onClose callback
     try {
       this.props.onClose();
-      console.log("✅ onClose callback executed");
     } catch (error) {
       console.error("❌ Error in onClose callback:", error);
     }
@@ -780,9 +741,7 @@ export class CommentsTable {
   }
 
   public destroy(): void {
-    console.log("🔄 CommentsTable destroy() called");
     if (this.destroyed) {
-      console.log("⚠️ Already destroyed, skipping");
       return;
     }
 
@@ -791,12 +750,10 @@ export class CommentsTable {
     if (this.escHandler) {
       document.removeEventListener("keydown", this.escHandler);
       this.escHandler = null;
-      console.log("✅ Event listeners removed");
     }
 
     if (this.element.parentNode) {
       this.element.parentNode.removeChild(this.element);
-      console.log("✅ Element removed from DOM");
     }
 
     if (this.imageModal) {
@@ -879,11 +836,9 @@ function exportCommentsToCSV(
 
     const BOM = "\uFEFF";
     const csvString = BOM + csvRows.join("\n");
-    console.log("Nội dung CSV:", csvString);
 
     const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
     const blobUrl = URL.createObjectURL(blob);
-    console.log("URL Blob:", blobUrl);
 
     const safeFilename = filename.endsWith(".csv")
       ? filename
@@ -901,8 +856,6 @@ function exportCommentsToCSV(
     setTimeout(() => {
       URL.revokeObjectURL(blobUrl);
     }, 5000);
-
-    console.log("✅ Tải file CSV thành công");
   } catch (error) {
     const msg =
       "Lỗi khi xuất CSV: " +

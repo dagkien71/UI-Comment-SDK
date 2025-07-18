@@ -330,13 +330,7 @@ export class CommentModal {
     content.appendChild(commentText);
 
     // Add attachments if any
-    console.log(
-      "🔍 Checking attachments for comment:",
-      comment.id,
-      comment.attachments
-    );
     if (comment.attachments && comment.attachments.length > 0) {
-      console.log("📎 Found attachments:", comment.attachments.length);
       const attachmentsContainer = document.createElement("div");
       attachmentsContainer.className = "uicm-comment-attachments";
 
@@ -349,7 +343,6 @@ export class CommentModal {
       }
 
       comment.attachments.forEach((attachment, index) => {
-        console.log(`📎 Processing attachment ${index}:`, attachment);
         const attachmentItem = document.createElement("div");
         attachmentItem.className = "uicm-attachment-item";
 
@@ -399,11 +392,9 @@ export class CommentModal {
         }
 
         attachmentsContainer.appendChild(attachmentItem);
-        console.log(`✅ Attachment ${index} added to container`);
       });
 
       content.appendChild(attachmentsContainer);
-      console.log("✅ Attachments container added to comment item");
     }
 
     item.appendChild(avatar);
@@ -769,21 +760,6 @@ export class CommentModal {
   }
 
   public updateComments(comments: Comment[]): void {
-    console.log("🔄 Updating modal comments:", comments.length);
-    comments.forEach((comment, index) => {
-      console.log(`📝 Comment ${index}:`, {
-        id: comment.id,
-        content: comment.content.substring(0, 50) + "...",
-        attachments: comment.attachments?.length || 0,
-        attachmentDetails:
-          comment.attachments?.map((a) => ({
-            type: a.type,
-            filename: a.filename,
-            size: a.size,
-          })) || [],
-      });
-    });
-
     const previousCount = this.props.comments.length;
     this.props.comments = comments;
     this.refreshCommentsList();
@@ -817,28 +793,22 @@ export class CommentModal {
         }
       }
     }
-
-    console.log("✅ Modal updated with new comments:", comments.length);
   }
 
   public updateUser(user: User): void {
     this.props.currentUser = user;
-    console.log("🔄 CommentModal: User updated:", user.name);
     // Refresh the modal to show updated user info
     this.refreshCommentsList();
   }
 
   private refreshCommentsList(): void {
-    console.log("🔄 Refreshing comments list");
     const commentsList = this.element.querySelector(".uicm-comments-list");
     if (commentsList) {
       commentsList.innerHTML = "";
       this.props.comments.forEach((comment) => {
-        console.log("📝 Creating comment item for:", comment.id);
         const commentItem = this.createCommentItem(comment);
         commentsList.appendChild(commentItem);
       });
-      console.log("✅ Comments list refreshed");
     }
   }
 
@@ -858,7 +828,6 @@ export class CommentModal {
     // Prevent modal from closing when clicking inside modal
     this.element.addEventListener("click", (e) => {
       e.stopPropagation();
-      console.log("🔒 Modal internal click - prevented propagation");
     });
 
     // Prevent modal from closing when interacting with form elements

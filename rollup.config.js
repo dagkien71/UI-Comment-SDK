@@ -52,7 +52,63 @@ export default [
         sourceMap: !isProduction,
         inlineSources: !isProduction,
       }),
-      ...(isProduction ? [terser()] : []),
+      ...(isProduction
+        ? [
+            terser({
+              compress: {
+                drop_console: true,
+                drop_debugger: true,
+                pure_funcs: [
+                  "console.log",
+                  "console.info",
+                  "console.debug",
+                  "console.warn",
+                ],
+                passes: 3,
+                unsafe: true,
+                unsafe_comps: true,
+                unsafe_Function: true,
+                unsafe_math: true,
+                unsafe_proto: true,
+                unsafe_regexp: true,
+                unsafe_undefined: true,
+                dead_code: true,
+                evaluate: true,
+                hoist_funs: true,
+                hoist_props: true,
+                hoist_vars: true,
+                if_return: true,
+                inline: true,
+                join_vars: true,
+                loops: true,
+                reduce_vars: true,
+                sequences: true,
+                side_effects: true,
+                switches: true,
+                toplevel: true,
+                typeofs: true,
+                unused: true,
+              },
+              mangle: {
+                toplevel: true,
+                properties: {
+                  regex: /^_/, // chỉ mangle các thuộc tính bắt đầu bằng _ (an toàn cho public API)
+                },
+                safari10: true,
+              },
+              format: {
+                comments: false,
+                ascii_only: true,
+                beautify: false,
+              },
+              ecma: 2020,
+              keep_classnames: false,
+              keep_fnames: false,
+              ie8: false,
+              safari10: true,
+            }),
+          ]
+        : []),
     ],
     external: (id) => {
       return id === "react" || id === "react-dom";
