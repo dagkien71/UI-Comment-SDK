@@ -5410,7 +5410,18 @@ class CommentManager {
             this.createCommentBubble(newComment);
         }
         catch (error) {
-            console.error("Failed to create comment:", error);
+            console.error("Failed to create comment via API, saving to localStorage:", error);
+            // Tạo comment locally khi API thất bại
+            const newComment = {
+                ...commentData,
+                id: generateId(),
+                createdAt: new Date().toISOString(),
+            };
+            this.comments.push(newComment);
+            this.createCommentBubble(newComment);
+            // Lưu vào localStorage ngay cả khi API thất bại
+            this.saveCommentsToLocalStorage(this.comments);
+            console.log("✅ Comment saved to localStorage as fallback");
         }
     }
     createCommentBubble(comment) {
@@ -5465,7 +5476,15 @@ class CommentManager {
         comment.replies.push(reply);
         // Update comment via API if configured
         if (this.config.onUpdateComment) {
-            await this.config.onUpdateComment(comment);
+            try {
+                await this.config.onUpdateComment(comment);
+            }
+            catch (error) {
+                console.error("Failed to update comment via API, saving to localStorage:", error);
+                // Lưu vào localStorage khi API thất bại
+                this.saveCommentsToLocalStorage(this.comments);
+                console.log("✅ Reply saved to localStorage as fallback");
+            }
         }
         // Update bubble
         const bubble = this.commentBubbles.get(commentId);
@@ -5481,7 +5500,15 @@ class CommentManager {
         comment.resolvedAt = new Date().toISOString();
         // Update comment via API if configured
         if (this.config.onUpdateComment) {
-            await this.config.onUpdateComment(comment);
+            try {
+                await this.config.onUpdateComment(comment);
+            }
+            catch (error) {
+                console.error("Failed to resolve comment via API, saving to localStorage:", error);
+                // Lưu vào localStorage khi API thất bại
+                this.saveCommentsToLocalStorage(this.comments);
+                console.log("✅ Comment resolution saved to localStorage as fallback");
+            }
         }
         // Update bubble
         const bubble = this.commentBubbles.get(commentId);
@@ -5506,7 +5533,15 @@ class CommentManager {
         }
         // Update comment via API if configured
         if (this.config.onUpdateComment) {
-            await this.config.onUpdateComment(comment);
+            try {
+                await this.config.onUpdateComment(comment);
+            }
+            catch (error) {
+                console.error("Failed to change comment status via API, saving to localStorage:", error);
+                // Lưu vào localStorage khi API thất bại
+                this.saveCommentsToLocalStorage(this.comments);
+                console.log("✅ Comment status change saved to localStorage as fallback");
+            }
         }
         // Update bubble
         const bubble = this.commentBubbles.get(commentId);
@@ -5527,7 +5562,10 @@ class CommentManager {
                 await this.config.onDeleteComment(commentId);
             }
             catch (error) {
-                console.error("Failed to delete comment:", error);
+                console.error("Failed to delete comment via API, saving to localStorage:", error);
+                // Lưu vào localStorage khi API thất bại
+                this.saveCommentsToLocalStorage(this.comments);
+                console.log("✅ Comment deletion saved to localStorage as fallback");
                 return;
             }
         }
@@ -5964,6 +6002,8 @@ class CommentSDK {
                     const updatedComments = [...allComments, newComment];
                     this.comments = updatedComments;
                     await this.config.onUpdate(updatedComments);
+                    // Sync với CommentManager và lưu localStorage
+                    await this.commentManager.loadComments();
                     return newComment;
                 },
                 onUpdateComment: async (updatedComment) => {
@@ -5973,6 +6013,8 @@ class CommentSDK {
                     const updatedComments = allComments.map((c) => c.id === updatedComment.id ? updatedComment : c);
                     this.comments = updatedComments;
                     await this.config.onUpdate(updatedComments);
+                    // Sync với CommentManager và lưu localStorage
+                    await this.commentManager.loadComments();
                     return updatedComment;
                 },
                 onDeleteComment: async (commentId) => {
@@ -5982,6 +6024,8 @@ class CommentSDK {
                     const updatedComments = allComments.filter((c) => c.id !== commentId);
                     this.comments = updatedComments;
                     await this.config.onUpdate(updatedComments);
+                    // Sync với CommentManager và lưu localStorage
+                    await this.commentManager.loadComments();
                 },
                 onFetchJsonFile: this.config.onFetchJsonFile,
                 onToggleModeSilent: async () => {
@@ -5992,8 +6036,14 @@ class CommentSDK {
             this.commentManager = new CommentManager(managerConfig, this.root);
             // Initialize UI components
             this.initializeUI();
-            // Load comments from API directly into SDK
-            await this.loadCommentsFromAPI();
+            // Load comments using CommentManager (có fallback localStorage)
+            await this.commentManager.loadComments();
+            // Sync comments từ CommentManager về SDK
+            this.comments = this.commentManager.getComments();
+            // Update comments count in table button
+            if (this.commentsTableButton) {
+                this.commentsTableButton.updateCommentsCount(this.comments.length);
+            }
             // Check if we're navigating from sidebar and need to open a comment
             this.handleSidebarNavigation();
             this.isInitialized = true;
@@ -6007,21 +6057,6 @@ class CommentSDK {
         if (this.commentManager) {
             const managerComments = this.commentManager.getComments();
             this.comments = [...managerComments];
-        }
-    }
-    // Load comments from API directly into SDK
-    async loadCommentsFromAPI() {
-        try {
-            const data = await this.config.onFetchJsonFile();
-            const allComments = data?.comments || [];
-            this.comments = allComments; // Lưu tất cả comments
-            // Update comments count in table button
-            if (this.commentsTableButton) {
-                this.commentsTableButton.updateCommentsCount(this.comments.length);
-            }
-        }
-        catch (error) {
-            // console.error("Failed to load comments from API into SDK:", error);
         }
     }
     setupDOM() {

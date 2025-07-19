@@ -33,3 +33,6 @@ Thumbs.db
 # File lock của hệ thống cũ
 yarn.lock
 pnpm-lock.yamldemo/config.js
+
+# Ignore Chrome extension folder
+ui-comment-extension/

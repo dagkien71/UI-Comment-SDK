@@ -19,7 +19,6 @@ export declare class CommentSDK {
     private validateConfig;
     init(): Promise<void>;
     syncCommentsFromManager(): void;
-    private loadCommentsFromAPI;
     private setupDOM;
     private initializeUI;
     private toggleMode;

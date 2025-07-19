@@ -144,6 +144,9 @@ export class CommentSDK {
           const updatedComments = [...allComments, newComment];
           this.comments = updatedComments;
           await this.config.onUpdate(updatedComments);
+
+          // Sync với CommentManager và lưu localStorage
+          await this.commentManager.loadComments();
           return newComment;
         },
         onUpdateComment: async (updatedComment: Comment) => {
@@ -155,6 +158,9 @@ export class CommentSDK {
           );
           this.comments = updatedComments;
           await this.config.onUpdate(updatedComments);
+
+          // Sync với CommentManager và lưu localStorage
+          await this.commentManager.loadComments();
           return updatedComment;
         },
         onDeleteComment: async (commentId: string) => {
@@ -164,6 +170,9 @@ export class CommentSDK {
           const updatedComments = allComments.filter((c) => c.id !== commentId);
           this.comments = updatedComments;
           await this.config.onUpdate(updatedComments);
+
+          // Sync với CommentManager và lưu localStorage
+          await this.commentManager.loadComments();
         },
         onFetchJsonFile: this.config.onFetchJsonFile,
         onToggleModeSilent: async () => {
@@ -177,8 +186,16 @@ export class CommentSDK {
       // Initialize UI components
       this.initializeUI();
 
-      // Load comments from API directly into SDK
-      await this.loadCommentsFromAPI();
+      // Load comments using CommentManager (có fallback localStorage)
+      await this.commentManager.loadComments();
+
+      // Sync comments từ CommentManager về SDK
+      this.comments = this.commentManager.getComments();
+
+      // Update comments count in table button
+      if (this.commentsTableButton) {
+        this.commentsTableButton.updateCommentsCount(this.comments.length);
+      }
 
       // Check if we're navigating from sidebar and need to open a comment
       this.handleSidebarNavigation();
@@ -196,21 +213,6 @@ export class CommentSDK {
       this.comments = [...managerComments];
     } else {
       // console.warn("⚠️ CommentManager not available for sync");
-    }
-  }
-
-  // Load comments from API directly into SDK
-  private async loadCommentsFromAPI(): Promise<void> {
-    try {
-      const data = await this.config.onFetchJsonFile();
-      const allComments = data?.comments || [];
-      this.comments = allComments; // Lưu tất cả comments
-      // Update comments count in table button
-      if (this.commentsTableButton) {
-        this.commentsTableButton.updateCommentsCount(this.comments.length);
-      }
-    } catch (error) {
-      // console.error("Failed to load comments from API into SDK:", error);
     }
   }
 

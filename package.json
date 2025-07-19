@@ -23,7 +23,8 @@
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
     "prepublishOnly": "npm run build:npm",
-    "prepack": "npm run build:npm"
+    "prepack": "npm run build:npm",
+    "postbuild": "cp dist/ui-comment-sdk.min.js ui-comment-extension/ui-comment-sdk.min.js"
   },
   "keywords": [
     "comment",

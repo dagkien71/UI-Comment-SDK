@@ -650,11 +650,27 @@ export class CommentManager {
 
     try {
       const newComment = await this.config.onSaveComment(commentData);
-
       this.comments.push(newComment);
       this.createCommentBubble(newComment);
     } catch (error) {
-      console.error("Failed to create comment:", error);
+      console.error(
+        "Failed to create comment via API, saving to localStorage:",
+        error
+      );
+
+      // Tạo comment locally khi API thất bại
+      const newComment: Comment = {
+        ...commentData,
+        id: generateId(),
+        createdAt: new Date().toISOString(),
+      };
+
+      this.comments.push(newComment);
+      this.createCommentBubble(newComment);
+
+      // Lưu vào localStorage ngay cả khi API thất bại
+      this.saveCommentsToLocalStorage(this.comments);
+      console.log("✅ Comment saved to localStorage as fallback");
     }
   }
 
@@ -734,7 +750,17 @@ export class CommentManager {
 
     // Update comment via API if configured
     if (this.config.onUpdateComment) {
-      await this.config.onUpdateComment(comment);
+      try {
+        await this.config.onUpdateComment(comment);
+      } catch (error) {
+        console.error(
+          "Failed to update comment via API, saving to localStorage:",
+          error
+        );
+        // Lưu vào localStorage khi API thất bại
+        this.saveCommentsToLocalStorage(this.comments);
+        console.log("✅ Reply saved to localStorage as fallback");
+      }
     }
 
     // Update bubble
@@ -753,7 +779,17 @@ export class CommentManager {
 
     // Update comment via API if configured
     if (this.config.onUpdateComment) {
-      await this.config.onUpdateComment(comment);
+      try {
+        await this.config.onUpdateComment(comment);
+      } catch (error) {
+        console.error(
+          "Failed to resolve comment via API, saving to localStorage:",
+          error
+        );
+        // Lưu vào localStorage khi API thất bại
+        this.saveCommentsToLocalStorage(this.comments);
+        console.log("✅ Comment resolution saved to localStorage as fallback");
+      }
     }
 
     // Update bubble
@@ -788,7 +824,19 @@ export class CommentManager {
 
     // Update comment via API if configured
     if (this.config.onUpdateComment) {
-      await this.config.onUpdateComment(comment);
+      try {
+        await this.config.onUpdateComment(comment);
+      } catch (error) {
+        console.error(
+          "Failed to change comment status via API, saving to localStorage:",
+          error
+        );
+        // Lưu vào localStorage khi API thất bại
+        this.saveCommentsToLocalStorage(this.comments);
+        console.log(
+          "✅ Comment status change saved to localStorage as fallback"
+        );
+      }
     }
 
     // Update bubble
@@ -812,7 +860,13 @@ export class CommentManager {
       try {
         await this.config.onDeleteComment(commentId);
       } catch (error) {
-        console.error("Failed to delete comment:", error);
+        console.error(
+          "Failed to delete comment via API, saving to localStorage:",
+          error
+        );
+        // Lưu vào localStorage khi API thất bại
+        this.saveCommentsToLocalStorage(this.comments);
+        console.log("✅ Comment deletion saved to localStorage as fallback");
         return;
       }
     }
